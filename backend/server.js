@@ -13,10 +13,13 @@ app.use(express.urlencoded({ extended: true }));
 // Static files
 app.use('/uploads', express.static('uploads'));
 
-// MongoDB Connection
+// MongoDB Connection with increased timeout for international connections
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 30000, // Increase to 30 seconds
+    socketTimeoutMS: 45000, // Increase to 45 seconds
+    connectTimeoutMS: 30000 // Increase to 30 seconds
 })
     .then(() => console.log('✅ MongoDB Connected'))
     .catch(err => console.error('❌ MongoDB Connection Error:', err));
