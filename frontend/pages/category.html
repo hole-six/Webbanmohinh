@@ -11,7 +11,6 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <script src="../js/api.js"></script>
     <style>
         *,
         *::before,
@@ -536,7 +535,8 @@
             height: 140px;
             overflow: hidden;
             margin-bottom: 28px;
-            background: var(--charcoal);
+            background: var(--white);
+            border: 1px solid var(--border);
         }
 
         .cat-banner img {
@@ -545,7 +545,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: .55;
+            opacity: .15;
             transition: opacity .4s;
         }
 
@@ -553,7 +553,7 @@
             position: relative;
             z-index: 1;
             padding: 28px 36px;
-            color: var(--white);
+            color: var(--charcoal);
         }
 
         .cat-banner-text h2 {
@@ -562,11 +562,12 @@
             font-weight: 600;
             letter-spacing: .5px;
             margin-bottom: 4px;
+            color: var(--black);
         }
 
         .cat-banner-text p {
             font-size: 13px;
-            color: rgba(255, 255, 255, .65);
+            color: var(--mid);
             letter-spacing: .3px;
         }
 
@@ -1590,7 +1591,7 @@
         .mob-nav {
             display: none !important;
         }
-        
+
         @media(max-width:768px) {
             .mob-nav {
                 display: grid !important;
@@ -1614,12 +1615,12 @@
                 margin: 0;
                 padding-top: 0;
             }
-            
+
             body {
                 padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
             }
         }
-        
+
         @media(max-width:640px) {
             .mob-nav {
                 display: grid !important;
@@ -1627,7 +1628,7 @@
                 bottom: 0 !important;
             }
         }
-        
+
         @media(min-width:769px) {
             .mob-nav {
                 display: none !important;
@@ -1692,7 +1693,8 @@
     <!-- HEADER -->
     <header class="site-header">
         <div class="header-top">
-            <div class="logo"><a href="index.html">Figure Korea <span>Shop</span><img src="https://flagcdn.com/16x12/kr.png"></a></div>
+            <div class="logo"><a href="index.html">Figure Korea <span>Shop</span><img
+                        src="https://flagcdn.com/16x12/kr.png"></a></div>
 
             <nav class="header-nav">
                 <a href="index.html">Trang chủ</a>
@@ -1777,10 +1779,10 @@
                         <input class="price-inp" type="number" id="price-max" placeholder="Đến">
                     </div>
                     <div class="price-presets">
-                        <button class="price-opt" onclick="setPrice(0,500000,this)">Dưới ₩500.000</button>
-                        <button class="price-opt" onclick="setPrice(500000,1000000,this)">₩500.000 – ₩1.000.000</button>
-                        <button class="price-opt" onclick="setPrice(1000000,5000000,this)">₩1.000.000 – ₩5.000.000</button>
-                        <button class="price-opt" onclick="setPrice(5000000,999999999,this)">Trên ₩5.000.000</button>
+                        <button class="price-opt" onclick="setPrice(0,500000,this)">Dưới 50w</button>
+                        <button class="price-opt" onclick="setPrice(500000,1000000,this)">50w – 100w</button>
+                        <button class="price-opt" onclick="setPrice(1000000,2000000,this)">100w – 200w</button>
+                        <button class="price-opt" onclick="setPrice(2000000,999999999,this)">Trên 200w</button>
                     </div>
                     <button class="btn-apply" onclick="applyFilters()">Áp dụng</button>
                 </div>
@@ -1793,8 +1795,7 @@
 
             <!-- BANNER -->
             <div class="cat-banner" id="cat-banner">
-                <img id="banner-img"
-                    src="https://images.unsplash.com/photo-1531525645387-7f14be1bdbbd?w=1400&h=300&fit=crop" alt="">
+
                 <div class="cat-banner-text">
                     <h2 id="banner-title">Tất cả sản phẩm</h2>
                     <p id="banner-desc">Khám phá bộ sưu tập mô hình cao cấp chính hãng</p>
@@ -1864,26 +1865,42 @@
 
         // ── Init ──
         document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🔄 Loading category page...');
+
             await window.initApp();
+
+            console.log('📁 Categories loaded:', window.categories);
+            console.log('📦 Products loaded:', window.products);
+
             const p = new URLSearchParams(location.search);
             const slug = p.get('cat');
+
+            console.log('🔍 Category slug:', slug);
+
             if (slug) {
-                const c = categories.find(x => x.slug === slug);
-                if (c) activeCatId = c.id;
+                const c = window.categories.find(x => x.slug === slug);
+                if (c) {
+                    activeCatId = c.id;
+                    console.log('✅ Active category ID:', activeCatId);
+                }
             }
-            loadCart(); updateCartUI();
+
+            loadCart();
+            updateCartUI();
             buildSidebar();
             buildFooterCats();
             updateBanner();
             applyFilters();
+
+            console.log('✅ Category page loaded');
         });
 
         // ── Sidebar ──
         function buildSidebar() {
-            document.getElementById('cnt-all').textContent = products.length;
+            document.getElementById('cnt-all').textContent = window.products.length;
             const el = document.getElementById('cat-items');
-            el.innerHTML = categories.map(c => {
-                const n = products.filter(p => p.categoryId === c.id).length;
+            el.innerHTML = window.categories.map(c => {
+                const n = window.products.filter(p => p.categoryId === c.id).length;
                 return `<div class="cat-row" id="cr-${c.id}" onclick="selectCategory(${c.id})">
       <span class="cat-n">${c.name}</span>
       <span class="cat-c">${n}</span>
@@ -1893,8 +1910,10 @@
         }
 
         function buildFooterCats() {
-            document.getElementById('footer-cats').innerHTML =
-                categories.map(c => `<li><a href="category.html?cat=${c.slug}">${c.name}</a></li>`).join('');
+            const footerCats = document.getElementById('footer-cats');
+            if (footerCats && window.categories && window.categories.length > 0) {
+                footerCats.innerHTML = window.categories.map(c => `<li><a href="category.html?cat=${c.slug}">${c.name}</a></li>`).join('');
+            }
         }
 
         function selectCategory(id) {
@@ -1914,7 +1933,7 @@
         // Convert Google Drive link to direct image link
         function convertGoogleDriveLink(url) {
             if (!url) return '';
-            
+
             // Check if it's a Google Drive link
             const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
             if (driveMatch) {
@@ -1922,7 +1941,7 @@
                 // Convert to direct image link
                 return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
             }
-            
+
             // If already a direct link or other URL, return as is
             return url;
         }
@@ -1934,13 +1953,12 @@
             const bc = document.getElementById('bc-cur');
             const ttl = document.getElementById('page-title');
             if (!activeCatId) {
-                img.src = 'https://images.unsplash.com/photo-1531525645387-7f14be1bdbbd?w=1400&h=300&fit=crop';
                 h2.textContent = 'Tất cả sản phẩm';
                 par.textContent = 'Khám phá bộ sưu tập mô hình cao cấp chính hãng';
                 bc.textContent = 'Tất cả sản phẩm';
                 ttl.textContent = 'Danh Mục Sản Phẩm — Figure Korea Shop';
             } else {
-                const c = categories.find(x => x.id === activeCatId);
+                const c = window.categories.find(x => x.id === activeCatId);
                 if (c) {
                     img.src = convertGoogleDriveLink(c.image) || 'https://images.unsplash.com/photo-1531525645387-7f14be1bdbbd?w=1400&h=300&fit=crop';
                     h2.textContent = c.name;
@@ -1963,16 +1981,29 @@
 
         // ── Filters ──
         function applyFilters() {
+            console.log('🔍 Applying filters...');
+            console.log('📦 window.products:', window.products);
+            console.log('🎯 activeCatId:', activeCatId);
+
             const kw = (document.getElementById('search-inp')?.value || '').toLowerCase().trim();
             sortMode = document.getElementById('sort-sel').value;
-            const mnv = parseFloat(document.getElementById('price-min').value);
-            const mxv = parseFloat(document.getElementById('price-max').value);
-            if (!isNaN(mnv)) priceMin = mnv;
-            if (!isNaN(mxv)) priceMax = mxv;
+            const minInput = document.getElementById('price-min').value;
+            const maxInput = document.getElementById('price-max').value;
 
-            let list = [...products];
-            if (activeCatId) list = list.filter(p => p.categoryId === activeCatId);
+            priceMin = minInput ? parseFloat(minInput) : 0;
+            priceMax = maxInput ? parseFloat(maxInput) : Infinity;
+
+            let list = [...(window.products || [])];
+            console.log('📋 Initial list length:', list.length);
+
+            if (activeCatId) {
+                list = list.filter(p => p.categoryId === activeCatId);
+                console.log('📋 After category filter:', list.length);
+            }
+
             list = list.filter(p => p.price >= (priceMin || 0) && p.price <= (priceMax || Infinity));
+            console.log('📋 After price filter:', list.length);
+
             if (kw) list = list.filter(p =>
                 p.name.toLowerCase().includes(kw) || (p.description || '').toLowerCase().includes(kw));
 
@@ -1989,6 +2020,8 @@
             }
 
             filtered = list;
+            console.log('✅ Final filtered list:', filtered.length);
+
             renderActiveFilters();
             renderGrid();
             renderPagination();
@@ -2001,14 +2034,14 @@
             const wrap = document.getElementById('active-filters');
             const tags = [];
             if (activeCatId) {
-                const c = categories.find(x => x.id === activeCatId);
+                const c = window.categories.find(x => x.id === activeCatId);
                 if (c) tags.push({ label: c.name, rm: () => { activeCatId = null; syncCatUI(); updateBanner(); applyFilters(); } });
             }
             const kw = document.getElementById('search-inp')?.value;
             if (kw) tags.push({ label: '"' + kw + '"', rm: () => { document.getElementById('search-inp').value = ''; applyFilters(); } });
             if (priceMin > 0 || priceMax < Infinity) {
                 tags.push({
-                    label: formatPrice(priceMin || 0) + ' – ' + (priceMax < 999999999 ? formatPrice(priceMax) : '∞'),
+                    label: window.API.formatPrice(priceMin || 0) + ' – ' + (priceMax < 999999999 ? window.API.formatPrice(priceMax) : '∞'),
                     rm: () => { priceMin = 0; priceMax = Infinity; document.getElementById('price-min').value = ''; document.getElementById('price-max').value = ''; document.querySelectorAll('.price-opt').forEach(b => b.classList.remove('active')); applyFilters(); }
                 });
             }
@@ -2046,8 +2079,8 @@
 
         function renderCard(p) {
             const img = p.images?.[0] || p.image || '';
-            const brand = brands.find(b => b.id === p.brandId);
-            const disc = p.oldPrice ? getDiscountPercent(p.price, p.oldPrice) : 0;
+            const brand = window.brands.find(b => b.id === p.brandId);
+            const disc = p.oldPrice ? window.API.getDiscountPercent(p.price, p.oldPrice) : 0;
             const low = p.stock > 0 && p.stock <= 5;
             const isW = wished.has(p.id);
 
@@ -2082,8 +2115,8 @@
       ${ratingHTML}
       ${low ? `<div class="stock-warn">Chỉ còn ${p.stock} sản phẩm</div>` : ''}
       <div class="pcard-price">
-        <span class="price-now">${formatPrice(p.price)}</span>
-        ${p.oldPrice ? `<span class="price-was">${formatPrice(p.oldPrice)}</span><span class="price-off">-${disc}%</span>` : ''}
+        <span class="price-now">${window.API.formatPrice(p.price)}</span>
+        ${p.oldPrice ? `<span class="price-was">${window.API.formatPrice(p.oldPrice)}</span><span class="price-off">-${disc}%</span>` : ''}
       </div>
       <button class="btn-add" onclick="location.href='product-detail.html?id=${p.id}'">Mua ngay</button>
     </div>
@@ -2185,13 +2218,15 @@
             </svg>
             <span>Sản phẩm</span>
         </a>
-        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item mess" target="_blank" rel="noopener">
+        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item mess" target="_blank"
+            rel="noopener">
             <svg viewBox="0 0 24 24">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
             <span>Messenger</span>
         </a>
-        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item fb" target="_blank" rel="noopener">
+        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item fb" target="_blank"
+            rel="noopener">
             <svg viewBox="0 0 24 24">
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
             </svg>

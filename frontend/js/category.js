@@ -13,39 +13,72 @@ function getCategoryFromURL() {
 
 // Load page data
 async function loadCategoryPage() {
+    // Show loading state
+    showLoading();
+    
     try {
-        // Load categories first
+        console.log('🔄 Starting to load category page...');
+        
+        // Load categories first and wait for it
         const categoriesData = await API.getAllCategories();
+        console.log('📁 Categories loaded:', categoriesData);
+        
         if (categoriesData.success) {
             categories = categoriesData.data;
             loadTopCategories();
         }
 
-        // Load products
+        // Get category slug from URL
         const categorySlug = getCategoryFromURL();
-        if (categorySlug) {
+        console.log('🔍 Category slug from URL:', categorySlug);
+        
+        // Find current category from loaded categories
+        if (categorySlug && categories.length > 0) {
             currentCategory = categories.find(c => c.slug === categorySlug);
-            if (currentCategory) {
-                const productsData = await API.getProductsByCategory(currentCategory.id);
-                if (productsData.success) {
-                    allProducts = productsData.data;
-                    filteredProducts = [...allProducts];
-                }
-            }
-        } else {
-            const productsData = await API.getAllProducts();
-            if (productsData.success) {
-                allProducts = productsData.data;
-                filteredProducts = [...allProducts];
-            }
+            console.log('✅ Current category found:', currentCategory);
         }
 
-        // Render categories list after products are loaded
+        // Load products based on category
+        let productsData;
+        if (currentCategory) {
+            console.log('📦 Loading products for category ID:', currentCategory.id);
+            productsData = await API.getProductsByCategory(currentCategory.id);
+        } else {
+            console.log('📦 Loading all products...');
+            productsData = await API.getAllProducts({ limit: 100 });
+        }
+        
+        console.log('📦 Products loaded:', productsData);
+        
+        if (productsData.success) {
+            allProducts = productsData.data;
+            filteredProducts = [...allProducts];
+            console.log('✅ Total products:', allProducts.length);
+        } else {
+            console.error('❌ Failed to load products:', productsData.message);
+            allProducts = [];
+            filteredProducts = [];
+        }
+
+        // Render UI after all data is loaded
         renderCategoriesList();
         updateCategoryBanner();
         displayProducts();
+        
+        console.log('✅ Category page loaded successfully');
     } catch (error) {
-        console.error('Error loading category page:', error);
+        console.error('❌ Error loading category page:', error);
+        // Show error message to user
+        const grid = document.getElementById('products-list');
+        if (grid) {
+            grid.innerHTML = `
+                <div class="empty" style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                    <h3 style="font-size: 18px; margin-bottom: 10px;">Lỗi tải dữ liệu</h3>
+                    <p style="color: #999; margin-bottom: 20px;">Vui lòng thử lại sau</p>
+                    <button onclick="location.reload()" style="padding: 10px 20px; background: #8b1a1a; color: white; border: none; border-radius: 4px; cursor: pointer;">Tải lại trang</button>
+                </div>
+            `;
+        }
     }
 }
 
@@ -117,10 +150,10 @@ function displayProducts() {
 
     if (filteredProducts.length === 0) {
         grid.innerHTML = `
-            <div class="empty">
-                <h3>Không tìm thấy sản phẩm</h3>
-                <p>Thử thay đổi bộ lọc hoặc tìm kiếm khác</p>
-                <button onclick="window.location.href='category.html'">Xem tất cả</button>
+            <div class="empty" style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                <h3 style="font-size: 18px; margin-bottom: 10px;">Không tìm thấy sản phẩm</h3>
+                <p style="color: #999; margin-bottom: 20px;">Thử thay đổi bộ lọc hoặc tìm kiếm khác</p>
+                <button onclick="window.location.href='category.html'" style="padding: 10px 20px; background: #8b1a1a; color: white; border: none; border-radius: 4px; cursor: pointer;">Xem tất cả</button>
             </div>
         `;
         return;
@@ -154,6 +187,25 @@ function displayProducts() {
             </div>
         `;
     }).join('');
+}
+
+// Show loading state
+function showLoading() {
+    const grid = document.getElementById('products-list');
+    const resultCount = document.getElementById('results-count');
+    
+    if (grid) {
+        grid.innerHTML = `
+            <div class="empty" style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                <h3 style="font-size: 18px; margin-bottom: 10px;">Đang tải sản phẩm...</h3>
+                <p style="color: #999;">Vui lòng đợi</p>
+            </div>
+        `;
+    }
+    
+    if (resultCount) {
+        resultCount.textContent = '0';
+    }
 }
 
 // Filter by price

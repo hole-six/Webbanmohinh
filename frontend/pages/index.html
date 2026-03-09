@@ -1433,7 +1433,7 @@
                 padding-bottom: env(safe-area-inset-bottom, 0px);
             }
         }
-        
+
         @media(min-width:769px) {
             .mob-nav {
                 display: none !important;
@@ -1496,7 +1496,8 @@
     <!-- HEADER -->
     <header class="site-header">
         <div class="header-inner">
-            <div class="logo"><a href="index.html">Figure Korea <span>Shop</span><img src="https://flagcdn.com/16x12/kr.png"></a></div>
+            <div class="logo"><a href="index.html">Figure Korea <span>Shop</span><img
+                        src="https://flagcdn.com/16x12/kr.png"></a></div>
 
             <nav class="header-nav">
                 <a href="index.html">Trang chủ</a>
@@ -1564,22 +1565,6 @@
         </div>
     </section>
 
-    <!-- POSTER BANNER -->
-    <section class="poster">
-        <img src="https://images.unsplash.com/photo-1635805737707-575885ab0820?w=1600&h=500&fit=crop&q=85"
-            alt="Collection Banner">
-        <div class="poster-overlay">
-            <div class="poster-label">Bộ sưu tập mới</div>
-            <h2 class="poster-title">Avengers Series — Scale 1/9</h2>
-            <div class="poster-sub">Mô hình chính hãng, chi tiết sắc nét, chất lượng premium</div>
-            <a href="category.html?cat=marvel" class="poster-btn">
-                Khám phá ngay
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="m9 18 6-6-6-6" />
-                </svg>
-            </a>
-        </div>
-    </section>
 
     <!-- SALE PRODUCTS -->
     <section class="products-section" id="sale">
@@ -1761,26 +1746,26 @@
         // Convert Google Drive link to direct image link
         function convertGoogleDriveLink(url) {
             if (!url) return '';
-            
+
             // Check if it's a Google Drive link
             const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
             if (driveMatch) {
                 const fileId = driveMatch[1];
                 return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
             }
-            
+
             return url;
         }
 
         function renderHeroGrid() {
             const grid = document.getElementById('hero-grid');
             if (!grid) return;
-            
+
             // Use categories from API loaded in main.js
             if (!window.categories || window.categories.length === 0) {
                 return;
             }
-            
+
             grid.innerHTML = window.categories.slice(0, 4).map(cat => {
                 const imageUrl = convertGoogleDriveLink(cat.image);
                 return `
@@ -1801,27 +1786,27 @@
         function renderFeaturedProducts() {
             const grid = document.getElementById('featured-products-grid');
             if (!grid) return;
-            
+
             // Use products from API loaded in main.js
             if (!window.products || window.products.length === 0) {
                 grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px"><div style="font-size:14px;color:var(--muted)">Đang tải sản phẩm...</div></div>';
                 return;
             }
-            
+
             grid.innerHTML = window.products.map(renderProductCard).join('');
         }
 
         function renderSaleProducts() {
             const grid = document.getElementById('sale-products-grid');
             if (!grid) return;
-            
+
             // Filter products with oldPrice (sale products)
             const saleProducts = window.products ? window.products.filter(p => p.oldPrice) : [];
             if (saleProducts.length === 0) {
                 grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px"><div style="font-size:14px;color:var(--muted)">Chưa có sản phẩm sale</div></div>';
                 return;
             }
-            
+
             grid.innerHTML = saleProducts.map(renderProductCard).join('');
         }
 
@@ -1935,10 +1920,10 @@
         function buildFooterCats() {
             const el = document.getElementById('footer-cats');
             if (!el) return;
-            
+
             // Use categories from API
             if (!window.categories) return;
-            
+
             el.innerHTML = window.categories.map(c => `<li><a href="category.html?cat=${c.slug}">${c.name}</a></li>`).join('');
         }
 
@@ -1946,10 +1931,10 @@
         function buildCatNav() {
             const el = document.getElementById('cat-nav-bar');
             if (!el) return;
-            
+
             // Use categories from API
             if (!window.categories) return;
-            
+
             el.innerHTML = `<a href="category.html" class="cat-nav-link all">Tất cả</a>` +
                 window.categories.map(c => `<a href="category.html?cat=${c.slug}" class="cat-nav-link">${c.name}</a>`).join('');
         }
@@ -2001,13 +1986,15 @@
             </svg>
             <span>Sản phẩm</span>
         </a>
-        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item mess" target="_blank" rel="noopener">
+        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item mess" target="_blank"
+            rel="noopener">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
             <span>Messenger</span>
         </a>
-        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item fb" target="_blank" rel="noopener">
+        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item fb" target="_blank"
+            rel="noopener">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
             </svg>
