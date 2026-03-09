@@ -1481,7 +1481,7 @@
     <!-- HEADER -->
     <header class="site-header">
         <div class="header-inner">
-            <div class="logo"><a href="index.html">Figure Korea <span>Shop</span></a></div>
+            <div class="logo"><a href="index.html">🇰🇷 Figure Korea <span>Shop</span></a></div>
 
             <nav class="header-nav">
                 <a href="index.html">Trang chủ</a>
@@ -1510,7 +1510,7 @@
                         <path d="M16 10a4 4 0 0 1-8 0" />
                     </svg>
                     <span class="cnt" id="cart-count-badge">0</span>
-                    <span class="total" id="cart-total-display">0đ</span>
+                    <span class="total" id="cart-total-display">₩0</span>
                 </div>
             </div>
         </div>
@@ -1625,9 +1625,9 @@
                 <input type="hidden" id="edit-category">
                 <label>Tên sản phẩm</label>
                 <input type="text" id="edit-name" required>
-                <label>Giá (VNĐ)</label>
+                <label>Giá (₩ Won)</label>
                 <input type="number" id="edit-price" required>
-                <label>Giá gốc (VNĐ — để trống nếu không giảm)</label>
+                <label>Giá gốc (₩ Won — để trống nếu không giảm)</label>
                 <input type="number" id="edit-oldPrice">
                 <label>Link ảnh</label>
                 <input type="url" id="edit-image" required placeholder="https://...">
@@ -1650,9 +1650,9 @@
                 <input type="hidden" id="add-category">
                 <label>Tên sản phẩm</label>
                 <input type="text" id="add-name" required placeholder="Nhập tên sản phẩm...">
-                <label>Giá (VNĐ)</label>
+                <label>Giá (₩ Won)</label>
                 <input type="number" id="add-price" required placeholder="VD: 500000">
-                <label>Giá gốc (VNĐ — tùy chọn)</label>
+                <label>Giá gốc (₩ Won — tùy chọn)</label>
                 <input type="number" id="add-oldPrice" placeholder="Để trống nếu không giảm giá">
                 <label>Link ảnh</label>
                 <input type="url" id="add-image" required placeholder="https://images.unsplash.com/...">
@@ -1682,9 +1682,9 @@
         }
 
         function formatPrice(price) {
-            return new Intl.NumberFormat('vi-VN', {
+            return new Intl.NumberFormat('ko-KR', {
                 style: 'currency',
-                currency: 'VND'
+                currency: 'KRW'
             }).format(price);
         }
 

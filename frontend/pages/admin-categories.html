@@ -229,6 +229,13 @@
                 <label>Slug (tự động từ tên)</label>
                 <input type="text" id="slug" placeholder="transformers">
             </div>
+            <div class="form-group">
+                <label>URL Ảnh Danh Mục</label>
+                <input type="text" id="image" placeholder="https://example.com/image.jpg">
+                <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                    Nhập URL ảnh cho danh mục (không bắt buộc)
+                </small>
+            </div>
             <button class="btn btn-primary" onclick="save()" id="saveBtn">💾 Thêm Danh Mục</button>
             <button class="btn btn-warning" onclick="cancelEdit()" id="cancelBtn"
                 style="display:none; margin-left: 10px;">❌ Hủy</button>
@@ -253,7 +260,9 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        const API = 'http://localhost:5000/api';
+        const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:5000/api'
+            : 'https://mohinhcaocap.wavestore.id.vn/api';
         let token = localStorage.getItem('admin_token');
 
         if (!token) {
@@ -301,7 +310,10 @@
             document.getElementById('list').innerHTML = data.data.map(c => `
                 <tr>
                     <td>${c.id}</td>
-                    <td>${c.name}</td>
+                    <td>
+                        ${c.image ? `<img src="${c.image}" alt="${c.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 8px; vertical-align: middle;">` : ''}
+                        ${c.name}
+                    </td>
                     <td>${c.slug}</td>
                     <td>
                         <button class="btn btn-warning" onclick="edit(${c.id})">✏️ Sửa</button>
@@ -315,6 +327,7 @@
             const editId = document.getElementById('editId').value;
             const name = document.getElementById('name').value.trim();
             const slug = document.getElementById('slug').value.trim();
+            const image = document.getElementById('image').value.trim();
 
             if (!name) {
                 showToast('Vui lòng nhập tên danh mục!', 'error');
@@ -324,7 +337,7 @@
             const category = {
                 name: name,
                 slug: slug || name.toLowerCase().replace(/\s+/g, '-'),
-                image: ''
+                image: image || ''
             };
 
             if (!editId) {
@@ -362,6 +375,7 @@
                 document.getElementById('editId').value = numericId;
                 document.getElementById('name').value = data.data.name;
                 document.getElementById('slug').value = data.data.slug;
+                document.getElementById('image').value = data.data.image || '';
                 document.getElementById('formTitle').textContent = '✏️ Sửa Danh Mục';
                 document.getElementById('saveBtn').textContent = '💾 Cập Nhật';
                 document.getElementById('cancelBtn').style.display = 'inline-block';
@@ -374,6 +388,7 @@
             document.getElementById('editId').value = '';
             document.getElementById('name').value = '';
             document.getElementById('slug').value = '';
+            document.getElementById('image').value = '';
             document.getElementById('formTitle').textContent = '➕ Thêm Danh Mục Mới';
             document.getElementById('saveBtn').textContent = '💾 Thêm Danh Mục';
             document.getElementById('cancelBtn').style.display = 'none';
