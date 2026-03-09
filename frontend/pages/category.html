@@ -1588,7 +1588,7 @@
 
         /* ─── MOBILE BOTTOM NAV ─── */
         .mob-nav {
-            display: none;
+            display: none !important;
         }
         
         @media(max-width:768px) {
@@ -1625,6 +1625,12 @@
                 display: grid !important;
                 position: fixed !important;
                 bottom: 0 !important;
+            }
+        }
+        
+        @media(min-width:769px) {
+            .mob-nav {
+                display: none !important;
             }
         }
 
