@@ -1,8 +1,8 @@
 // API Client for Frontend
 // Auto-detect API URL based on environment
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:5000/api'  // Local development
-    : 'http://mohinhcaocap.wavestore.id.vn/api';  // Production
+    ? 'http://localhost:5001/api'  // Local development
+    : 'http://mohinhcaocap.wavestore.id.vn/api';  // Production (nginx proxy)
 
 // ============================================
 // PRODUCTS API
