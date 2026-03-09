@@ -1705,7 +1705,7 @@
                 padding-bottom: env(safe-area-inset-bottom, 0px);
             }
         }
-        
+
         @media(min-width:769px) {
             .mob-nav {
                 display: none !important;
@@ -1767,12 +1767,13 @@
 
 <body>
 
-    
+
 
     <!-- HEADER -->
     <header class="site-header">
         <div class="header-inner">
-            <div class="logo"><a href="index.html">Figure Korea <span>Shop</span><img src="https://flagcdn.com/16x12/kr.png"></a></div>
+            <div class="logo"><a href="index.html">Figure Korea <span>Shop</span><img
+                        src="https://flagcdn.com/16x12/kr.png"></a></div>
             <nav class="header-nav">
                 <a href="index.html">Trang chủ</a>
                 <a href="category.html">Sản phẩm</a>
@@ -1857,7 +1858,8 @@
                     <div class="price-save" id="price-save" style="display:none"></div>
                 </div>
                 <div class="contact-cta">
-                    <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" target="_blank" class="btn-mess" style="flex: 1;">
+                    <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" target="_blank"
+                        class="btn-mess" style="flex: 1;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                             <path
                                 d="M12 2C6.36 2 2 6.13 2 11.7c0 2.91 1.19 5.44 3.14 7.17.16.14.26.34.27.56l.05 1.74a.75.75 0 0 0 1.06.67l1.94-.86c.17-.07.36-.09.53-.04.95.26 1.96.4 2.98.4 5.64 0 10-4.13 10-9.7S17.64 2 12 2zm4.93 7.57-2.9 4.6a1.4 1.4 0 0 1-2.02.37l-2.31-1.73a.56.56 0 0 0-.67 0l-3.12 2.37c-.42.31-.97-.19-.7-.65l2.9-4.6a1.4 1.4 0 0 1 2.02-.37l2.31 1.73c.2.15.48.14.67 0l3.12-2.37c.42-.31.97.19.7.65z" />
@@ -1968,7 +1970,7 @@
     <script>
         // ── State ──
         let product = null, images = [], lbIdx = 0, wished = false;
-        
+
         // Helper function to get product from local data
         function getProductById(id) {
             return window.products?.find(p => p._id === id || p.id === id);
@@ -1978,7 +1980,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await window.initApp();
             const id = new URLSearchParams(location.search).get('id');
-            
+
             // Try to get product from API first (for newly created products)
             if (id) {
                 try {
@@ -1995,18 +1997,18 @@
                     product = getProductById(id);
                 }
             }
-            
+
             // If still no product found, show error
             if (!product) {
                 showNotFound();
                 return;
             }
-            
-            loadCart(); 
+
+            loadCart();
             updateCartUI();
             renderProduct();
             buildFooterCats();
-            
+
             // keyboard nav
             document.addEventListener('keydown', e => {
                 if (!document.getElementById('lightbox').classList.contains('open')) return;
@@ -2015,15 +2017,18 @@
                 if (e.key === 'Escape') closeLightbox();
             });
         });
-        
+
         function showNotFound() {
-            document.querySelector('.prod-detail-wrap').innerHTML = `
-                <div style="text-align: center; padding: 80px 20px;">
-                    <h2 style="font-size: 24px; margin-bottom: 16px; color: var(--charcoal);">Sản phẩm không tồn tại</h2>
-                    <p style="color: var(--muted); margin-bottom: 24px;">Sản phẩm bạn đang tìm không tồn tại hoặc đã bị xóa.</p>
-                    <a href="category.html" style="display: inline-block; padding: 12px 24px; background: var(--charcoal); color: white; border-radius: 4px; text-decoration: none;">Quay lại danh sách sản phẩm</a>
-                </div>
-            `;
+            const mainEl = document.querySelector('.page-main');
+            if (mainEl) {
+                mainEl.innerHTML = `
+                    <div style="text-align: center; padding: 80px 20px;">
+                        <h2 style="font-size: 24px; margin-bottom: 16px; color: var(--charcoal);">Sản phẩm không tồn tại</h2>
+                        <p style="color: var(--muted); margin-bottom: 24px;">Sản phẩm bạn đang tìm không tồn tại hoặc đã bị xóa.</p>
+                        <a href="category.html" style="display: inline-block; padding: 12px 24px; background: var(--charcoal); color: white; border-radius: 4px; text-decoration: none;">Quay lại danh sách sản phẩm</a>
+                    </div>
+                `;
+            }
         }
 
         function renderProduct() {
@@ -2036,8 +2041,8 @@
             document.getElementById('bc-name').textContent = p.name;
 
             // Category & Brand
-            const cat = categories.find(c => c.id === p.categoryId);
-            const brand = brands.find(b => b.id === p.brandId);
+            const cat = window.categories.find(c => c.id == p.categoryId);
+            const brand = window.brands.find(b => b.id == p.brandId);
             document.getElementById('prod-cat').textContent = (brand?.name || '') + (cat ? ' · ' + cat.name : '');
             document.getElementById('prod-name').textContent = p.name;
 
@@ -2145,8 +2150,8 @@
         function renderSpecs() {
             const p = product;
             const specs = p.specifications || p.specs || {
-                'Thương hiệu': brands.find(b => b.id === p.brandId)?.name || '—',
-                'Danh mục': categories.find(c => c.id === p.categoryId)?.name || '—',
+                'Thương hiệu': window.brands.find(b => b.id == p.brandId)?.name || '—',
+                'Danh mục': window.categories.find(c => c.id == p.categoryId)?.name || '—',
                 'Tình trạng': p.stock > 0 ? 'Còn hàng' : 'Hết hàng',
             };
             if (p.height) specs['Chiều cao'] = p.height;
@@ -2220,18 +2225,18 @@
 
         function renderRelated() {
             const p = product;
-            const related = products.filter(x => x.id !== p.id && x.categoryId === p.categoryId).slice(0, 4);
+            const related = window.products.filter(x => x.id != p.id && x.categoryId == p.categoryId).slice(0, 4);
             if (!related.length) { document.querySelector('.related-section').style.display = 'none'; return; }
 
             document.getElementById('related-grid').innerHTML = related.map(r => {
                 const img = r.images?.[0] || r.image || '';
-                const brand = brands.find(b => b.id === r.brandId);
-                const disc = r.oldPrice ? getDiscountPercent(r.price, r.oldPrice) : 0;
+                const brand = window.brands.find(b => b.id == r.brandId);
+                const disc = r.oldPrice ? window.API.getDiscountPercent(r.price, r.oldPrice) : 0;
                 let badgeHTML = '';
                 if (r.badge === 'HOT') badgeHTML = `<div class="rbadge rb-hot">Hot</div>`;
                 else if (r.badge === 'NEW') badgeHTML = `<div class="rbadge rb-new">New</div>`;
                 else if (disc > 0) badgeHTML = `<div class="rbadge rb-disc">-${disc}%</div>`;
-                return `<div class="rcard" onclick="location.href='product-detail.html?id=${r.id}'">
+                return `<div class="rcard" onclick="location.href='product-detail.html?id=${r.id || r._id}'">
       <div class="rcard-img">
         <img src="${img}" alt="${r.name}" loading="lazy">
         ${badgeHTML}
@@ -2240,8 +2245,8 @@
         <div class="rcard-brand">${brand?.name || ''}</div>
         <div class="rcard-name">${r.name}</div>
         <div class="rcard-price">
-          <span class="rp-now">${formatPrice(r.price)}</span>
-          ${r.oldPrice ? `<span class="rp-was">${formatPrice(r.oldPrice)}</span>` : ''}
+          <span class="rp-now">${window.API.formatPrice(r.price)}</span>
+          ${r.oldPrice ? `<span class="rp-was">${window.API.formatPrice(r.oldPrice)}</span>` : ''}
         </div>
       </div>
     </div>`;
@@ -2325,13 +2330,15 @@
             </svg>
             <span>Sản phẩm</span>
         </a>
-        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item mess" target="_blank" rel="noopener">
+        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item mess" target="_blank"
+            rel="noopener">
             <svg viewBox="0 0 24 24">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
             <span>Messenger</span>
         </a>
-        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item fb" target="_blank" rel="noopener">
+        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item fb" target="_blank"
+            rel="noopener">
             <svg viewBox="0 0 24 24">
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
             </svg>
@@ -2341,8 +2348,6 @@
 
     <!-- API Client -->
     <script src="../js/api.js"></script>
-    <!-- Product Detail JS -->
-    <script src="../js/product-detail.js"></script>
 </body>
 
 </html>
