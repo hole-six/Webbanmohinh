@@ -645,7 +645,7 @@ function searchProducts(keyword) {
 
 // Format giá
 function formatPrice(price) {
-    return price.toLocaleString('vi-VN') + 'đ';
+    return '₩' + price.toLocaleString('ko-KR');
 }
 
 // Tính phần trăm giảm giá

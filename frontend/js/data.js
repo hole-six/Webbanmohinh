@@ -154,7 +154,7 @@ const heroGridItems = [
 
 // Format giá tiền
 function formatPrice(price) {
-    return price.toLocaleString('vi-VN') + 'VNĐ';
+    return '₩' + price.toLocaleString('ko-KR');
 }
 
 // Render sản phẩm

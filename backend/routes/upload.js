@@ -2,46 +2,45 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-const { authMiddleware } = require('../middleware/auth');
 
-// Make sure uploads directory exists
-const uploadDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Multer config
+// Configure multer storage
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'uploads/');
     },
     filename: function (req, file, cb) {
-        cb(null, 'img-' + Date.now() + Math.round(Math.random() * 1E9) + path.extname(file.originalname));
+        const uniqueSuffix = Date.now() + Math.random().toString(36).substring(2, 15);
+        cb(null, 'img-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
+
+// File filter
+const fileFilter = (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (mimetype && extname) {
+        return cb(null, true);
+    } else {
+        cb(new Error('Only image files are allowed!'));
+    }
+};
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-    fileFilter: function (req, file, cb) {
-        const filetypes = /jpeg|jpg|png|webp|gif/;
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = filetypes.test(file.mimetype);
-
-        if (mimetype && extname) {
-            return cb(null, true);
-        } else {
-            cb(new Error('Chỉ cho phép upload hình ảnh!'));
-        }
-    }
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: fileFilter
 });
 
-// Endpoint upload 1 hình ảnh
-router.post('/', authMiddleware, upload.single('image'), (req, res) => {
+// POST /api/upload - Upload single image
+router.post('/', upload.single('image'), (req, res) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ success: false, message: 'Chưa chọn file ảnh nào' });
+            return res.status(400).json({
+                success: false,
+                message: 'No file uploaded'
+            });
         }
 
         // Get protocol and host from request
@@ -49,24 +48,16 @@ router.post('/', authMiddleware, upload.single('image'), (req, res) => {
         const host = req.get('host');
         const fullUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
 
-        res.status(200).json({
+        res.json({
             success: true,
             message: 'Upload thành công',
             url: fullUrl
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 });
 
-// Add error handling middleware for Multer
-router.use((err, req, res, next) => {
-    if (err instanceof multer.MulterError) {
-        return res.status(400).json({ success: false, message: 'Lỗi Multer: ' + err.message });
-    } else if (err) {
-        return res.status(400).json({ success: false, message: err.message });
-    }
-    next();
-});
-
-module.exports = router;

@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">Chi Tiết Sản Phẩm — Mô Hình Cao Cấp</title>
+    <title id="page-title">Chi Tiết Sản Phẩm — Figure Korea Shop</title>
     <meta name="description" content="Chi tiết sản phẩm mô hình cao cấp chính hãng">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Roboto:wght@700;800;900&display=swap"
         rel="stylesheet">
     <script src="../js/api.js"></script>
     <style>
@@ -486,11 +486,13 @@
         }
 
         .price-now {
-            font-family: var(--f-serif);
-            font-size: 32px;
-            font-weight: 700;
+            font-family: 'Roboto', 'Inter', var(--f-sans);
+            font-size: 42px;
+            font-weight: 800;
             color: var(--accent);
-            letter-spacing: -.5px;
+            letter-spacing: -1px;
+            text-shadow: 0 2px 4px rgba(139, 26, 26, 0.1);
+            line-height: 1.1;
         }
 
         .price-row {
@@ -502,24 +504,27 @@
         }
 
         .price-was {
-            font-size: 16px;
+            font-size: 18px;
             color: var(--light);
             text-decoration: line-through;
+            font-weight: 500;
         }
 
         .price-off {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             letter-spacing: .5px;
-            padding: 2px 7px;
+            padding: 3px 9px;
             background: var(--accent);
             color: #fff;
+            border-radius: 4px;
         }
 
         .price-save {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--muted);
             letter-spacing: .3px;
+            font-weight: 500;
         }
 
         /* Stock */
@@ -1752,7 +1757,7 @@
     <!-- HEADER -->
     <header class="site-header">
         <div class="header-inner">
-            <div class="logo"><a href="index.html">Mô Hình <span>Cao Cấp</span></a></div>
+            <div class="logo"><a href="index.html">Figure Korea <span>Shop</span></a></div>
             <nav class="header-nav">
                 <a href="index.html">Trang chủ</a>
                 <a href="category.html">Sản phẩm</a>
@@ -1978,7 +1983,7 @@
             images = p.images || (p.image ? [p.image] : []);
 
             // Page meta
-            document.getElementById('page-title').textContent = p.name + ' — Mô Hình Cao Cấp';
+            document.getElementById('page-title').textContent = p.name + ' — Figure Korea Shop';
             document.getElementById('bc-name').textContent = p.name;
 
             // Category & Brand

@@ -232,8 +232,9 @@ function isAdminLoggedIn() {
 // ============================================
 
 function formatPrice(price) {
-    return new Intl.NumberFormat('vi-VN', {
+    return new Intl.NumberFormat('ko-KR', {
         style: 'currency',
+        currency: 'KRW'
         currency: 'VND'
     }).format(price);
 }

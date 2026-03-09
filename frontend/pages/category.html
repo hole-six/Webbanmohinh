@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">Danh Mục Sản Phẩm — Mô Hình Cao Cấp</title>
+    <title id="page-title">Danh Mục Sản Phẩm — Figure Korea Shop</title>
     <meta name="description" content="Khám phá toàn bộ danh mục mô hình cao cấp chính hãng">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
@@ -895,16 +895,17 @@
         }
 
         .price-now {
-            font-size: 17px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             color: var(--accent);
-            letter-spacing: -.3px;
+            letter-spacing: -.4px;
         }
 
         .price-was {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--light);
             text-decoration: line-through;
+            font-weight: 500;
         }
 
         .price-off {
@@ -913,7 +914,8 @@
             letter-spacing: .5px;
             color: var(--white);
             background: var(--accent);
-            padding: 1px 5px;
+            padding: 2px 6px;
+            border-radius: 3px;
         }
 
         .btn-add {
@@ -1646,7 +1648,7 @@
     <!-- HEADER -->
     <header class="site-header">
         <div class="header-top">
-            <div class="logo"><a href="index.html">Mô Hình <span>Cao Cấp</span></a></div>
+            <div class="logo"><a href="index.html">Figure Korea <span>Shop</span></a></div>
 
             <nav class="header-nav">
                 <a href="index.html">Trang chủ</a>
@@ -1810,7 +1812,7 @@
         <div class="footer-inner">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <div class="flogo"><a href="index.html">Mô Hình <span>Cao Cấp</span></a></div>
+                    <div class="flogo"><a href="index.html">Figure Korea <span>Shop</span></a></div>
                     <p>Chuyên phân phối mô hình chính hãng từ các thương hiệu hàng đầu thế giới: Threezero, Hot Toys,
                         Bandai, Yolopark và nhiều hơn nữa.</p>
                 </div>
@@ -1836,7 +1838,7 @@
                     </div>
                 </div>
             </div>
-            <div class="footer-bottom">© 2026 Mô Hình Cao Cấp. All rights reserved.</div>
+            <div class="footer-bottom">© 2026 Figure Korea Shop. All rights reserved.</div>
         </div>
     </footer>
 
@@ -1911,7 +1913,7 @@
                 h2.textContent = 'Tất cả sản phẩm';
                 par.textContent = 'Khám phá bộ sưu tập mô hình cao cấp chính hãng';
                 bc.textContent = 'Tất cả sản phẩm';
-                ttl.textContent = 'Danh Mục Sản Phẩm — Mô Hình Cao Cấp';
+                ttl.textContent = 'Danh Mục Sản Phẩm — Figure Korea Shop';
             } else {
                 const c = categories.find(x => x.id === activeCatId);
                 if (c) {
@@ -1919,7 +1921,7 @@
                     h2.textContent = c.name;
                     par.textContent = c.description;
                     bc.textContent = c.name;
-                    ttl.textContent = c.name + ' — Mô Hình Cao Cấp';
+                    ttl.textContent = c.name + ' — Figure Korea Shop';
                 }
             }
         }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Sản Phẩm - Admin</title>
+    <title>Quản Lý Sản Phẩm - Figure Korea Shop Admin</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
@@ -104,7 +104,7 @@
 <body>
     <!-- Menu -->
     <div class="top-menu">
-        <h1>🎯 Quản Lý Sản Phẩm</h1>
+        <h1>🎯 Quản Lý Sản Phẩm - Figure Korea Shop</h1>
         <div class="menu-links">
             <a href="admin-products.html" class="active">Sản Phẩm</a>
             <a href="admin-categories.html">Danh Mục</a>
@@ -492,7 +492,7 @@
                 <tr>
                     <td><img src="${p.images[0]}" alt="${p.name}"></td>
                     <td>${p.name}</td>
-                    <td class="hide-mobile">${p.price.toLocaleString('vi-VN')}đ</td>
+                    <td class="hide-mobile">₩${p.price.toLocaleString('ko-KR')}</td>
                     <td class="hide-mobile">${p.stock}</td>
                     <td class="hide-mobile">ID: ${p.categoryId}</td>
                     <td>

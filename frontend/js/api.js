@@ -66,9 +66,9 @@ async function getAllBrands() {
 // ============================================
 
 function formatPrice(price) {
-    return new Intl.NumberFormat('vi-VN', {
+    return new Intl.NumberFormat('ko-KR', {
         style: 'currency',
-        currency: 'VND'
+        currency: 'KRW'
     }).format(price);
 }
 
