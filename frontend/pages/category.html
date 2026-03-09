@@ -1878,7 +1878,7 @@
             console.log('🔍 Category slug:', slug);
 
             if (slug) {
-                const c = window.categories.find(x => x.slug === slug);
+                const c = window.categories.find(x => x.slug == slug || x.id == slug);
                 if (c) {
                     activeCatId = c.id;
                     console.log('✅ Active category ID:', activeCatId);
@@ -1900,7 +1900,7 @@
             document.getElementById('cnt-all').textContent = window.products.length;
             const el = document.getElementById('cat-items');
             el.innerHTML = window.categories.map(c => {
-                const n = window.products.filter(p => p.categoryId === c.id).length;
+                const n = window.products.filter(p => p.categoryId == c.id).length;
                 return `<div class="cat-row" id="cr-${c.id}" onclick="selectCategory(${c.id})">
       <span class="cat-n">${c.name}</span>
       <span class="cat-c">${n}</span>
@@ -1923,7 +1923,7 @@
 
         function syncCatUI() {
             document.querySelectorAll('.cat-row').forEach(el => el.classList.remove('active'));
-            if (!activeCatId) {
+            if (activeCatId == null) {
                 document.getElementById('cat-all')?.classList.add('active');
             } else {
                 document.getElementById('cr-' + activeCatId)?.classList.add('active');
@@ -1952,15 +1952,15 @@
             const par = document.getElementById('banner-desc');
             const bc = document.getElementById('bc-cur');
             const ttl = document.getElementById('page-title');
-            if (!activeCatId) {
+            if (activeCatId == null) {
                 h2.textContent = 'Tất cả sản phẩm';
                 par.textContent = 'Khám phá bộ sưu tập mô hình cao cấp chính hãng';
                 bc.textContent = 'Tất cả sản phẩm';
                 ttl.textContent = 'Danh Mục Sản Phẩm — Figure Korea Shop';
             } else {
-                const c = window.categories.find(x => x.id === activeCatId);
+                const c = window.categories.find(x => x.id == activeCatId);
                 if (c) {
-                    img.src = convertGoogleDriveLink(c.image) || 'https://images.unsplash.com/photo-1531525645387-7f14be1bdbbd?w=1400&h=300&fit=crop';
+                    if (img) img.src = convertGoogleDriveLink(c.image) || 'https://images.unsplash.com/photo-1531525645387-7f14be1bdbbd?w=1400&h=300&fit=crop';
                     h2.textContent = c.name;
                     par.textContent = c.description;
                     bc.textContent = c.name;
@@ -1981,60 +1981,78 @@
 
         // ── Filters ──
         function applyFilters() {
-            console.log('🔍 Applying filters...');
-            console.log('📦 window.products:', window.products);
-            console.log('🎯 activeCatId:', activeCatId);
-
             const kw = (document.getElementById('search-inp')?.value || '').toLowerCase().trim();
-            sortMode = document.getElementById('sort-sel').value;
-            const minInput = document.getElementById('price-min').value;
-            const maxInput = document.getElementById('price-max').value;
+            const sortSel = document.getElementById('sort-sel');
+            sortMode = sortSel ? sortSel.value : 'default';
+            const minInput = document.getElementById('price-min')?.value || '';
+            const maxInput = document.getElementById('price-max')?.value || '';
 
             priceMin = minInput ? parseFloat(minInput) : 0;
             priceMax = maxInput ? parseFloat(maxInput) : Infinity;
 
-            let list = [...(window.products || [])];
-            console.log('📋 Initial list length:', list.length);
-
-            if (activeCatId) {
-                list = list.filter(p => p.categoryId === activeCatId);
-                console.log('📋 After category filter:', list.length);
+            // Ensure products array exists
+            if (!window.products || !Array.isArray(window.products)) {
+                console.warn('⚠️ Products not loaded yet');
+                return;
             }
 
+            let list = [...window.products];
+
+            // Filter by category
+            if (activeCatId != null) {
+                list = list.filter(p => p.categoryId == activeCatId);
+            }
+
+            // Filter by price range
             list = list.filter(p => p.price >= (priceMin || 0) && p.price <= (priceMax || Infinity));
-            console.log('📋 After price filter:', list.length);
 
-            if (kw) list = list.filter(p =>
-                p.name.toLowerCase().includes(kw) || (p.description || '').toLowerCase().includes(kw));
+            // Filter by keyword
+            if (kw) {
+                list = list.filter(p =>
+                    p.name.toLowerCase().includes(kw) || (p.description || '').toLowerCase().includes(kw)
+                );
+            }
 
+            // Sort
             switch (sortMode) {
-                case 'price-asc': list.sort((a, b) => a.price - b.price); break;
-                case 'price-desc': list.sort((a, b) => b.price - a.price); break;
-                case 'rating': list.sort((a, b) => (b.rating || 0) - (a.rating || 0)); break;
-                case 'name': list.sort((a, b) => a.name.localeCompare(b.name, 'vi')); break;
-                case 'disc': list.sort((a, b) => {
-                    const da = a.oldPrice ? (a.oldPrice - a.price) / a.oldPrice : 0;
-                    const db = b.oldPrice ? (b.oldPrice - b.price) / b.oldPrice : 0;
-                    return db - da;
-                }); break;
+                case 'price-asc':
+                    list.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-desc':
+                    list.sort((a, b) => b.price - a.price);
+                    break;
+                case 'rating':
+                    list.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                    break;
+                case 'name':
+                    list.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+                    break;
+                case 'disc':
+                    list.sort((a, b) => {
+                        const da = a.oldPrice ? (a.oldPrice - a.price) / a.oldPrice : 0;
+                        const db = b.oldPrice ? (b.oldPrice - b.price) / b.oldPrice : 0;
+                        return db - da;
+                    });
+                    break;
             }
 
             filtered = list;
-            console.log('✅ Final filtered list:', filtered.length);
-
             renderActiveFilters();
             renderGrid();
             renderPagination();
-            document.getElementById('result-txt').innerHTML =
-                `Hiển thị <strong>${list.length}</strong> sản phẩm`;
+
+            const resultTxt = document.getElementById('result-txt');
+            if (resultTxt) {
+                resultTxt.innerHTML = `Hiển thị <strong>${list.length}</strong> sản phẩm`;
+            }
         }
 
         // ── Active filter tags ──
         function renderActiveFilters() {
             const wrap = document.getElementById('active-filters');
             const tags = [];
-            if (activeCatId) {
-                const c = window.categories.find(x => x.id === activeCatId);
+            if (activeCatId != null) {
+                const c = window.categories.find(x => x.id == activeCatId);
                 if (c) tags.push({ label: c.name, rm: () => { activeCatId = null; syncCatUI(); updateBanner(); applyFilters(); } });
             }
             const kw = document.getElementById('search-inp')?.value;
