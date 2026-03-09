@@ -1865,23 +1865,15 @@
 
         // ── Init ──
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🔄 Loading category page...');
-
             await window.initApp();
-
-            console.log('📁 Categories loaded:', window.categories);
-            console.log('📦 Products loaded:', window.products);
 
             const p = new URLSearchParams(location.search);
             const slug = p.get('cat');
-
-            console.log('🔍 Category slug:', slug);
 
             if (slug) {
                 const c = window.categories.find(x => x.slug == slug || x.id == slug);
                 if (c) {
                     activeCatId = c.id;
-                    console.log('✅ Active category ID:', activeCatId);
                 }
             }
 
@@ -1891,8 +1883,6 @@
             buildFooterCats();
             updateBanner();
             applyFilters();
-
-            console.log('✅ Category page loaded');
         });
 
         // ── Sidebar ──

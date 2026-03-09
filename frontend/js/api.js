@@ -1,5 +1,8 @@
 // API Configuration
-const API_URL = 'http://localhost:5000/api';
+// Auto-detect API URL based on environment
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:5000/api'  // Local development
+    : 'http://mohinhcaocap.wavestore.id.vn/api';  // Production
 
 // Helper function to make API calls
 async function apiCall(endpoint, options = {}) {
