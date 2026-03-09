@@ -1968,15 +1968,45 @@
     <script>
         // ── State ──
         let product = null, images = [], lbIdx = 0, wished = false;
+        
+        // Helper function to get product from local data
+        function getProductById(id) {
+            return window.products?.find(p => p._id === id || p.id === id);
+        }
 
         // ── Init ──
         document.addEventListener('DOMContentLoaded', async () => {
             await window.initApp();
             const id = new URLSearchParams(location.search).get('id');
-            product = getProductById(id) || products[0];
-            loadCart(); updateCartUI();
+            
+            // Try to get product from API first (for newly created products)
+            if (id) {
+                try {
+                    const response = await window.API.getProductById(id);
+                    if (response && response.success) {
+                        product = response.data;
+                    } else {
+                        // Fallback to local data
+                        product = getProductById(id);
+                    }
+                } catch (error) {
+                    console.error('Error fetching product:', error);
+                    // Fallback to local data
+                    product = getProductById(id);
+                }
+            }
+            
+            // If still no product found, show error
+            if (!product) {
+                showNotFound();
+                return;
+            }
+            
+            loadCart(); 
+            updateCartUI();
             renderProduct();
             buildFooterCats();
+            
             // keyboard nav
             document.addEventListener('keydown', e => {
                 if (!document.getElementById('lightbox').classList.contains('open')) return;
@@ -1985,6 +2015,16 @@
                 if (e.key === 'Escape') closeLightbox();
             });
         });
+        
+        function showNotFound() {
+            document.querySelector('.prod-detail-wrap').innerHTML = `
+                <div style="text-align: center; padding: 80px 20px;">
+                    <h2 style="font-size: 24px; margin-bottom: 16px; color: var(--charcoal);">Sản phẩm không tồn tại</h2>
+                    <p style="color: var(--muted); margin-bottom: 24px;">Sản phẩm bạn đang tìm không tồn tại hoặc đã bị xóa.</p>
+                    <a href="category.html" style="display: inline-block; padding: 12px 24px; background: var(--charcoal); color: white; border-radius: 4px; text-decoration: none;">Quay lại danh sách sản phẩm</a>
+                </div>
+            `;
+        }
 
         function renderProduct() {
             if (!product) return;
