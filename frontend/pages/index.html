@@ -1752,6 +1752,20 @@
   </div>`;
         }
 
+        // Convert Google Drive link to direct image link
+        function convertGoogleDriveLink(url) {
+            if (!url) return '';
+            
+            // Check if it's a Google Drive link
+            const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (driveMatch) {
+                const fileId = driveMatch[1];
+                return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+            }
+            
+            return url;
+        }
+
         function renderHeroGrid() {
             const grid = document.getElementById('hero-grid');
             if (!grid) return;
@@ -1761,9 +1775,11 @@
                 return;
             }
             
-            grid.innerHTML = window.categories.slice(0, 4).map(cat => `
+            grid.innerHTML = window.categories.slice(0, 4).map(cat => {
+                const imageUrl = convertGoogleDriveLink(cat.image);
+                return `
     <a href="category.html?cat=${cat.slug}" class="hero-item">
-      <img src="${cat.image}" alt="${cat.name}" loading="lazy">
+      <img src="${imageUrl}" alt="${cat.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x500?text=${encodeURIComponent(cat.name)}'">
       <div class="hero-overlay">
         <div class="hero-cat">${cat.icon || ''}</div>
         <div class="hero-name">${cat.name}</div>
@@ -1772,7 +1788,8 @@
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
         </span>
       </div>
-    </a>`).join('');
+    </a>`;
+            }).join('');
         }
 
         function renderFeaturedProducts() {
@@ -1984,9 +2001,9 @@
             </svg>
             <span>Messenger</span>
         </a>
-        <a href="cart.html" class="mnav-item cart">
+        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item fb" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M9 2a1 1 0 0 0-1 1v1H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-4V3a1 1 0 0 0-1-1H9z" />
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
             </svg>
             <span>Fanpage</span>
         </a>

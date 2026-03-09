@@ -49,6 +49,15 @@
             color: var(--charcoal);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        html {
+            overflow-x: hidden;
+            position: relative;
+            height: 100%;
         }
 
         a {
@@ -1256,7 +1265,7 @@
 
         @media (max-width: 640px) {
             body {
-                padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+                padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
             }
 
             /* Header */
@@ -1580,22 +1589,42 @@
         /* ─── MOBILE BOTTOM NAV ─── */
         .mob-nav {
             display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 999;
-            background: #fff;
-            border-top: 1px solid var(--border);
-            box-shadow: 0 -2px 16px rgba(0, 0, 0, .09);
-            grid-template-columns: repeat(4, 1fr);
-            height: 62px;
-            padding-bottom: env(safe-area-inset-bottom, 0px);
         }
-
+        
         @media(max-width:768px) {
             .mob-nav {
-                display: grid;
+                display: grid !important;
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                z-index: 99999 !important;
+                background: #fff;
+                border-top: 1px solid var(--border);
+                box-shadow: 0 -2px 16px rgba(0, 0, 0, .09);
+                grid-template-columns: repeat(4, 1fr);
+                min-height: 62px;
+                padding-bottom: env(safe-area-inset-bottom, 0px);
+                transform: translateZ(0);
+                -webkit-transform: translateZ(0);
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+                will-change: transform;
+                margin: 0;
+                padding-top: 0;
+            }
+            
+            body {
+                padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+            }
+        }
+        
+        @media(max-width:640px) {
+            .mob-nav {
+                display: grid !important;
+                position: fixed !important;
+                bottom: 0 !important;
             }
         }
 
@@ -1815,40 +1844,6 @@
         </main>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="site-footer">
-        <div class="footer-inner">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <div class="flogo"><a href="index.html">🇰🇷 Figure Korea <span>Shop</span></a></div>
-                    <p>Chuyên phân phối mô hình chính hãng từ các thương hiệu hàng đầu thế giới: Threezero, Hot Toys,
-                        Bandai, Yolopark và nhiều hơn nữa.</p>
-                </div>
-                <div class="footer-col">
-                    <h5>Danh mục</h5>
-                    <ul id="footer-cats"></ul>
-                </div>
-                <div class="footer-col">
-                    <h5>Hỗ trợ</h5>
-                    <ul>
-                        <li><a href="#">Chính sách đổi trả</a></li>
-                        <li><a href="#">Vận chuyển</a></li>
-                        <li><a href="#">Thanh toán</a></li>
-                        <li><a href="#">Câu hỏi thường gặp</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h5>Liên hệ</h5>
-                    <div class="fcontact">
-                        <div>0123 456 789</div>
-                        <div>contact@mohinhcaocap.vn</div>
-                        <div>Hà Nội, Việt Nam</div>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">© 2026 Figure Korea Shop. All rights reserved.</div>
-        </div>
-    </footer>
 
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
@@ -2190,9 +2185,9 @@
             </svg>
             <span>Messenger</span>
         </a>
-        <a href="cart.html" class="mnav-item cart">
+        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item fb" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24">
-                <path d="M9 2a1 1 0 0 0-1 1v1H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-4V3a1 1 0 0 0-1-1H9z" />
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
             </svg>
             <span>Fanpage</span>
         </a>
