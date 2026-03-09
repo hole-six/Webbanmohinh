@@ -199,12 +199,13 @@ function renderRelatedProducts(products) {
 // Contact functions
 function orderViaMessenger() {
     const message = `Xin chào! Tôi muốn đặt mua:\n${currentProduct.name}\nGiá: ${API.formatPrice(currentProduct.price)}`;
-    window.open(`https://m.me/YOUR_PAGE_ID?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://m.me/61572168088906?text=${encodeURIComponent(message)}`, '_blank');
 }
 
 function orderViaFacebook() {
-    alert(`Vui lòng liên hệ fanpage để đặt hàng:\n\nSản phẩm: ${currentProduct.name}\nGiá: ${API.formatPrice(currentProduct.price)}`);
-    window.open('https://facebook.com/YOUR_PAGE', '_blank');
+    // Redirect to Messenger instead
+    const message = `Xin chào! Tôi muốn đặt mua:\n${currentProduct.name}\nGiá: ${API.formatPrice(currentProduct.price)}`;
+    window.open(`https://m.me/61572168088906?text=${encodeURIComponent(message)}`, '_blank');
 }
 
 function orderViaPhone() {
