@@ -1,0 +1,2181 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Danh Mục Sản Phẩm — Mô Hình Cao Cấp</title>
+    <meta name="description" content="Khám phá toàn bộ danh mục mô hình cao cấp chính hãng">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="../js/api.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #0a0a0a;
+            --charcoal: #1c1c1e;
+            --dark: #2c2c2e;
+            --mid: #48484a;
+            --muted: #8e8e93;
+            --light: #d1d1d6;
+            --border: #e5e5ea;
+            --bg: #f5f5f0;
+            --white: #ffffff;
+            --cream: #faf9f6;
+            --accent: #8b1a1a;
+            --accent-light: #a52020;
+            --gold: #b8960c;
+            --r: 2px;
+            --sh: 0 1px 8px rgba(0, 0, 0, .07);
+            --sh-md: 0 4px 20px rgba(0, 0, 0, .10);
+            --sidebar: 260px;
+            --f-serif: 'Playfair Display', Georgia, serif;
+            --f-sans: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            font-family: var(--f-sans);
+            background: var(--bg);
+            color: var(--charcoal);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            font-family: var(--f-sans);
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        input {
+            font-family: var(--f-sans);
+        }
+
+        /* ─── ANNOUNCEMENT ─── */
+        .announce {
+            background: var(--charcoal);
+            color: var(--light);
+            text-align: center;
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 1.5px;
+            padding: 10px 24px;
+            text-transform: uppercase;
+        }
+
+        .announce-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .announce-inner a {
+            color: rgba(255, 255, 255, .7);
+            text-decoration: none;
+            transition: color .2s;
+            position: relative;
+            padding-bottom: 2px;
+        }
+
+        .announce-inner a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width .25s;
+        }
+
+        .announce-inner a:hover {
+            color: var(--white);
+        }
+
+        .announce-inner a:hover::after {
+            width: 100%;
+        }
+
+        .announce-inner .sep {
+            color: rgba(255, 255, 255, .3);
+        }
+
+        .announce span {
+            color: var(--white);
+            font-weight: 500;
+        }
+
+        /* ─── HEADER ─── */
+        .site-header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 300;
+        }
+
+        .header-top {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+
+        .logo {
+            font-family: var(--f-serif);
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--black);
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .logo a {
+            color: var(--black);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .logo a:hover {
+            color: var(--accent);
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 36px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .header-nav a {
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--mid);
+            transition: color .2s;
+            position: relative;
+            padding-bottom: 2px;
+        }
+
+        .header-nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width .25s;
+        }
+
+        .header-nav a:hover {
+            color: var(--black);
+        }
+
+        .header-nav a:hover::after {
+            width: 100%;
+        }
+
+        .header-nav a.active {
+            color: var(--black);
+            font-weight: 600;
+        }
+
+        .header-nav a.active::after {
+            width: 100%;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-shrink: 0;
+        }
+
+        .hdr-search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+            padding: 6px 0;
+        }
+
+        .hdr-search input {
+            background: none;
+            border: none;
+            outline: none;
+            font-size: 13px;
+            width: 180px;
+            color: var(--charcoal);
+        }
+
+        .hdr-search input::placeholder {
+            color: var(--muted);
+        }
+
+        .hdr-search svg {
+            color: var(--muted);
+            flex-shrink: 0;
+        }
+
+        .hdr-cart {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            color: var(--charcoal);
+            cursor: pointer;
+            transition: color .2s;
+        }
+
+        .hdr-cart:hover {
+            color: var(--accent);
+        }
+
+        .hdr-cart .cnt {
+            background: var(--accent);
+            color: var(--white);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ─── BREADCRUMB ─── */
+        .breadcrumb-bar {
+            background: var(--cream);
+            border-bottom: 1px solid var(--border);
+            padding: 11px 0;
+        }
+
+        .breadcrumb-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--muted);
+            letter-spacing: .3px;
+        }
+
+        .breadcrumb-inner a {
+            color: var(--muted);
+            transition: color .2s;
+        }
+
+        .breadcrumb-inner a:hover {
+            color: var(--charcoal);
+        }
+
+        .breadcrumb-inner .sep {
+            color: var(--light);
+        }
+
+        .breadcrumb-inner .cur {
+            color: var(--charcoal);
+            font-weight: 500;
+        }
+
+        /* ─── PAGE LAYOUT ─── */
+        .page-wrap {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 36px 40px 80px;
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        /* ─── SIDEBAR ─── */
+        .sidebar {
+            width: var(--sidebar);
+            flex-shrink: 0;
+            position: sticky;
+            top: 86px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--light);
+        }
+
+        .sb-block {
+            background: var(--white);
+            border: 1px solid var(--border);
+        }
+
+        .sb-block:first-child {
+            border-radius: var(--r) var(--r) 0 0;
+        }
+
+        .sb-block:last-child {
+            border-radius: 0 0 var(--r) var(--r);
+        }
+
+        .sb-heading {
+            padding: 16px 20px 14px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Category items */
+        .cat-list {
+            padding: 4px 0;
+        }
+
+        .cat-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 20px;
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--mid);
+            cursor: pointer;
+            transition: all .18s;
+            border-left: 2px solid transparent;
+        }
+
+        .cat-row:hover {
+            color: var(--black);
+            background: #fafaf8;
+            border-left-color: var(--light);
+        }
+
+        .cat-row.active {
+            color: var(--accent);
+            font-weight: 600;
+            background: #fdf5f5;
+            border-left-color: var(--accent);
+        }
+
+        .cat-row .cat-n {
+            flex: 1;
+        }
+
+        .cat-row .cat-c {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 400;
+            min-width: 22px;
+            text-align: right;
+        }
+
+        .cat-row.active .cat-c {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .cat-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 3px 0;
+        }
+
+        /* Price filter */
+        .price-body {
+            padding: 18px 20px 20px;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .price-inp {
+            flex: 1;
+            min-width: 100px;
+            padding: 9px 10px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            font-size: 12px;
+            color: var(--charcoal);
+            outline: none;
+            text-align: center;
+            transition: border-color .2s;
+        }
+
+        .price-inp:focus {
+            border-color: var(--accent);
+            background: var(--white);
+        }
+
+        .price-dash {
+            color: var(--light);
+            font-size: 12px;
+        }
+
+        .price-presets {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            margin-bottom: 14px;
+        }
+
+        .price-opt {
+            padding: 9px 12px;
+            text-align: left;
+            font-size: 12px;
+            color: var(--mid);
+            background: none;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all .18s;
+            letter-spacing: .2px;
+        }
+
+        .price-opt:hover {
+            border-color: var(--mid);
+            color: var(--charcoal);
+            background: #fafafa;
+        }
+
+        .price-opt.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: #fdf5f5;
+            font-weight: 600;
+        }
+
+        .btn-apply {
+            width: 100%;
+            padding: 10px;
+            background: var(--charcoal);
+            color: var(--white);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: background .2s;
+        }
+
+        .btn-apply:hover {
+            background: var(--accent);
+        }
+
+        /* ─── MAIN CONTENT ─── */
+        .main-col {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Category banner */
+        .cat-banner {
+            position: relative;
+            height: 140px;
+            overflow: hidden;
+            margin-bottom: 28px;
+            background: var(--charcoal);
+        }
+
+        .cat-banner img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: .55;
+            transition: opacity .4s;
+        }
+
+        .cat-banner-text {
+            position: relative;
+            z-index: 1;
+            padding: 28px 36px;
+            color: var(--white);
+        }
+
+        .cat-banner-text h2 {
+            font-family: var(--f-serif);
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: .5px;
+            margin-bottom: 4px;
+        }
+
+        .cat-banner-text p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, .65);
+            letter-spacing: .3px;
+        }
+
+        /* Active filters */
+        .active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 18px;
+            min-height: 28px;
+        }
+
+        .ftag {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border: 1px solid var(--charcoal);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: .5px;
+            color: var(--charcoal);
+            text-transform: uppercase;
+        }
+
+        .ftag .fx {
+            cursor: pointer;
+            opacity: .6;
+            font-size: 13px;
+            transition: opacity .2s;
+        }
+
+        .ftag .fx:hover {
+            opacity: 1;
+        }
+
+        .clear-btn {
+            font-size: 11px;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: 4px 10px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .clear-btn:hover {
+            border-color: var(--mid);
+            color: var(--charcoal);
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        .result-txt {
+            font-size: 13px;
+            color: var(--muted);
+            flex: 1;
+        }
+
+        .result-txt strong {
+            color: var(--charcoal);
+            font-weight: 600;
+        }
+
+        .sort-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sort-lbl {
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .sort-sel {
+            padding: 7px 12px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            font-family: var(--f-sans);
+            font-size: 12px;
+            color: var(--charcoal);
+            outline: none;
+            cursor: pointer;
+            transition: border-color .2s;
+        }
+
+        .sort-sel:focus {
+            border-color: var(--charcoal);
+        }
+
+        .view-wrap {
+            display: flex;
+            gap: 2px;
+        }
+
+        .vbtn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all .2s;
+            color: var(--muted);
+        }
+
+        .vbtn:hover {
+            border-color: var(--mid);
+            color: var(--charcoal);
+        }
+
+        .vbtn.active {
+            border-color: var(--charcoal);
+            background: var(--charcoal);
+            color: var(--white);
+        }
+
+        /* Product grid */
+        .prod-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+        }
+
+        .prod-grid.list {
+            grid-template-columns: 1fr;
+        }
+
+        /* Product card */
+        .pcard {
+            background: var(--white);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow .25s;
+        }
+
+        .pcard:hover {
+            box-shadow: var(--sh-md);
+            z-index: 1;
+        }
+
+        .pcard-img {
+            position: relative;
+            overflow: hidden;
+            background: var(--cream);
+        }
+
+        .pcard-img::before {
+            content: '';
+            display: block;
+            padding-top: 110%;
+        }
+
+        .pcard-img img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .6s cubic-bezier(.25, .46, .45, .94);
+        }
+
+        .pcard:hover .pcard-img img {
+            transform: scale(1.05);
+        }
+
+        /* Badges */
+        .pbadge {
+            position: absolute;
+            top: 12px;
+            left: 0;
+            z-index: 2;
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--white);
+        }
+
+        .pbadge.hot {
+            background: var(--accent);
+        }
+
+        .pbadge.new {
+            background: var(--charcoal);
+        }
+
+        .pbadge.sale {
+            background: var(--gold);
+        }
+
+        .pbadge.best {
+            background: var(--dark);
+        }
+
+        /* Quick actions */
+        .pcard-actions {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, .96);
+            padding: 14px 16px;
+            display: flex;
+            gap: 8px;
+            transform: translateY(100%);
+            transition: transform .28s cubic-bezier(.4, 0, .2, 1);
+            border-top: 1px solid var(--border);
+        }
+
+        .pcard:hover .pcard-actions {
+            transform: translateY(0);
+        }
+
+        .btn-quick {
+            flex: 1;
+            padding: 9px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: var(--charcoal);
+            color: var(--white);
+            transition: background .2s;
+        }
+
+        .btn-quick:hover {
+            background: var(--accent);
+        }
+
+        .btn-view {
+            padding: 9px 14px;
+            border: 1px solid var(--border);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: .5px;
+            color: var(--mid);
+            transition: all .2s;
+            text-transform: uppercase;
+        }
+
+        .btn-view:hover {
+            border-color: var(--charcoal);
+            color: var(--charcoal);
+        }
+
+        /* Wishlist */
+        .pwish {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 3;
+            width: 32px;
+            height: 32px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all .2s;
+            opacity: 0;
+        }
+
+        .pcard:hover .pwish {
+            opacity: 1;
+        }
+
+        .pwish:hover,
+        .pwish.on {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Card body */
+        .pcard-body {
+            padding: 16px 18px 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .pcard-brand {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .pcard-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--charcoal);
+            line-height: 1.45;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 38px;
+        }
+
+        .pcard-rating {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .stars {
+            color: var(--gold);
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .rc {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .pcard-price {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .price-now {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: -.3px;
+        }
+
+        .price-was {
+            font-size: 12px;
+            color: var(--light);
+            text-decoration: line-through;
+        }
+
+        .price-off {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            color: var(--white);
+            background: var(--accent);
+            padding: 1px 5px;
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--charcoal);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--charcoal);
+            transition: all .22s;
+        }
+
+        .btn-add:hover {
+            background: var(--charcoal);
+            color: var(--white);
+        }
+
+        /* LIST VIEW */
+        .prod-grid.list .pcard {
+            display: flex;
+        }
+
+        .prod-grid.list .pcard-img {
+            width: 200px;
+            min-width: 200px;
+            flex-shrink: 0;
+        }
+
+        .prod-grid.list .pcard-img::before {
+            padding-top: 0;
+            height: 100%;
+            display: none;
+        }
+
+        .prod-grid.list .pcard-img img {
+            position: static;
+            width: 200px;
+            height: 200px;
+        }
+
+        .prod-grid.list .pcard-actions {
+            position: static;
+            transform: none;
+            flex-direction: column;
+            border: none;
+            width: auto;
+        }
+
+        .prod-grid.list .pcard-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-top: none;
+            border-left: 1px solid var(--border);
+        }
+
+        .prod-grid.list .pcard-name {
+            min-height: auto;
+            -webkit-line-clamp: 3;
+        }
+
+        /* Empty state */
+        .empty {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 80px 40px;
+            background: var(--white);
+            border: 1px solid var(--border);
+        }
+
+        .empty h3 {
+            font-family: var(--f-serif);
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: var(--charcoal);
+        }
+
+        .empty p {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 24px;
+        }
+
+        .empty button {
+            padding: 11px 28px;
+            border: 1px solid var(--charcoal);
+            background: none;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .empty button:hover {
+            background: var(--charcoal);
+            color: var(--white);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            margin-top: 40px;
+        }
+
+        .pg {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--mid);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .18s;
+        }
+
+        .pg:hover {
+            border-color: var(--charcoal);
+            color: var(--charcoal);
+        }
+
+        .pg.active {
+            background: var(--charcoal);
+            border-color: var(--charcoal);
+            color: var(--white);
+        }
+
+        .pg:disabled {
+            opacity: .35;
+            cursor: default;
+        }
+
+        /* Stock low */
+        .stock-warn {
+            font-size: 11px;
+            color: #b45309;
+            letter-spacing: .3px;
+            margin-bottom: 6px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: var(--charcoal);
+            color: var(--white);
+            padding: 14px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: .3px;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: all .3s cubic-bezier(.4, 0, .2, 1);
+            border-left: 3px solid var(--accent);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Mobile sidebar toggle */
+        .mob-filter {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            color: var(--charcoal);
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .mob-filter:hover {
+            border-color: var(--charcoal);
+        }
+
+        /* ─── FOOTER ─── */
+        .site-footer {
+            background: var(--black);
+            color: rgba(255, 255, 255, .55);
+            padding: 60px 40px 28px;
+            margin-top: 0;
+        }
+
+        .footer-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+            padding-bottom: 48px;
+        }
+
+        .footer-brand .flogo {
+            font-family: var(--f-serif);
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--white);
+            margin-bottom: 14px;
+        }
+
+        .footer-brand .flogo span {
+            color: var(--accent);
+        }
+
+        .footer-brand p {
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .footer-col h5 {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .9);
+            margin-bottom: 16px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .footer-col ul li a {
+            font-size: 13px;
+            color: rgba(255, 255, 255, .5);
+            transition: color .2s;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--white);
+        }
+
+        .footer-col .fcontact {
+            font-size: 13px;
+            line-height: 2.1;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, .25);
+            letter-spacing: .5px;
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 1100px) {
+            .prod-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            :root {
+                --sidebar: 230px;
+            }
+
+            .header-nav {
+                gap: 24px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                z-index: 500;
+                transform: translateX(-100%);
+                transition: transform .3s;
+                background: var(--white);
+                border-right: 1px solid var(--border);
+                width: 280px;
+                max-height: 100vh;
+                padding-top: 60px;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: 4px 0 24px rgba(0, 0, 0, .12);
+            }
+
+            .mob-filter {
+                display: flex;
+            }
+
+            .header-nav {
+                display: none;
+            }
+
+            .hdr-search {
+                display: none;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 32px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+            }
+
+            /* Header */
+            .announce {
+                font-size: 10px;
+                padding: 6px 12px;
+                letter-spacing: .5px;
+            }
+
+            .header-top {
+                padding: 0 14px;
+                height: 52px;
+            }
+
+            .logo {
+                font-size: 15px;
+                letter-spacing: 1px;
+            }
+
+            .hdr-cart {
+                font-size: 0;
+                gap: 4px;
+            }
+
+            .hdr-cart .cnt {
+                font-size: 10px;
+            }
+
+            .breadcrumb-bar {
+                padding: 8px 14px;
+            }
+
+            .breadcrumb-bar a,
+            .breadcrumb-bar span {
+                font-size: 11px;
+            }
+
+            /* Banner */
+            .cat-banner {
+                height: 90px;
+                margin-bottom: 0;
+                border-radius: 0;
+            }
+
+            .cat-banner-text h2 {
+                font-size: 16px;
+                letter-spacing: 1px;
+            }
+
+            .cat-banner-text p {
+                display: none;
+            }
+
+            /* Page layout */
+            .page-wrap {
+                padding: 14px 12px 80px;
+                display: block;
+            }
+
+            /* Lọc button */
+            .mob-filter {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 12px;
+                padding: 10px 16px;
+                font-size: 11px;
+                letter-spacing: 1px;
+                background: var(--white);
+                border: 1px solid var(--border);
+            }
+
+            /* Toolbar — hide complex parts, keep minimal */
+            .toolbar {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+            }
+
+            .result-txt {
+                font-size: 11px;
+                flex: 1;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            .sort-wrap {
+                margin-left: auto;
+            }
+
+            .sort-lbl {
+                display: none;
+            }
+
+            .sort-sel {
+                padding: 6px 8px;
+                font-size: 11px;
+                max-width: 130px;
+            }
+
+            .view-wrap {
+                gap: 1px;
+            }
+
+            .vbtn {
+                width: 28px;
+                height: 28px;
+            }
+
+            /* Active filters */
+            .active-filters {
+                margin-bottom: 10px;
+            }
+
+            .ftag {
+                font-size: 10px;
+                padding: 3px 8px;
+            }
+
+            /* Product grid — 2 col, tight */
+            .prod-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                border: none;
+            }
+
+            .prod-grid.list {
+                grid-template-columns: 1fr;
+            }
+
+            /* List view mobile fixes */
+            .prod-grid.list .pcard {
+                display: flex;
+                flex-direction: row;
+            }
+
+            .prod-grid.list .pcard-img {
+                width: 120px;
+                min-width: 120px;
+                height: 120px;
+            }
+
+            .prod-grid.list .pcard-img::before {
+                display: none;
+            }
+
+            .prod-grid.list .pcard-img img {
+                position: static;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .prod-grid.list .pcard-body {
+                flex: 1;
+                border-left: 1px solid var(--border);
+                border-top: none;
+                padding: 10px;
+            }
+
+            .prod-grid.list .pcard-name {
+                font-size: 13px;
+                -webkit-line-clamp: 2;
+                min-height: auto;
+                margin-bottom: 6px;
+            }
+
+            .prod-grid.list .pcard-price {
+                margin-bottom: 8px;
+            }
+
+            .prod-grid.list .price-now {
+                font-size: 15px;
+            }
+
+            .prod-grid.list .btn-add {
+                padding: 8px;
+                font-size: 10px;
+            }
+
+            .prod-grid.list .pcard-actions {
+                position: static;
+                transform: none;
+                padding: 8px;
+                flex-direction: column;
+                gap: 6px;
+                border-top: none;
+            }
+
+            /* Product card */
+            .pcard {
+                border: 1px solid var(--border);
+                border-radius: 0;
+            }
+
+            .pcard-img::before {
+                padding-top: 100%;
+            }
+
+            .pcard-body {
+                padding: 10px 10px 12px;
+            }
+
+            .pcard-brand {
+                font-size: 9px;
+                letter-spacing: 1px;
+                margin-bottom: 4px;
+            }
+
+            .pcard-name {
+                font-size: 12px;
+                line-height: 1.4;
+                min-height: 34px;
+                margin-bottom: 6px;
+                -webkit-line-clamp: 2;
+            }
+
+            .pcard-rating {
+                margin-bottom: 6px;
+            }
+
+            .stars {
+                font-size: 10px;
+            }
+
+            .rc {
+                font-size: 10px;
+            }
+
+            .pcard-price {
+                gap: 5px;
+                margin-bottom: 10px;
+            }
+
+            .price-now {
+                font-size: 14px;
+                font-weight: 700;
+            }
+
+            .price-was {
+                font-size: 11px;
+            }
+
+            .price-off {
+                font-size: 9px;
+                padding: 1px 4px;
+            }
+
+            .btn-add {
+                font-size: 10px;
+                padding: 9px;
+                letter-spacing: .8px;
+            }
+
+            /* Sidebar drawer */
+            .sidebar {
+                width: 290px;
+                padding: 70px 0 80px;
+                overflow-y: auto;
+            }
+
+            /* Price filter responsive */
+            .price-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .price-dash {
+                display: none;
+            }
+
+            .price-inp {
+                width: 100%;
+                min-width: auto;
+            }
+
+            .price-inp:first-child::placeholder {
+                content: "Giá tối thiểu";
+            }
+
+            .price-inp:last-child::placeholder {
+                content: "Giá tối đa";
+            }
+        }
+
+        .sb-section {
+            padding: 0 20px 20px;
+        }
+
+        .sb-title {
+            font-size: 10px;
+            padding: 0 20px 10px;
+        }
+
+        /* Pagination */
+        .pagination {
+            margin-top: 28px;
+        }
+
+        .pg {
+            width: 32px;
+            height: 32px;
+            font-size: 12px;
+        }
+
+        /* Footer */
+        .footer-grid {
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .site-footer {
+            padding: 32px 16px 16px;
+        }
+        }
+
+
+        /* ─── MOBILE BOTTOM NAV ─── */
+        .mob-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background: #fff;
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -2px 16px rgba(0, 0, 0, .09);
+            grid-template-columns: repeat(4, 1fr);
+            height: 62px;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        @media(max-width:768px) {
+            .mob-nav {
+                display: grid;
+            }
+        }
+
+        .mnav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+            transition: color .18s;
+        }
+
+        .mnav-item svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 1.6;
+            fill: none;
+            stroke: currentColor;
+        }
+
+        .mnav-item.active {
+            color: var(--accent);
+        }
+
+        .mnav-item.active svg {
+            stroke: var(--accent);
+        }
+
+        .mnav-item.mess {
+            color: #0a7cff;
+        }
+
+        .mnav-item.mess svg {
+            stroke: #0a7cff;
+        }
+
+        .mnav-item.fb {
+            color: #1877f2;
+        }
+
+        .mnav-item.fb svg {
+            stroke: #1877f2;
+        }
+
+        .mnav-item:active {
+            opacity: .6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="site-header">
+        <div class="header-top">
+            <div class="logo"><a href="index.html">Mô Hình <span>Cao Cấp</span></a></div>
+
+            <nav class="header-nav">
+                <a href="index.html">Trang chủ</a>
+                <a href="category.html" class="active">Sản phẩm</a>
+                <a href="index.html#sale">Khuyến mãi</a>
+                <a href="#">Về chúng tôi</a>
+                <a href="#">Liên hệ</a>
+            </nav>
+
+            <div class="header-actions">
+                <div class="hdr-search">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                    </svg>
+                    <input type="text" id="search-inp" placeholder="Tìm kiếm..." oninput="applyFilters()">
+                </div>
+                <div class="hdr-cart" onclick="showToast('Tính năng giỏ hàng đang được phát triển')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8">
+                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <path d="M16 10a4 4 0 0 1-8 0" />
+                    </svg>
+                    Giỏ hàng
+                    <span class="cnt" id="cart-cnt">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb-bar">
+        <div class="breadcrumb-inner">
+            <a href="index.html">Trang chủ</a>
+            <span class="sep">/</span>
+            <span class="cur" id="bc-cur">Tất cả sản phẩm</span>
+        </div>
+    </div>
+
+    <!-- PAGE -->
+    <div class="page-wrap">
+
+        <!-- Mobile filter toggle -->
+        <button class="mob-filter" onclick="toggleSidebar()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="4" y1="12" x2="14" y2="12" />
+                <line x1="4" y1="18" x2="10" y2="18" />
+            </svg>
+            Lọc
+        </button>
+
+        <!-- Sidebar overlay -->
+        <div id="sb-ov" onclick="closeSidebar()"
+            style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:499"></div>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+
+            <!-- DANH MỤC -->
+            <div class="sb-block">
+                <div class="sb-heading">Danh mục</div>
+                <div class="cat-list">
+                    <div class="cat-row active" id="cat-all" onclick="selectCategory(null)">
+                        <span class="cat-n">Tất cả sản phẩm</span>
+                        <span class="cat-c" id="cnt-all">—</span>
+                    </div>
+                    <div class="cat-divider"></div>
+                    <div id="cat-items"></div>
+                </div>
+            </div>
+
+            <!-- KHOẢNG GIÁ -->
+            <div class="sb-block">
+                <div class="sb-heading">Khoảng giá</div>
+                <div class="price-body">
+                    <div class="price-row">
+                        <input class="price-inp" type="number" id="price-min" placeholder="Từ">
+                        <span class="price-dash">—</span>
+                        <input class="price-inp" type="number" id="price-max" placeholder="Đến">
+                    </div>
+                    <div class="price-presets">
+                        <button class="price-opt" onclick="setPrice(0,500000,this)">Dưới 500.000đ</button>
+                        <button class="price-opt" onclick="setPrice(500000,1000000,this)">500.000 – 1.000.000đ</button>
+                        <button class="price-opt" onclick="setPrice(1000000,5000000,this)">1.000.000 –
+                            5.000.000đ</button>
+                        <button class="price-opt" onclick="setPrice(5000000,999999999,this)">Trên 5.000.000đ</button>
+                    </div>
+                    <button class="btn-apply" onclick="applyFilters()">Áp dụng</button>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-col">
+
+            <!-- BANNER -->
+            <div class="cat-banner" id="cat-banner">
+                <img id="banner-img"
+                    src="https://images.unsplash.com/photo-1531525645387-7f14be1bdbbd?w=1400&h=300&fit=crop" alt="">
+                <div class="cat-banner-text">
+                    <h2 id="banner-title">Tất cả sản phẩm</h2>
+                    <p id="banner-desc">Khám phá bộ sưu tập mô hình cao cấp chính hãng</p>
+                </div>
+            </div>
+
+            <!-- ACTIVE FILTERS -->
+            <div class="active-filters" id="active-filters"></div>
+
+            <!-- TOOLBAR -->
+            <div class="toolbar">
+                <div class="result-txt" id="result-txt">Hiển thị <strong>0</strong> sản phẩm</div>
+                <div class="sort-wrap">
+                    <span class="sort-lbl">Sắp xếp</span>
+                    <select class="sort-sel" id="sort-sel" onchange="applyFilters()">
+                        <option value="">Mặc định</option>
+                        <option value="price-asc">Giá tăng dần</option>
+                        <option value="price-desc">Giá giảm dần</option>
+                        <option value="rating">Đánh giá cao</option>
+                        <option value="name">Tên A–Z</option>
+                        <option value="disc">Giảm giá nhiều nhất</option>
+                    </select>
+                </div>
+                <div class="view-wrap">
+                    <button class="vbtn active" id="vg" onclick="setView('grid')" title="Lưới">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                        </svg>
+                    </button>
+                    <button class="vbtn" id="vl" onclick="setView('list')" title="Danh sách">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="8" y1="6" x2="21" y2="6" />
+                            <line x1="8" y1="12" x2="21" y2="12" />
+                            <line x1="8" y1="18" x2="21" y2="18" />
+                            <circle cx="3" cy="6" r="1" fill="currentColor" />
+                            <circle cx="3" cy="12" r="1" fill="currentColor" />
+                            <circle cx="3" cy="18" r="1" fill="currentColor" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- GRID -->
+            <div class="prod-grid" id="prod-grid"></div>
+
+            <!-- PAGINATION -->
+            <div class="pagination" id="pagination"></div>
+
+        </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="flogo"><a href="index.html">Mô Hình <span>Cao Cấp</span></a></div>
+                    <p>Chuyên phân phối mô hình chính hãng từ các thương hiệu hàng đầu thế giới: Threezero, Hot Toys,
+                        Bandai, Yolopark và nhiều hơn nữa.</p>
+                </div>
+                <div class="footer-col">
+                    <h5>Danh mục</h5>
+                    <ul id="footer-cats"></ul>
+                </div>
+                <div class="footer-col">
+                    <h5>Hỗ trợ</h5>
+                    <ul>
+                        <li><a href="#">Chính sách đổi trả</a></li>
+                        <li><a href="#">Vận chuyển</a></li>
+                        <li><a href="#">Thanh toán</a></li>
+                        <li><a href="#">Câu hỏi thường gặp</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h5>Liên hệ</h5>
+                    <div class="fcontact">
+                        <div>0123 456 789</div>
+                        <div>contact@mohinhcaocap.vn</div>
+                        <div>Hà Nội, Việt Nam</div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">© 2026 Mô Hình Cao Cấp. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ── State ──
+        let activeCatId = null, priceMin = 0, priceMax = Infinity;
+        let sortMode = '', viewMode = 'grid', page = 1;
+        const PER = 9;
+        let filtered = [];
+        let wished = new Set();
+
+        // ── Init ──
+        document.addEventListener('DOMContentLoaded', async () => {
+            await window.initApp();
+            const p = new URLSearchParams(location.search);
+            const slug = p.get('cat');
+            if (slug) {
+                const c = categories.find(x => x.slug === slug);
+                if (c) activeCatId = c.id;
+            }
+            loadCart(); updateCartUI();
+            buildSidebar();
+            buildFooterCats();
+            updateBanner();
+            applyFilters();
+        });
+
+        // ── Sidebar ──
+        function buildSidebar() {
+            document.getElementById('cnt-all').textContent = products.length;
+            const el = document.getElementById('cat-items');
+            el.innerHTML = categories.map(c => {
+                const n = products.filter(p => p.categoryId === c.id).length;
+                return `<div class="cat-row" id="cr-${c.id}" onclick="selectCategory(${c.id})">
+      <span class="cat-n">${c.name}</span>
+      <span class="cat-c">${n}</span>
+    </div>`;
+            }).join('');
+            syncCatUI();
+        }
+
+        function buildFooterCats() {
+            document.getElementById('footer-cats').innerHTML =
+                categories.map(c => `<li><a href="category.html?cat=${c.slug}">${c.name}</a></li>`).join('');
+        }
+
+        function selectCategory(id) {
+            activeCatId = id; page = 1;
+            syncCatUI(); updateBanner(); applyFilters(); closeSidebar();
+        }
+
+        function syncCatUI() {
+            document.querySelectorAll('.cat-row').forEach(el => el.classList.remove('active'));
+            if (!activeCatId) {
+                document.getElementById('cat-all')?.classList.add('active');
+            } else {
+                document.getElementById('cr-' + activeCatId)?.classList.add('active');
+            }
+        }
+
+        function updateBanner() {
+            const img = document.getElementById('banner-img');
+            const h2 = document.getElementById('banner-title');
+            const par = document.getElementById('banner-desc');
+            const bc = document.getElementById('bc-cur');
+            const ttl = document.getElementById('page-title');
+            if (!activeCatId) {
+                img.src = 'https://images.unsplash.com/photo-1531525645387-7f14be1bdbbd?w=1400&h=300&fit=crop';
+                h2.textContent = 'Tất cả sản phẩm';
+                par.textContent = 'Khám phá bộ sưu tập mô hình cao cấp chính hãng';
+                bc.textContent = 'Tất cả sản phẩm';
+                ttl.textContent = 'Danh Mục Sản Phẩm — Mô Hình Cao Cấp';
+            } else {
+                const c = categories.find(x => x.id === activeCatId);
+                if (c) {
+                    img.src = c.image;
+                    h2.textContent = c.name;
+                    par.textContent = c.description;
+                    bc.textContent = c.name;
+                    ttl.textContent = c.name + ' — Mô Hình Cao Cấp';
+                }
+            }
+        }
+
+        // ── Price ──
+        function setPrice(mn, mx, btn) {
+            priceMin = mn; priceMax = mx; page = 1;
+            document.getElementById('price-min').value = mn > 0 ? mn : '';
+            document.getElementById('price-max').value = mx < 999999999 ? mx : '';
+            document.querySelectorAll('.price-opt').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyFilters();
+        }
+
+        // ── Filters ──
+        function applyFilters() {
+            const kw = (document.getElementById('search-inp')?.value || '').toLowerCase().trim();
+            sortMode = document.getElementById('sort-sel').value;
+            const mnv = parseFloat(document.getElementById('price-min').value);
+            const mxv = parseFloat(document.getElementById('price-max').value);
+            if (!isNaN(mnv)) priceMin = mnv;
+            if (!isNaN(mxv)) priceMax = mxv;
+
+            let list = [...products];
+            if (activeCatId) list = list.filter(p => p.categoryId === activeCatId);
+            list = list.filter(p => p.price >= (priceMin || 0) && p.price <= (priceMax || Infinity));
+            if (kw) list = list.filter(p =>
+                p.name.toLowerCase().includes(kw) || (p.description || '').toLowerCase().includes(kw));
+
+            switch (sortMode) {
+                case 'price-asc': list.sort((a, b) => a.price - b.price); break;
+                case 'price-desc': list.sort((a, b) => b.price - a.price); break;
+                case 'rating': list.sort((a, b) => (b.rating || 0) - (a.rating || 0)); break;
+                case 'name': list.sort((a, b) => a.name.localeCompare(b.name, 'vi')); break;
+                case 'disc': list.sort((a, b) => {
+                    const da = a.oldPrice ? (a.oldPrice - a.price) / a.oldPrice : 0;
+                    const db = b.oldPrice ? (b.oldPrice - b.price) / b.oldPrice : 0;
+                    return db - da;
+                }); break;
+            }
+
+            filtered = list;
+            renderActiveFilters();
+            renderGrid();
+            renderPagination();
+            document.getElementById('result-txt').innerHTML =
+                `Hiển thị <strong>${list.length}</strong> sản phẩm`;
+        }
+
+        // ── Active filter tags ──
+        function renderActiveFilters() {
+            const wrap = document.getElementById('active-filters');
+            const tags = [];
+            if (activeCatId) {
+                const c = categories.find(x => x.id === activeCatId);
+                if (c) tags.push({ label: c.name, rm: () => { activeCatId = null; syncCatUI(); updateBanner(); applyFilters(); } });
+            }
+            const kw = document.getElementById('search-inp')?.value;
+            if (kw) tags.push({ label: '"' + kw + '"', rm: () => { document.getElementById('search-inp').value = ''; applyFilters(); } });
+            if (priceMin > 0 || priceMax < Infinity) {
+                tags.push({
+                    label: formatPrice(priceMin || 0) + ' – ' + (priceMax < 999999999 ? formatPrice(priceMax) : '∞'),
+                    rm: () => { priceMin = 0; priceMax = Infinity; document.getElementById('price-min').value = ''; document.getElementById('price-max').value = ''; document.querySelectorAll('.price-opt').forEach(b => b.classList.remove('active')); applyFilters(); }
+                });
+            }
+            if (!tags.length) { wrap.innerHTML = ''; return; }
+            window._rms = tags.map(t => t.rm);
+            wrap.innerHTML = tags.map((t, i) =>
+                `<div class="ftag">${t.label} <span class="fx" onclick="_rms[${i}]()">×</span></div>`
+            ).join('') + `<button class="clear-btn" onclick="clearAll()">Xóa bộ lọc</button>`;
+        }
+
+        function clearAll() {
+            activeCatId = null; priceMin = 0; priceMax = Infinity; page = 1;
+            document.getElementById('search-inp').value = '';
+            document.getElementById('price-min').value = '';
+            document.getElementById('price-max').value = '';
+            document.querySelectorAll('.price-opt').forEach(b => b.classList.remove('active'));
+            syncCatUI(); updateBanner(); applyFilters();
+        }
+
+        // ── Render grid ──
+        function renderGrid() {
+            const grid = document.getElementById('prod-grid');
+            const start = (page - 1) * PER;
+            const slice = filtered.slice(start, start + PER);
+
+            if (!slice.length) {
+                grid.innerHTML = `<div class="empty">
+      <h3>Không tìm thấy sản phẩm</h3>
+      <p>Thử thay đổi bộ lọc hoặc tìm kiếm khác</p>
+      <button onclick="clearAll()">Xóa bộ lọc</button>
+    </div>`; return;
+            }
+            grid.innerHTML = slice.map(renderCard).join('');
+        }
+
+        function renderCard(p) {
+            const img = p.images?.[0] || p.image || '';
+            const brand = brands.find(b => b.id === p.brandId);
+            const disc = p.oldPrice ? getDiscountPercent(p.price, p.oldPrice) : 0;
+            const low = p.stock > 0 && p.stock <= 5;
+            const isW = wished.has(p.id);
+
+            let badgeHTML = '';
+            if (p.badge) {
+                const cls = p.badge === 'HOT' ? 'hot' : p.badge === 'NEW' ? 'new' : p.badge === 'BEST SELLER' ? 'best' : 'sale';
+                badgeHTML = `<div class="pbadge ${cls}">${p.badge}</div>`;
+            } else if (disc > 0) {
+                badgeHTML = `<div class="pbadge sale">-${disc}%</div>`;
+            }
+
+            const ratingHTML = p.rating ? `
+    <div class="pcard-rating">
+      <span class="stars">${'★'.repeat(Math.round(p.rating))}${'☆'.repeat(5 - Math.round(p.rating))}</span>
+      <span class="rc">(${p.reviewCount || 0})</span>
+    </div>` : '';
+
+            return `<div class="pcard">
+    ${badgeHTML}
+    <button class="pwish${isW ? ' on' : ''}" onclick="toggleWish(${p.id},this)" title="Yêu thích">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="${isW ? '#8b1a1a' : 'none'}" stroke="${isW ? '#8b1a1a' : '#48484a'}" stroke-width="1.8">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+    </button>
+    <div class="pcard-img">
+      <img src="${img}" alt="${p.name}" loading="lazy">
+     
+    </div>
+    <div class="pcard-body">
+      <div class="pcard-brand">${brand?.name || ''}</div>
+      <div class="pcard-name">${p.name}</div>
+      ${ratingHTML}
+      ${low ? `<div class="stock-warn">Chỉ còn ${p.stock} sản phẩm</div>` : ''}
+      <div class="pcard-price">
+        <span class="price-now">${formatPrice(p.price)}</span>
+        ${p.oldPrice ? `<span class="price-was">${formatPrice(p.oldPrice)}</span><span class="price-off">-${disc}%</span>` : ''}
+      </div>
+      <button class="btn-add" onclick="location.href='product-detail.html?id=${p.id}'">Mua ngay</button>
+    </div>
+  </div>`;
+        }
+
+        // ── Pagination ──
+        function renderPagination() {
+            const total = Math.ceil(filtered.length / PER);
+            const el = document.getElementById('pagination');
+            if (total <= 1) { el.innerHTML = ''; return; }
+            let h = `<button class="pg" onclick="goPage(${page - 1})" ${page === 1 ? 'disabled' : ''}>‹</button>`;
+            for (let i = 1; i <= total; i++) {
+                if (i === 1 || i === total || Math.abs(i - page) <= 1) {
+                    h += `<button class="pg${i === page ? ' active' : ''}" onclick="goPage(${i})">${i}</button>`;
+                } else if (Math.abs(i - page) === 2) {
+                    h += `<span style="padding:0 4px;color:var(--muted);font-size:13px">…</span>`;
+                }
+            }
+            h += `<button class="pg" onclick="goPage(${page + 1})" ${page === total ? 'disabled' : ''}>›</button>`;
+            el.innerHTML = h;
+        }
+
+        function goPage(n) {
+            const total = Math.ceil(filtered.length / PER);
+            if (n < 1 || n > total) return;
+            page = n;
+            renderGrid(); renderPagination();
+            document.querySelector('.main-col').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ── View toggle ──
+        function setView(m) {
+            viewMode = m;
+            document.getElementById('prod-grid').classList.toggle('list', m === 'list');
+            document.getElementById('vg').classList.toggle('active', m === 'grid');
+            document.getElementById('vl').classList.toggle('active', m === 'list');
+            renderGrid();
+        }
+
+        // ── Wishlist ──
+        function toggleWish(id, btn) {
+            if (wished.has(id)) {
+                wished.delete(id); btn.classList.remove('on');
+                btn.querySelector('svg').setAttribute('fill', 'none');
+                btn.querySelector('svg').setAttribute('stroke', '#48484a');
+                showToast('Đã xóa khỏi danh sách yêu thích');
+            } else {
+                wished.add(id); btn.classList.add('on');
+                btn.querySelector('svg').setAttribute('fill', '#8b1a1a');
+                btn.querySelector('svg').setAttribute('stroke', '#8b1a1a');
+                showToast('Đã thêm vào danh sách yêu thích');
+            }
+        }
+
+        // ── Cart ──
+        function addCart(id) {
+            loadCart(); addToCart(id, 1); updateCartUI();
+            showToast('Sản phẩm đã được thêm vào giỏ hàng');
+        }
+        function updateCartUI() {
+            document.getElementById('cart-cnt').textContent = getCartCount();
+        }
+
+        // ── Sidebar mobile ──
+        function toggleSidebar() {
+            const s = document.getElementById('sidebar'), ov = document.getElementById('sb-ov');
+            s.classList.toggle('open');
+            ov.style.display = s.classList.contains('open') ? 'block' : 'none';
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sb-ov').style.display = 'none';
+        }
+
+        // ── Toast ──
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.classList.add('show');
+            clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2800);
+        }
+    </script>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="mob-nav">
+        <a href="index.html" class="mnav-item">
+            <svg viewBox="0 0 24 24">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span>Trang chủ</span>
+        </a>
+        <a href="category.html" class="mnav-item active">
+            <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+            </svg>
+            <span>Sản phẩm</span>
+        </a>
+        <a href="https://m.me/mohinhcaocap" class="mnav-item mess" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Messenger</span>
+        </a>
+        <a href="https://www.facebook.com/mohinhcaocap" class="mnav-item fb" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+            </svg>
+            <span>Fanpage</span>
+        </a>
+    </nav>
+
+    <!-- API Client -->
+    <script src="../js/api.js"></script>
+    <!-- Category JS -->
+    <script src="../js/category.js"></script>
+</body>
+
+</html>

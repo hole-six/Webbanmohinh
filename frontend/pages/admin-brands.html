@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Thương Hiệu - Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .top-menu {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-menu h1 {
+            font-size: 20px;
+        }
+
+        .menu-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .menu-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        .menu-links a:hover,
+        .menu-links a.active {
+            background: #34495e;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #ecf0f1;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 14px;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 9999;
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        .toast.success {
+            border-left: 4px solid #27ae60;
+        }
+
+        .toast.error {
+            border-left: 4px solid #e74c3c;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .top-menu { flex-direction: column; gap: 15px; padding: 15px; }
+            .menu-links { flex-wrap: wrap; justify-content: center; }
+            .container { padding: 0 15px; margin: 20px auto; }
+            .card { padding: 20px; }
+            
+            table { font-size: 12px; }
+            th, td { padding: 8px 6px; }
+            .btn { padding: 6px 10px; font-size: 12px; }
+        }
+        
+        @media (max-width: 480px) {
+            .top-menu h1 { font-size: 16px; }
+            .menu-links a { padding: 6px 12px; font-size: 12px; }
+            .card-title { font-size: 16px; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-menu">
+        <h1>⭐ Quản Lý Thương Hiệu</h1>
+        <div class="menu-links">
+            <a href="admin-products.html">Sản Phẩm</a>
+            <a href="admin-categories.html">Danh Mục</a>
+            <a href="admin-brands.html" class="active">Thương Hiệu</a>
+            <a href="#" onclick="logout()">Đăng Xuất</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-title" id="formTitle">➕ Thêm Thương Hiệu Mới</div>
+            <input type="hidden" id="editId">
+            <div class="form-group">
+                <label>Tên Thương Hiệu (*)</label>
+                <input type="text" id="name" placeholder="Ví dụ: Hot Toys">
+            </div>
+            <div class="form-group">
+                <label>Slug (tự động từ tên)</label>
+                <input type="text" id="slug" placeholder="hot-toys">
+            </div>
+            <button class="btn btn-primary" onclick="save()" id="saveBtn">💾 Thêm Thương Hiệu</button>
+            <button class="btn btn-warning" onclick="cancelEdit()" id="cancelBtn"
+                style="display:none; margin-left: 10px;">❌ Hủy</button>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📋 Danh Sách Thương Hiệu</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên Thương Hiệu</th>
+                        <th>Slug</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody id="list"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API = 'http://localhost:5000/api';
+        let token = localStorage.getItem('admin_token');
+
+        if (!token) {
+            alert('Vui lòng đăng nhập!');
+            window.location.href = 'login.html';
+        }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function logout() {
+            localStorage.removeItem('admin_token');
+            window.location.href = 'login.html';
+        }
+
+        // Auto slug
+        document.getElementById('name').addEventListener('input', function () {
+            if (!document.getElementById('editId').value) {
+                const slug = this.value.toLowerCase()
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .trim().replace(/\s+/g, '-').replace(/-+/g, '-');
+                document.getElementById('slug').value = slug;
+            }
+        });
+
+        async function getNextId() {
+            const res = await fetch(`${API}/brands`);
+            const data = await res.json();
+            if (data.success && data.data.length > 0) {
+                return Math.max(...data.data.map(b => b.id)) + 1;
+            }
+            return 1;
+        }
+
+        async function load() {
+            const res = await fetch(`${API}/brands`);
+            const data = await res.json();
+
+            document.getElementById('list').innerHTML = data.data.map(b => `
+                <tr>
+                    <td>${b.id}</td>
+                    <td>${b.name}</td>
+                    <td>${b.slug}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="edit(${b.id})">✏️ Sửa</button>
+                        <button class="btn btn-danger" onclick="del(${b.id})">🗑️ Xóa</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function save() {
+            const editId = document.getElementById('editId').value;
+            const name = document.getElementById('name').value.trim();
+            const slug = document.getElementById('slug').value.trim();
+
+            if (!name) {
+                showToast('Vui lòng nhập tên thương hiệu!', 'error');
+                return;
+            }
+
+            const brand = {
+                name: name,
+                slug: slug || name.toLowerCase().replace(/\s+/g, '-')
+            };
+
+            if (!editId) {
+                brand.id = await getNextId();
+            }
+
+            try {
+                const url = editId ? `${API}/brands/${editId}` : `${API}/brands`;
+                const method = editId ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(brand)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast(editId ? 'Cập nhật thành công!' : 'Thêm thương hiệu thành công!');
+                    load();
+                    cancelEdit();
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (error) {
+                showToast('Lỗi: ' + error.message, 'error');
+            }
+        }
+
+        async function edit(numericId) {
+            const res = await fetch(`${API}/brands/${numericId}`);
+            const data = await res.json();
+
+            if (data.success) {
+                document.getElementById('editId').value = numericId;
+                document.getElementById('name').value = data.data.name;
+                document.getElementById('slug').value = data.data.slug;
+                document.getElementById('formTitle').textContent = '✏️ Sửa Thương Hiệu';
+                document.getElementById('saveBtn').textContent = '💾 Cập Nhật';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+            } else {
+                showToast('Không tìm thấy thương hiệu', 'error');
+            }
+        }
+
+        function cancelEdit() {
+            document.getElementById('editId').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('slug').value = '';
+            document.getElementById('formTitle').textContent = '➕ Thêm Thương Hiệu Mới';
+            document.getElementById('saveBtn').textContent = '💾 Thêm Thương Hiệu';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+
+        async function del(numericId) {
+            if (!confirm('Xác nhận xóa thương hiệu này?')) return;
+
+            try {
+                const res = await fetch(`${API}/brands/${numericId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast('Đã xóa thương hiệu!');
+                    load();
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (error) {
+                showToast('Lỗi: ' + error.message, 'error');
+            }
+        }
+
+        load();
+    </script>
+</body>
+
+</html>
