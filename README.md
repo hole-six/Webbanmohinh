@@ -64,17 +64,6 @@ cd backend
 npm install
 ```
 
-### 3. Cấu Hình Environment
-Tạo file `backend/.env`:
-```env
-PORT=5000
-NODE_ENV=development
-MONGODB_URI=mongodb+srv://admin:123123Aa@mohinhcaocap.s2liv1g.mongodb.net/mohinhcaocap?retryWrites=true&w=majority&appName=mohinhcaocap
-JWT_SECRET=your-secret-key
-ADMIN_EMAIL=admin@mohinhcaocap.vn
-ADMIN_PASSWORD=admin123
-FRONTEND_URL=http://localhost:5500
-```
 
 ### 4. Khởi Tạo Database
 ```bash
@@ -112,17 +101,6 @@ cd /var/www/mohinhcaocap
 bash deploy.sh
 ```
 
-## 📱 Demo
-
-**Website:** https://mohinhcaocap.vn (sẽ cập nhật sau khi deploy)
-
-**Admin Panel:** https://mohinhcaocap.vn/login.html
-
-**Thông tin đăng nhập:**
-- Email: `admin@mohinhcaocap.vn`
-- Password: `admin123`
-
-## 📂 Cấu Trúc Project
 
 ```
 Webbanmohinh/
