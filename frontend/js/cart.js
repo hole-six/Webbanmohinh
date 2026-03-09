@@ -143,14 +143,7 @@ function updateCartSummary() {
 
 // Order via Messenger
 function orderViaMessenger() {
-    const orderText = generateOrderText();
-    const messengerUrl = `https://m.me/61572168088906?text=${encodeURIComponent(orderText)}`;
-
-    // Show instruction
-    alert('Bạn sẽ được chuyển đến Messenger để hoàn tất đơn hàng.\n\nVui lòng gửi tin nhắn với nội dung đơn hàng để chúng tôi xác nhận!');
-
-    // Open Messenger
-    window.open(messengerUrl, '_blank');
+    window.open('https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr', '_blank');
 }
 
 // Order via Facebook
@@ -182,7 +175,7 @@ function orderViaFacebook() {
                 <button onclick="copyOrderText('${orderText.replace(/'/g, "\\'")}'); this.textContent='✓ Đã copy!'" style="flex: 1; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
                     📋 Copy nội dung
                 </button>
-                <button onclick="window.open('https://m.me/61572168088906', '_blank')" style="flex: 1; padding: 12px; background: #1877F2; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                <button onclick="window.open('https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr', '_blank')" style="flex: 1; padding: 12px; background: #1877F2; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
                     💬 Nhắn tin Messenger
                 </button>
                 <button onclick="this.parentElement.parentElement.parentElement.remove()" style="padding: 12px 20px; background: #999; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">

@@ -198,14 +198,11 @@ function renderRelatedProducts(products) {
 
 // Contact functions
 function orderViaMessenger() {
-    const message = `Xin chào! Tôi muốn đặt mua:\n${currentProduct.name}\nGiá: ${API.formatPrice(currentProduct.price)}`;
-    window.open(`https://m.me/61572168088906?text=${encodeURIComponent(message)}`, '_blank');
+    window.open('https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr', '_blank');
 }
 
 function orderViaFacebook() {
-    // Redirect to Messenger instead
-    const message = `Xin chào! Tôi muốn đặt mua:\n${currentProduct.name}\nGiá: ${API.formatPrice(currentProduct.price)}`;
-    window.open(`https://m.me/61572168088906?text=${encodeURIComponent(message)}`, '_blank');
+    window.open('https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr', '_blank');
 }
 
 function orderViaPhone() {

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://flagcdn.com/32x24/kr.png">
     <title id="page-title">Danh Mục Sản Phẩm — Figure Korea Shop</title>
     <meta name="description" content="Khám phá toàn bộ danh mục mô hình cao cấp chính hãng">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -157,10 +158,18 @@
             color: var(--black);
             text-decoration: none;
             transition: color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .logo a:hover {
             color: var(--accent);
+        }
+
+        .logo a img {
+            display: inline-block;
+            vertical-align: middle;
         }
 
         .logo span {
@@ -1648,7 +1657,7 @@
     <!-- HEADER -->
     <header class="site-header">
         <div class="header-top">
-            <div class="logo"><a href="index.html">🇰🇷 Figure Korea <span>Shop</span></a></div>
+            <div class="logo"><a href="index.html">Figure Korea <span>Shop</span><img src="https://flagcdn.com/16x12/kr.png"></a></div>
 
             <nav class="header-nav">
                 <a href="index.html">Trang chủ</a>
@@ -1901,6 +1910,22 @@
             }
         }
 
+        // Convert Google Drive link to direct image link
+        function convertGoogleDriveLink(url) {
+            if (!url) return '';
+            
+            // Check if it's a Google Drive link
+            const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (driveMatch) {
+                const fileId = driveMatch[1];
+                // Convert to direct image link
+                return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+            }
+            
+            // If already a direct link or other URL, return as is
+            return url;
+        }
+
         function updateBanner() {
             const img = document.getElementById('banner-img');
             const h2 = document.getElementById('banner-title');
@@ -1916,7 +1941,7 @@
             } else {
                 const c = categories.find(x => x.id === activeCatId);
                 if (c) {
-                    img.src = c.image;
+                    img.src = convertGoogleDriveLink(c.image) || 'https://images.unsplash.com/photo-1531525645387-7f14be1bdbbd?w=1400&h=300&fit=crop';
                     h2.textContent = c.name;
                     par.textContent = c.description;
                     bc.textContent = c.name;
@@ -2159,7 +2184,7 @@
             </svg>
             <span>Sản phẩm</span>
         </a>
-        <a href="https://m.me/61572168088906" class="mnav-item mess" target="_blank" rel="noopener">
+        <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" class="mnav-item mess" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>

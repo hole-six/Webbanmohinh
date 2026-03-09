@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://flagcdn.com/32x24/kr.png">
     <title>Quản Lý Danh Mục - Figure Korea Shop Admin</title>
     <style>
         * {
@@ -303,6 +304,22 @@
             return 1;
         }
 
+        // Convert Google Drive link to direct image link
+        function convertGoogleDriveLink(url) {
+            if (!url) return '';
+            
+            // Check if it's a Google Drive link
+            const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (driveMatch) {
+                const fileId = driveMatch[1];
+                // Convert to direct image link
+                return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+            }
+            
+            // If already a direct link or other URL, return as is
+            return url;
+        }
+
         async function load() {
             const res = await fetch(`${API}/categories`);
             const data = await res.json();
@@ -311,7 +328,7 @@
                 <tr>
                     <td>${c.id}</td>
                     <td>
-                        ${c.image ? `<img src="${c.image}" alt="${c.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 8px; vertical-align: middle;">` : ''}
+                        ${c.image ? `<img src="${convertGoogleDriveLink(c.image)}" alt="${c.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 8px; vertical-align: middle;" onerror="this.style.display='none'">` : ''}
                         ${c.name}
                     </td>
                     <td>${c.slug}</td>
@@ -327,12 +344,15 @@
             const editId = document.getElementById('editId').value;
             const name = document.getElementById('name').value.trim();
             const slug = document.getElementById('slug').value.trim();
-            const image = document.getElementById('image').value.trim();
+            let image = document.getElementById('image').value.trim();
 
             if (!name) {
                 showToast('Vui lòng nhập tên danh mục!', 'error');
                 return;
             }
+
+            // Convert Google Drive link if needed
+            image = convertGoogleDriveLink(image);
 
             const category = {
                 name: name,
