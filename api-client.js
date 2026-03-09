@@ -2,7 +2,7 @@
 // Auto-detect API URL based on environment
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:5001/api'  // Local development
-    : 'http://mohinhcaocap.wavestore.id.vn/api';  // Production (nginx proxy)
+    : 'https://mohinhcaocap.wavestore.id.vn/api';  // Production (nginx proxy with HTTPS)
 
 // ============================================
 // PRODUCTS API
