@@ -424,7 +424,7 @@
                 console.log('Upload response:', data);
                 
                 if (data.success) {
-                    uploadedImages.push('http://localhost:5000' + data.url);
+                    uploadedImages.push(data.url);
                     updatePreview();
                     showToast('Upload thành công: ' + file.name);
                 } else {

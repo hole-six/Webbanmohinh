@@ -14,12 +14,11 @@ function getCategoryFromURL() {
 // Load page data
 async function loadCategoryPage() {
     try {
-        // Load categories
+        // Load categories first
         const categoriesData = await API.getAllCategories();
         if (categoriesData.success) {
             categories = categoriesData.data;
             loadTopCategories();
-            renderCategoriesList();
         }
 
         // Load products
@@ -41,6 +40,8 @@ async function loadCategoryPage() {
             }
         }
 
+        // Render categories list after products are loaded
+        renderCategoriesList();
         updateCategoryBanner();
         displayProducts();
     } catch (error) {
@@ -80,22 +81,27 @@ function updateCategoryBanner() {
 
 // Render categories list
 function renderCategoriesList() {
-    const list = document.getElementById('category-list');
+    const list = document.getElementById('cat-items');
+    const countAll = document.getElementById('cnt-all');
+    
     if (!list) return;
 
-    list.innerHTML = `
-        <div class="cat-row ${!currentCategory ? 'active' : ''}" onclick="window.location.href='category.html'">
-            <span class="cat-n">Tất cả</span>
-            <span class="cat-c">${allProducts.length}</span>
-        </div>
-        ${categories.map(cat => `
+    const totalProducts = allProducts.length;
+    
+    if (countAll) {
+        countAll.textContent = totalProducts;
+    }
+
+    list.innerHTML = categories.map(cat => {
+        const count = allProducts.filter(p => p.categoryId === cat.id).length;
+        return `
             <div class="cat-row ${currentCategory?.id === cat.id ? 'active' : ''}" 
                  onclick="window.location.href='category.html?cat=${cat.slug}'">
-                <span class="cat-n">${cat.icon} ${cat.name}</span>
-                <span class="cat-c">${allProducts.filter(p => p.categoryId === cat.id).length}</span>
+                <span class="cat-n">${cat.icon || ''} ${cat.name}</span>
+                <span class="cat-c">${count}</span>
             </div>
-        `).join('')}
-    `;
+        `;
+    }).join('');
 }
 
 // Display products

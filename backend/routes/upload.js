@@ -44,13 +44,15 @@ router.post('/', authMiddleware, upload.single('image'), (req, res) => {
             return res.status(400).json({ success: false, message: 'Chưa chọn file ảnh nào' });
         }
 
-        // URL của hình ảnh trả về cho Client
-        const imageUrl = `/uploads/${req.file.filename}`;
+        // Get protocol and host from request
+        const protocol = req.protocol;
+        const host = req.get('host');
+        const fullUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
 
         res.status(200).json({
             success: true,
             message: 'Upload thành công',
-            url: imageUrl
+            url: fullUrl
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
