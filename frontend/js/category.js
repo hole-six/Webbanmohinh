@@ -181,7 +181,7 @@ function displayProducts() {
                         ${oldPrice}
                         ${discount}
                     </div>
-                    <div class="pcard-delivery" style="color: #2e8b57; font-size: 11px; margin-top: 6px; margin-bottom: 10px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Giao từ 7 - 10 ngày</div>
+                    <div class="pcard-delivery" style="color: #2e8b57; font-size: 10px; margin-top: 6px; margin-bottom: 10px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Order 7-10 ngày</div>
                     <a href="product-detail.html?id=${p._id}" class="btn-add">⚡ MUA NGAY</a>
                 </div>
             </div>
