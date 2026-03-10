@@ -15,7 +15,7 @@ async function loadData() {
         if (categoriesData.success) {
             categories = categoriesData.data;
             window.categories = categories;
-            
+
             // Call functions from index.html
             if (typeof loadTopCategories === 'function') loadTopCategories();
             if (typeof renderHeroGrid === 'function') renderHeroGrid();
@@ -28,7 +28,7 @@ async function loadData() {
         if (productsData.success) {
             products = productsData.data;
             window.products = products;
-            
+
             // Call render functions from index.html
             if (typeof renderFeaturedProducts === 'function') renderFeaturedProducts();
             if (typeof renderSaleProducts === 'function') renderSaleProducts();
@@ -42,37 +42,24 @@ async function loadData() {
 function loadTopCategories() {
     const topCategoriesBar = document.getElementById('top-categories');
     if (!topCategoriesBar) return;
-    
-    const html = categories.map(cat => 
+
+    const html = categories.map(cat =>
         `<a href="category.html?cat=${cat.slug}">${cat.name}</a>`
     ).join('<span class="sep">·</span>');
-    
+
     topCategoriesBar.innerHTML = html;
 }
 
-// Get brand name by ID
-function getBrandName(brandId) {
-    const brands = {
-        1: 'THREEZERO',
-        2: 'HOT TOYS',
-        3: 'BANDAI',
-        4: 'YOLOPARK',
-        5: 'BLOKEES'
-    };
-    return brands[brandId] || 'BRAND';
-}
-
 // Export to window
-window.getBrandName = getBrandName;
 window.loadTopCategories = loadTopCategories;
 
 // Initialize app
-window.initApp = async function() {
+window.initApp = async function () {
     await loadData();
 };
 
 // Auto-load on DOMContentLoaded if not called manually
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     if (!window.appInitialized) {
         window.appInitialized = true;
         loadData();

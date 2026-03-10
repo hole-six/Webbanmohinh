@@ -15,14 +15,14 @@ function getCategoryFromURL() {
 async function loadCategoryPage() {
     // Show loading state
     showLoading();
-    
+
     try {
         console.log('🔄 Starting to load category page...');
-        
+
         // Load categories first and wait for it
         const categoriesData = await API.getAllCategories();
         console.log('📁 Categories loaded:', categoriesData);
-        
+
         if (categoriesData.success) {
             categories = categoriesData.data;
             loadTopCategories();
@@ -31,7 +31,7 @@ async function loadCategoryPage() {
         // Get category slug from URL
         const categorySlug = getCategoryFromURL();
         console.log('🔍 Category slug from URL:', categorySlug);
-        
+
         // Find current category from loaded categories
         if (categorySlug && categories.length > 0) {
             currentCategory = categories.find(c => c.slug === categorySlug);
@@ -47,9 +47,9 @@ async function loadCategoryPage() {
             console.log('📦 Loading all products...');
             productsData = await API.getAllProducts({ limit: 100 });
         }
-        
+
         console.log('📦 Products loaded:', productsData);
-        
+
         if (productsData.success) {
             allProducts = productsData.data;
             filteredProducts = [...allProducts];
@@ -64,7 +64,7 @@ async function loadCategoryPage() {
         renderCategoriesList();
         updateCategoryBanner();
         displayProducts();
-        
+
         console.log('✅ Category page loaded successfully');
     } catch (error) {
         console.error('❌ Error loading category page:', error);
@@ -86,11 +86,11 @@ async function loadCategoryPage() {
 function loadTopCategories() {
     const topCategoriesBar = document.getElementById('top-categories');
     if (!topCategoriesBar) return;
-    
-    const html = categories.map(cat => 
+
+    const html = categories.map(cat =>
         `<a href="category.html?cat=${cat.slug}">${cat.name}</a>`
     ).join('<span class="sep">·</span>');
-    
+
     topCategoriesBar.innerHTML = html;
 }
 
@@ -116,11 +116,11 @@ function updateCategoryBanner() {
 function renderCategoriesList() {
     const list = document.getElementById('cat-items');
     const countAll = document.getElementById('cnt-all');
-    
+
     if (!list) return;
 
     const totalProducts = allProducts.length;
-    
+
     if (countAll) {
         countAll.textContent = totalProducts;
     }
@@ -141,7 +141,7 @@ function renderCategoriesList() {
 function displayProducts() {
     const grid = document.getElementById('products-list');
     const resultCount = document.getElementById('results-count');
-    
+
     if (!grid) return;
 
     if (resultCount) {
@@ -163,7 +163,7 @@ function displayProducts() {
         const badge = p.badge ? `<div class="pbadge ${p.badge.toLowerCase()}">${p.badge}</div>` : '';
         const oldPrice = p.oldPrice ? `<span class="price-was">${API.formatPrice(p.oldPrice)}</span>` : '';
         const discount = p.oldPrice ? `<span class="price-off">-${API.getDiscountPercent(p.price, p.oldPrice)}%</span>` : '';
-        
+
         return `
             <div class="pcard" onclick="window.location.href='product-detail.html?id=${p._id}'">
                 <div class="pcard-img">
@@ -171,7 +171,7 @@ function displayProducts() {
                     ${badge}
                 </div>
                 <div class="pcard-body">
-                    <div class="pcard-brand">${getBrandName(p.brandId)}</div>
+                    <div class="pcard-delivery" style="color: #2e8b57; font-size: 11px; margin-bottom: 5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Giao từ 7 - 10 ngày</div>
                     <div class="pcard-name">${p.name}</div>
                     <div class="pcard-rating">
                         <span class="stars">${'★'.repeat(Math.floor(p.rating || 0))}</span>
@@ -193,7 +193,7 @@ function displayProducts() {
 function showLoading() {
     const grid = document.getElementById('products-list');
     const resultCount = document.getElementById('results-count');
-    
+
     if (grid) {
         grid.innerHTML = `
             <div class="empty" style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
@@ -202,7 +202,7 @@ function showLoading() {
             </div>
         `;
     }
-    
+
     if (resultCount) {
         resultCount.textContent = '0';
     }
@@ -213,7 +213,7 @@ function filterByPrice() {
     const minPrice = parseInt(document.getElementById('price-min')?.value) || 0;
     const maxPrice = parseInt(document.getElementById('price-max')?.value) || Infinity;
 
-    filteredProducts = allProducts.filter(p => 
+    filteredProducts = allProducts.filter(p =>
         p.price >= minPrice && p.price <= maxPrice
     );
 
@@ -222,7 +222,7 @@ function filterByPrice() {
 
 // Sort products
 function sortProducts(sortBy) {
-    switch(sortBy) {
+    switch (sortBy) {
         case 'price-asc':
             filteredProducts.sort((a, b) => a.price - b.price);
             break;
@@ -241,19 +241,9 @@ function sortProducts(sortBy) {
     displayProducts();
 }
 
-// Get brand name
-function getBrandName(brandId) {
-    const brands = {
-        1: 'THREEZERO',
-        2: 'HOT TOYS',
-        3: 'BANDAI',
-        4: 'YOLOPARK',
-        5: 'BLOKEES'
-    };
-    return brands[brandId] || 'BRAND';
-}
+
 
 // Initialize
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     loadCategoryPage();
 });

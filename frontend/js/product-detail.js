@@ -31,7 +31,7 @@ async function loadProductDetail() {
         // Load product
         const productData = await API.getProductById(productId);
         console.log('Product data:', productData);
-        
+
         if (productData.success && productData.data) {
             currentProduct = productData.data;
             renderProductDetail();
@@ -52,11 +52,11 @@ async function loadProductDetail() {
 function loadTopCategories() {
     const topCategoriesBar = document.getElementById('top-categories');
     if (!topCategoriesBar) return;
-    
-    const html = categories.map(cat => 
+
+    const html = categories.map(cat =>
         `<a href="category.html?cat=${cat.slug}">${cat.name}</a>`
     ).join('<span class="sep">·</span>');
-    
+
     topCategoriesBar.innerHTML = html;
 }
 
@@ -185,7 +185,7 @@ function renderRelatedProducts(products) {
                 ${p.badge ? `<div class="rbadge rb-${p.badge.toLowerCase()}">${p.badge}</div>` : ''}
             </div>
             <div class="rcard-body">
-                <div class="rcard-brand">${getBrandName(p.brandId)}</div>
+                <div class="rcard-delivery" style="color: #2e8b57; font-size: 11px; margin-bottom: 5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Giao từ 7 - 10 ngày</div>
                 <div class="rcard-name">${p.name}</div>
                 <div class="rcard-price">
                     <span class="rp-now">${API.formatPrice(p.price)}</span>
@@ -209,19 +209,9 @@ function orderViaPhone() {
     alert(`Gọi ngay: 0123 456 789\n\nSản phẩm: ${currentProduct.name}\nGiá: ${API.formatPrice(currentProduct.price)}`);
 }
 
-// Get brand name
-function getBrandName(brandId) {
-    const brands = {
-        1: 'THREEZERO',
-        2: 'HOT TOYS',
-        3: 'BANDAI',
-        4: 'YOLOPARK',
-        5: 'BLOKEES'
-    };
-    return brands[brandId] || 'BRAND';
-}
+
 
 // Initialize
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     loadProductDetail();
 });

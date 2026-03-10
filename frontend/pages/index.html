@@ -1692,21 +1692,11 @@
             return window.products ? window.products.find(p => (p._id || p.id) == id) : null;
         }
 
-        function getBrandName(brandId) {
-            const brands = {
-                1: 'THREEZERO',
-                2: 'HOT TOYS',
-                3: 'BANDAI',
-                4: 'YOLOPARK',
-                5: 'BLOKEES'
-            };
-            return brands[brandId] || 'BRAND';
-        }
+
 
         function renderProductCard(p) {
             const productId = p._id || p.id;
             const img = p.images ? p.images[0] : p.image;
-            const brandName = getBrandName(p.brandId);
             const disc = p.oldPrice ? getDiscountPercent(p.price, p.oldPrice) : 0;
             const low = p.stock > 0 && p.stock <= 5;
             const adminShow = (typeof isAdmin !== 'undefined' && isAdmin) ? 'flex' : 'none';
@@ -1724,7 +1714,7 @@
         <div class="pcard-ov"><span>Xem chi tiết</span></div>
       </div>
       <div class="pcard-body">
-        <div class="pcard-brand">${brandName}</div>
+        <div class="pcard-delivery" style="color: #2e8b57; font-size: 11px; margin-bottom: 5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Giao từ 7 - 10 ngày</div>
         <div class="pcard-name">${p.name}</div>
         ${stars ? `<div class="pcard-star">${stars}<span>(${p.reviewCount || 0})</span></div>` : ''}
         <div class="pcard-price">
