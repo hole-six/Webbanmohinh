@@ -171,17 +171,17 @@ function displayProducts() {
                     ${badge}
                 </div>
                 <div class="pcard-body">
-                    <div class="pcard-delivery" style="color: #2e8b57; font-size: 11px; margin-bottom: 5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Giao từ 7 - 10 ngày</div>
-                    <div class="pcard-name">${p.name}</div>
-                    <div class="pcard-rating">
+                    <div class="pcard-name" style="margin-bottom: 2px;">${p.name}</div>
+                    <div class="pcard-rating" style="margin-bottom: 2px;">
                         <span class="stars">${'★'.repeat(Math.floor(p.rating || 0))}</span>
                         <span class="rc">(${p.reviewCount || 0})</span>
                     </div>
-                    <div class="pcard-price">
+                    <div class="pcard-price" style="margin-bottom: 4px;">
                         <span class="price-now">${API.formatPrice(p.price)}</span>
                         ${oldPrice}
                         ${discount}
                     </div>
+                    <div class="pcard-delivery" style="color: #2e8b57; font-size: 11px; margin-top: 6px; margin-bottom: 10px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Giao từ 7 - 10 ngày</div>
                     <a href="product-detail.html?id=${p._id}" class="btn-add">⚡ MUA NGAY</a>
                 </div>
             </div>

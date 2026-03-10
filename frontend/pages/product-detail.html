@@ -1859,6 +1859,38 @@
                     <div class="price-save" id="price-save" style="display:none"></div>
                 </div>
                 <div class="contact-cta">
+                    <style>
+                        @keyframes blinkCta {
+                            0% {
+                                opacity: 1;
+                                color: #d32f2f;
+                                transform: scale(1);
+                            }
+
+                            50% {
+                                opacity: 0.7;
+                                color: #f44336;
+                                transform: scale(1.02);
+                            }
+
+                            100% {
+                                opacity: 1;
+                                color: #d32f2f;
+                                transform: scale(1);
+                            }
+                        }
+
+                        .blink-order-text {
+                            animation: blinkCta 1.2s infinite;
+                            font-size: 15px;
+                            font-weight: 700;
+                            text-align: center;
+                            margin-bottom: 2px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                        }
+                    </style>
+                    <div class="blink-order-text">🔥 NHẮN TIN ĐỂ ĐẶT HÀNG NGAY 👇</div>
                     <a href="https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr" target="_blank"
                         class="btn-mess" style="flex: 1;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">

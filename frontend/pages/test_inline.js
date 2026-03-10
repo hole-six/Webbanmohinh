@@ -239,14 +239,14 @@ function renderCard(p) {
      
     </div>
     <div class="pcard-body">
-      <div class="pcard-delivery" style="color: #2e8b57; font-size: 11px; margin-bottom: 5px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Giao từ 7 - 10 ngày</div>
-      <div class="pcard-name">${p.name}</div>
+      <div class="pcard-name" style="margin-bottom: 2px;">${p.name}</div>
       ${ratingHTML}
       ${low ? `<div class="stock-warn">Chỉ còn ${p.stock} sản phẩm</div>` : ''}
-      <div class="pcard-price">
+      <div class="pcard-price" style="margin-bottom: 4px;">
         <span class="price-now">${formatPrice(p.price)}</span>
         ${p.oldPrice ? `<span class="price-was">${formatPrice(p.oldPrice)}</span><span class="price-off">-${disc}%</span>` : ''}
       </div>
+      <div class="pcard-delivery" style="color: #2e8b57; font-size: 11px; margin-top: 6px; margin-bottom: 10px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Giao từ 7 - 10 ngày</div>
       <button class="btn-add" onclick="location.href='product-detail.html?id=${p.id}'">Mua ngay</button>
     </div>
   </div>`;
