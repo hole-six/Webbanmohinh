@@ -2123,8 +2123,11 @@
             const nav = document.getElementById('slider-nav');
             if (!slides || !nav) return;
 
-            // Use categories from API loaded in main.js
+            console.log('🎬 Rendering hero slider...', window.categories);
+
+            // Use categories from API loaded in api.js
             if (!window.categories || window.categories.length === 0) {
+                console.log('⚠️ No categories found for hero slider');
                 return;
             }
 
@@ -2150,6 +2153,8 @@
             nav.innerHTML = categories.map((_, index) => 
                 `<div class="nav-dot ${index === 0 ? 'active' : ''}" onclick="goToSlide(${index})"></div>`
             ).join('');
+
+            console.log('✅ Hero slider rendered with', categories.length, 'slides');
 
             // Start auto-slide
             startAutoSlide();
@@ -2257,21 +2262,30 @@
             const grid = document.getElementById('featured-products-grid');
             if (!grid) return;
 
-            // Use products from API loaded in main.js
+            console.log('🎨 Rendering featured products...', window.products);
+
+            // Use products from API loaded in api.js
             if (!window.products || window.products.length === 0) {
                 grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px"><div style="font-size:14px;color:var(--muted)">Đang tải sản phẩm...</div></div>';
                 return;
             }
 
-            grid.innerHTML = window.products.map(renderProductCard).join('');
+            // Take first 8 products for featured section
+            const featuredProducts = window.products.slice(0, 8);
+            grid.innerHTML = featuredProducts.map(renderProductCard).join('');
+            console.log('✅ Featured products rendered:', featuredProducts.length);
         }
 
         function renderFastDeliveryProducts() {
             const slider = document.getElementById('fast-delivery-slider');
             if (!slider) return;
 
+            console.log('🚚 Rendering fast delivery products...', window.products);
+
             // Filter products with fastDelivery = true
             const fastDeliveryProducts = window.products ? window.products.filter(p => p.fastDelivery) : [];
+            
+            console.log('Fast delivery products found:', fastDeliveryProducts.length);
             
             if (fastDeliveryProducts.length === 0) {
                 slider.innerHTML = '<div style="min-width:100%;text-align:center;padding:60px 20px"><div style="font-size:14px;color:var(--muted)">Chưa có sản phẩm giao hàng nhanh</div></div>';
@@ -2279,6 +2293,7 @@
             }
 
             slider.innerHTML = fastDeliveryProducts.map(p => renderProductCard(p, true)).join('');
+            console.log('✅ Fast delivery products rendered');
         }
 
         function renderProductCard(p, showFastDelivery = false) {
@@ -2345,14 +2360,22 @@
             const grid = document.getElementById('sale-products-grid');
             if (!grid) return;
 
+            console.log('💰 Rendering sale products...', window.products);
+
             // Filter products with oldPrice (sale products)
             const saleProducts = window.products ? window.products.filter(p => p.oldPrice) : [];
+            
+            console.log('Sale products found:', saleProducts.length);
+            
             if (saleProducts.length === 0) {
                 grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px"><div style="font-size:14px;color:var(--muted)">Chưa có sản phẩm sale</div></div>';
                 return;
             }
 
-            grid.innerHTML = saleProducts.map(renderProductCard).join('');
+            // Take first 8 sale products
+            const displayProducts = saleProducts.slice(0, 8);
+            grid.innerHTML = displayProducts.map(renderProductCard).join('');
+            console.log('✅ Sale products rendered:', displayProducts.length);
         }
 
         function renderAllProductsSection() { location.href = 'category.html'; }
@@ -2487,7 +2510,16 @@
 
         // ── Init ──
         document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 Starting app initialization...');
+            
             await window.initApp();
+            
+            console.log('📊 Data loaded:', {
+                categories: window.categories?.length || 0,
+                products: window.products?.length || 0,
+                brands: window.brands?.length || 0
+            });
+            
             loadCart();
             renderHeroSlider();
             buildCatNav();
@@ -2497,6 +2529,7 @@
             updateCartUI();
             buildFooterCats();
 
+            console.log('✅ App initialized successfully');
 
             // Show admin add button if admin
             if (typeof isAdmin !== 'undefined' && isAdmin) {
