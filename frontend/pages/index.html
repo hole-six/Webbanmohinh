@@ -13,7 +13,7 @@
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <script src="../js/api.js"></script>
-    <script src="../js/main.js"></script>
+    <script src="../js/mainF.js"></script>
     <style>
         *,
         *::before,
@@ -1413,6 +1413,7 @@
             }
 
             .logo a img {
+                margin-top:10px;
                 height: 75px !important; /* Even larger logo */
             }
 
@@ -1835,7 +1836,7 @@
             <div class="logo">
                 <a href="index.html" style="display: flex; align-items: center; gap: 20px; padding: 6px 0; text-decoration: none;">
                     <img src="https://drive.google.com/thumbnail?id=1OKfpl8tUbUEQt1TJNPSD51tBnc0neJa5&sz=w400" alt="Figure Korean Shop" style="height: 70px; width: auto; object-fit: contain; flex-shrink: 0;">
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
                         <div style="font-family: var(--f-serif); font-size: 28px; font-weight: 700; letter-spacing: 2px; line-height: 1; display: flex; gap: 6px;">
                             <span style="color: #ff6b35;">Figure</span>
                             <span style="color: #1e5ba8;">Korean</span>
@@ -1940,16 +1941,27 @@
     <section class="products-section" id="san-pham">
         <div class="prod-wrap">
             <div class="section-hd">
-                <div class="sh-title">Sản phẩm nổi bật</div>
+                <div class="sh-title">⭐ Sản phẩm nổi bật</div>
                 <div class="sh-line"></div>
                 <span id="add-featured-btn" style="display:none">
                     <button class="btn-add-prod" onclick="showAddProductModal('featured')">+ Thêm sản phẩm</button>
                 </span>
                 <a href="category.html" class="sh-link">Xem tất cả</a>
             </div>
-            <div class="prod-grid" id="featured-products-grid"></div>
-            <div class="view-all-wrap">
-                <button class="btn-view-all" onclick="location.href='category.html'">Xem toàn bộ sản phẩm</button>
+            
+            <!-- Horizontal scrollable product slider -->
+            <div class="prod-slider-container">
+                <button class="slider-btn prev" id="featured-prev" onclick="scrollProducts('featured', -1)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15,18 9,12 15,6"/>
+                    </svg>
+                </button>
+                <div class="prod-slider" id="featured-products-grid"></div>
+                <button class="slider-btn next" id="featured-next" onclick="scrollProducts('featured', 1)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9,18 15,12 9,6"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </section>
@@ -1959,11 +1971,25 @@
     <section class="products-section" id="sale">
         <div class="prod-wrap">
             <div class="section-hd" style="margin-bottom:32px">
-                <div class="sh-title">Sản phẩm giảm giá</div>
+                <div class="sh-title">💰 Sản phẩm giảm giá</div>
                 <div class="sh-line"></div>
                 <a href="category.html?sort=disc" class="sh-link">Xem thêm</a>
             </div>
-            <div class="prod-grid" id="sale-products-grid"></div>
+            
+            <!-- Horizontal scrollable product slider -->
+            <div class="prod-slider-container">
+                <button class="slider-btn prev" id="sale-prev" onclick="scrollProducts('sale', -1)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15,18 9,12 15,6"/>
+                    </svg>
+                </button>
+                <div class="prod-slider" id="sale-products-grid"></div>
+                <button class="slider-btn next" id="sale-next" onclick="scrollProducts('sale', 1)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9,18 15,12 9,6"/>
+                    </svg>
+                </button>
+            </div>
         </div>
     </section>
 
