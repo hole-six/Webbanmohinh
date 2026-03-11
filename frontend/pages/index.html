@@ -86,9 +86,11 @@
 
         /* ─── HEADER ─── */
         .site-header {
-            display: none; /* Hidden on index page */
-            background: var(--white);
-            border-bottom: 1px solid var(--border);
+            background-image: url('/uploads/logoweb (2).png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-bottom: none;
             position: sticky;
             top: 0;
             z-index: 300;
@@ -97,7 +99,8 @@
         .header-inner {
             max-width: var(--max);
             margin: 0 auto;
-            padding: 0 40px;
+            padding: 0;
+            height: 120px; /* Adjust height as needed */
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -1799,42 +1802,7 @@
     <!-- HEADER -->
     <header class="site-header">
         <div class="header-inner">
-            <div class="logo">
-                <a href="index.html" style="padding: 6px 0;">
-                    <img src="/uploads/logoweb.png" alt="Figure Korean Shop" style="height: 60px; object-fit: contain; vertical-align: middle;">
-                </a>
-            </div>
-
-            <nav class="header-nav">
-                <a href="index.html">Trang chủ</a>
-                <a href="category.html">Sản phẩm</a>
-                <a href="#sale">Khuyến mãi</a>
-                <a href="#">Về chúng tôi</a>
-                <a href="#">Liên hệ</a>
-            </nav>
-
-            <div class="header-right">
-
-
-                <div class="admin-area">
-
-                    <button id="admin-logout-btn" class="admin-btn-icon logged" onclick="adminLogout()"
-                        style="display:none" title="Đăng xuất">
-                        <span id="admin-badge" style="font-size:9px;font-weight:700;letter-spacing:.5px">ADMIN</span>
-                    </button>
-                </div>
-
-                <div class="cart-pill" id="cart-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="1.8">
-                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                        <line x1="3" y1="6" x2="21" y2="6" />
-                        <path d="M16 10a4 4 0 0 1-8 0" />
-                    </svg>
-                    <span class="cnt" id="cart-count-badge">0</span>
-                    <span class="total" id="cart-total-display">₩0</span>
-                </div>
-            </div>
+            <!-- Header is now just a background image -->
         </div>
     </header>
 
