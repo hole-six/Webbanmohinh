@@ -2086,7 +2086,7 @@
           <span class="price-n">${formatPrice(p.price)}</span>
           ${p.oldPrice ? `<span class="price-o">${formatPrice(p.oldPrice)}</span><span class="price-pct">-${disc}%</span>` : ''}
         </div>
-        <div class="pcard-delivery" style="color: #2e8b57; font-size: 10px; margin-top: 6px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Order 7-10 ngày</div>
+        <div class="pcard-delivery" style="color: ${p.fastDelivery ? '#27ae60' : '#2e8b57'}; font-size: 10px; margin-top: 6px; font-weight: 500; display: flex; align-items: center; gap: 4px;">${p.fastDelivery ? '🚚 Giao 2-3 ngày' : '🚚 Order 7-10 ngày'}</div>
       </div>
     </a>
     <div style="padding:0 16px 16px">
@@ -2311,13 +2311,16 @@
             }
 
             // Add fast delivery badge if needed
-            const fastDeliveryBadge = showFastDelivery && p.fastDelivery ? 
+            const fastDeliveryBadge = p.fastDelivery ? 
                 `<div class="fast-delivery-badge">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M3 4h13l3 3v6h-2a3 3 0 1 1-6 0H9a3 3 0 1 1-6 0H1V6a2 2 0 0 1 2-2z"/>
                     </svg>
                     2-3 ngày
                 </div>` : '';
+                
+            const deliveryText = p.fastDelivery ? '🚚 Giao 2-3 ngày' : '🚚 Order 7-10 ngày';
+            const deliveryColor = p.fastDelivery ? '#27ae60' : '#2e8b57';
 
             const ratingHTML = p.rating ? `
                 <div class="pcard-star">${'★'.repeat(Math.round(p.rating))}${'☆'.repeat(5 - Math.round(p.rating))} <span>(${p.reviewCount || 0})</span></div>` : '';
@@ -2338,7 +2341,8 @@
                         <span class="price-n">${formatPrice(p.price)}</span>
                         ${p.oldPrice ? `<span class="price-o">${formatPrice(p.oldPrice)}</span><span class="price-pct">-${disc}%</span>` : ''}
                     </div>
-                    ${showFastDelivery && p.fastDelivery ? '<div style="color:#27ae60;font-size:11px;font-weight:600;margin-top:4px;">🚚 Giao 2-3 ngày</div>' : ''}
+                    <div class="pcard-delivery" style="color: ${p.fastDelivery ? '#27ae60' : '#2e8b57'}; font-size: 10px; margin-top: 6px; font-weight: 500; display: flex; align-items: center; gap: 4px;">${p.fastDelivery ? '🚚 Giao 2-3 ngày' : '🚚 Order 7-10 ngày'}</div>
+                    ${showFastDelivery && p.fastDelivery ? '<div style="color:#27ae60;font-size:11px;font-weight:600;margin-top:4px;">⚡ Có sẵn</div>' : ''}
                     <button class="btn-card" onclick="event.stopPropagation(); location.href='product-detail.html?id=${p.id || p._id}'">Xem chi tiết</button>
                 </div>
             </div>`;

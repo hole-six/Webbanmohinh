@@ -106,9 +106,9 @@ function updateCategoryBanner() {
         if (icon) icon.textContent = currentCategory.icon;
         document.title = `${currentCategory.name} - Mô Hình Cao Cấp`;
     } else {
-        if (title) title.textContent = 'Tất cả sản phẩm';
-        if (description) description.textContent = 'Khám phá toàn bộ bộ sưu tập';
-        if (icon) icon.textContent = '🎯';
+        if (title) title.textContent = '';
+        if (description) description.textContent = '';
+        if (icon) icon.textContent = '';
     }
 }
 
@@ -163,9 +163,13 @@ function displayProducts() {
         const badge = p.badge ? `<div class="pbadge ${p.badge.toLowerCase()}">${p.badge}</div>` : '';
         const oldPrice = p.oldPrice ? `<span class="price-was">${API.formatPrice(p.oldPrice)}</span>` : '';
         const discount = p.oldPrice ? `<span class="price-off">-${API.getDiscountPercent(p.price, p.oldPrice)}%</span>` : '';
+        
+        // Check if product has fast delivery
+        const deliveryText = p.fastDelivery ? '🚚 Giao 2-3 ngày' : '🚚 Order 7-10 ngày';
+        const deliveryColor = p.fastDelivery ? '#27ae60' : '#2e8b57';
 
         return `
-            <div class="pcard" onclick="window.location.href='product-detail.html?id=${p.id || p._id}'">
+            <div class="pcard" style="cursor: pointer;" onclick="window.location.href='product-detail.html?id=${p.id || p._id}'">
                 <div class="pcard-img">
                     <img src="${p.images[0]}" alt="${p.name}">
                     ${badge}
@@ -181,8 +185,8 @@ function displayProducts() {
                         ${oldPrice}
                         ${discount}
                     </div>
-                    <div class="pcard-delivery" style="color: #2e8b57; font-size: 10px; margin-top: 6px; margin-bottom: 10px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Order 7-10 ngày</div>
-                    <a href="product-detail.html?id=${p.id || p._id}" class="btn-add">⚡ MUA NGAY</a>
+                    <div class="pcard-delivery" style="color: ${deliveryColor}; font-size: 10px; margin-top: 6px; margin-bottom: 10px; font-weight: 500; display: flex; align-items: center; gap: 4px;">${deliveryText}</div>
+                    <button class="btn-add" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${p.id || p._id}'">⚡ MUA NGAY</button>
                 </div>
             </div>
         `;

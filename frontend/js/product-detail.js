@@ -135,12 +135,12 @@ function renderProductDetail() {
         
         // Add styling and icons for the specific note pattern safely
         formattedText = formattedText
-            .replace(/MỘT SỐ LƯU Ý TRƯỚC KHI ĐẶT HÀNG/gi, '<br><strong style="color: #8b1a1a; font-size: 1.1em; display: inline-block; margin-bottom: 4px;">📌 MỘT SỐ LƯU Ý TRƯỚC KHI ĐẶT HÀNG</strong>')
-            .replace(/1\s*-\s*/g, '🔸 <strong>1 - </strong>')
-            .replace(/2\s*-\s*/g, '🔸 <strong>2 - </strong>')
-            .replace(/3\s*-\s*/g, '🔸 <strong>3 - </strong>')
-            .replace(/\*\*\s*/g, '<span style="color: #d35400;">✨ <strong>Lưu ý:</strong> </span>')
-            .replace(/Cảm ơn khách hàng đã tin tưởng và ủng hộ/gi, '<span style="color: #8b1a1a; font-weight: 500; display: block; margin-top: 12px; text-align: center;">❤️ Cảm ơn khách hàng đã tin tưởng và ủng hộ!</span>');
+            .replace(/(?:<br>|\s)*MỘT SỐ LƯU Ý TRƯỚC KHI ĐẶT HÀNG(?:<br>|\s)*/gi, '<strong style="color: #8b1a1a; font-size: 1.1em; display: inline-block; margin-bottom: 4px;">📌 MỘT SỐ LƯU Ý TRƯỚC KHI ĐẶT HÀNG</strong><br>')
+            .replace(/(?:<br>|\s)*1\s*-\s*/g, '<br><br>🔸 <strong>1 - </strong>')
+            .replace(/(?:<br>|\s)*2\s*-\s*/g, '<br><br>🔸 <strong>2 - </strong>')
+            .replace(/(?:<br>|\s)*3\s*-\s*/g, '<br><br>🔸 <strong>3 - </strong>')
+            .replace(/(?:<br>|\s)*\*\*\s*/g, '<br><br><span style="color: #d35400;">✨ <strong>Lưu ý:</strong> </span>')
+            .replace(/(?:<br>|\s)*Cảm ơn khách hàng đã tin tưởng và ủng hộ/gi, '<br><br><span style="color: #8b1a1a; font-weight: 500; display: block; margin-top: 12px; text-align: center;">❤️ Cảm ơn khách hàng đã tin tưởng và ủng hộ!</span>');
         
         // Remove excessive newlines
         formattedText = formattedText.replace(/(<br>\s*){3,}/g, '<br><br>');
@@ -223,7 +223,7 @@ function renderRelatedProducts(products) {
                     <span class="rp-now">${API.formatPrice(p.price)}</span>
                     ${p.oldPrice ? `<span class="rp-was">${API.formatPrice(p.oldPrice)}</span>` : ''}
                 </div>
-                <div class="rcard-delivery" style="color: #2e8b57; font-size: 10px; margin-top: 6px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Order 7-10 ngày</div>
+                <div class="rcard-delivery" style="color: ${p.fastDelivery ? '#27ae60' : '#2e8b57'}; font-size: 10px; margin-top: 6px; font-weight: 500; display: flex; align-items: center; gap: 4px;">${p.fastDelivery ? '🚚 Giao 2-3 ngày' : '🚚 Order 7-10 ngày'}</div>
             </div>
         </div>
     `).join('');

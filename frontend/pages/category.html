@@ -2083,9 +2083,9 @@
       <span class="rc">(${p.reviewCount || 0})</span>
     </div>` : '';
 
-            return `<div class="pcard">
+            return `<div class="pcard" style="cursor: pointer;" onclick="location.href='product-detail.html?id=${p.id || p._id}'">
     ${badgeHTML}
-    <button class="pwish${isW ? ' on' : ''}" onclick="toggleWish(${p.id},this)" title="Yêu thích">
+    <button class="pwish${isW ? ' on' : ''}" onclick="event.stopPropagation(); toggleWish(${p.id},this)" title="Yêu thích">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="${isW ? '#8b1a1a' : 'none'}" stroke="${isW ? '#8b1a1a' : '#48484a'}" stroke-width="1.8">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
       </svg>
@@ -2102,8 +2102,8 @@
         <span class="price-now">${window.API.formatPrice(p.price)}</span>
         ${p.oldPrice ? `<span class="price-was">${window.API.formatPrice(p.oldPrice)}</span><span class="price-off">-${disc}%</span>` : ''}
       </div>
-      <div class="pcard-delivery" style="color: #2e8b57; font-size: 10px; margin-top: 6px; margin-bottom: 10px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Order 7-10 ngày</div>
-      <button class="btn-add" onclick="location.href='product-detail.html?id=${p.id || p._id}'">Mua ngay</button>
+      <div class="pcard-delivery" style="color: ${p.fastDelivery ? '#27ae60' : '#2e8b57'}; font-size: 10px; margin-top: 6px; margin-bottom: 10px; font-weight: 500; display: flex; align-items: center; gap: 4px;">${p.fastDelivery ? '🚚 Giao 2-3 ngày' : '🚚 Order 7-10 ngày'}</div>
+      <button class="btn-add" onclick="event.stopPropagation(); location.href='product-detail.html?id=${p.id || p._id}'">Mua ngay</button>
     </div>
   </div>`;
         }
