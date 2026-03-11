@@ -769,12 +769,14 @@
             position: relative;
             overflow: hidden;
             background: #ffffff; /* White background for better product visibility */
+            height: 0;
+            padding-bottom: 110%; /* Fixed aspect ratio */
         }
 
         .pcard-img::before {
             content: '';
             display: block;
-            padding-top: 110%;
+            padding-top: 0; /* Remove padding-top since we use padding-bottom on parent */
         }
 
         .pcard-img img {
