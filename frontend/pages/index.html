@@ -714,7 +714,7 @@
         .pcard-img {
             position: relative;
             overflow: hidden;
-            background: var(--cream);
+            background: #ffffff; /* White background for better product visibility */
         }
 
         .pcard-img::before {
@@ -728,12 +728,13 @@
             inset: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain; /* Changed from cover to contain - shows full product */
+            padding: 8px; /* Add padding so products don't touch edges */
             transition: transform .6s cubic-bezier(.25, .46, .45, .94);
         }
 
         .pcard:hover .pcard-img img {
-            transform: scale(1.05);
+            transform: scale(1.08);
         }
 
         /* Badge */
@@ -2207,26 +2208,26 @@
 
             console.log('✅ Hero slider rendered with', categories.length, 'slides');
 
-            // Auto-slide disabled - only manual swipe/click navigation
-            // startAutoSlide();
+            // Auto-slide enabled - slides change automatically every 4 seconds
+            startAutoSlide();
         }
 
         function goToSlide(index) {
             currentSlide = index;
             updateSlider();
-            // resetAutoSlide(); // Disabled auto-slide
+            resetAutoSlide(); // Reset timer when manually clicking
         }
 
         function nextSlide() {
             currentSlide = (currentSlide + 1) % categories.length;
             updateSlider();
-            // resetAutoSlide(); // Disabled auto-slide
+            // Don't reset on auto-slide, only on manual click
         }
 
         function prevSlide() {
             currentSlide = (currentSlide - 1 + categories.length) % categories.length;
             updateSlider();
-            // resetAutoSlide(); // Disabled auto-slide
+            resetAutoSlide(); // Reset timer when manually clicking
         }
 
         function updateSlider() {
@@ -2282,10 +2283,14 @@
             if (Math.abs(diff) > swipeThreshold) {
                 if (diff > 0) {
                     // Swipe left - next slide
-                    nextSlide();
+                    currentSlide = (currentSlide + 1) % categories.length;
+                    updateSlider();
+                    resetAutoSlide(); // Reset timer when swiping
                 } else {
                     // Swipe right - previous slide
-                    prevSlide();
+                    currentSlide = (currentSlide - 1 + categories.length) % categories.length;
+                    updateSlider();
+                    resetAutoSlide(); // Reset timer when swiping
                 }
             }
         }
