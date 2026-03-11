@@ -87,30 +87,30 @@
         /* ─── HEADER ─── */
         .site-header {
             background-color: #1a1a1a; /* Fallback color */
-            background-image: url('https://drive.google.com/thumbnail?id=1Zfw5s-eqJB2k-Yj8h025mtlwQYduA6X_&sz=w2000');
-            background-size: 100% 100%; /* Stretch to fill entire header */
+            background-image: url('https://drive.google.com/thumbnail?id=1Zfw5s-eqJB2k-Yj8h025mtlwQYduA6X_&sz=w4000');
+            background-size: cover; /* Use cover instead of 100% 100% */
             background-position: center center;
             background-repeat: no-repeat;
             border-bottom: none;
             position: sticky;
             top: 0;
             z-index: 300;
-            height: 100px; /* Reduced height */
+            height: 150px; /* Increased height for better aspect ratio */
             width: 100%;
         }
 
         /* Responsive header for mobile */
         @media (max-width: 768px) {
             .site-header {
-                height: 70px; /* Smaller height on mobile */
-                background-size: 100% 100%; /* Also stretch on mobile */
+                height: 100px; /* Taller on mobile */
+                background-size: cover;
             }
         }
 
         @media (max-width: 480px) {
             .site-header {
-                height: 60px; /* Even smaller on very small screens */
-                background-size: 100% 100%; /* Also stretch on small mobile */
+                height: 80px;
+                background-size: cover;
             }
         }
 
