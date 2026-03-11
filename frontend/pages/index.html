@@ -620,6 +620,7 @@
             padding: 0 20px;
             scrollbar-width: none;
             -ms-overflow-style: none;
+            align-items: stretch; /* Make all cards same height */
         }
 
         .prod-slider::-webkit-scrollbar {
@@ -628,7 +629,21 @@
 
         .prod-slider .pcard {
             min-width: 280px;
+            max-width: 280px; /* Add max-width to prevent expansion */
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            height: auto; /* Let content determine height but keep consistent */
+        }
+        
+        .prod-slider .pcard .pcard-img {
+            flex-shrink: 0; /* Prevent image container from shrinking */
+        }
+        
+        .prod-slider .pcard .pcard-body {
+            flex: 1; /* Body takes remaining space */
+            display: flex;
+            flex-direction: column;
         }
 
         .slider-btn {
@@ -1361,6 +1376,7 @@
 
             .prod-slider .pcard {
                 min-width: 260px;
+                max-width: 260px;
             }
 
             .hero-slider {
@@ -1436,6 +1452,7 @@
 
             .prod-slider .pcard {
                 min-width: 240px;
+                max-width: 240px;
             }
 
             .slider-btn {
@@ -1496,6 +1513,7 @@
 
             .prod-slider .pcard {
                 min-width: 200px;
+                max-width: 200px;
             }
 
             .slider-btn {
