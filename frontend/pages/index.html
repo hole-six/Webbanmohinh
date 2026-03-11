@@ -88,27 +88,29 @@
         .site-header {
             background-color: #1a1a1a; /* Fallback color */
             background-image: url('https://drive.google.com/thumbnail?id=1q_dPpZjHJJaTGeZ497PowfDr9G96Scva&sz=w2000');
-            background-size: cover; /* Changed from contain to cover */
+            background-size: 100% 100%; /* Stretch to fill entire header */
             background-position: center center;
             background-repeat: no-repeat;
             border-bottom: none;
             position: sticky;
             top: 0;
             z-index: 300;
-            height: 120px; /* Fixed height for desktop */
+            height: 100px; /* Reduced height */
+            width: 100%;
         }
 
         /* Responsive header for mobile */
         @media (max-width: 768px) {
             .site-header {
-                height: 80px; /* Smaller height on mobile */
-                background-size: contain; /* Fit entire logo on mobile */
+                height: 70px; /* Smaller height on mobile */
+                background-size: 100% 100%; /* Also stretch on mobile */
             }
         }
 
         @media (max-width: 480px) {
             .site-header {
                 height: 60px; /* Even smaller on very small screens */
+                background-size: 100% 100%; /* Also stretch on small mobile */
             }
         }
 
