@@ -1815,9 +1815,9 @@
                     </div>
                     <div class="price-save" id="price-save" style="display:none"></div>
                 </div>
-                <div class="prod-delivery"
-                    style="color: #2e8b57; font-size: 12px; margin-top: 12px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
-                    🚚 Order 7-10 ngày</div>
+                <div id="prod-delivery" class="prod-delivery"
+                    style="font-size: 12px; margin-top: 12px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+                    </div>
                 <div class="contact-cta">
                     <style>
                         @keyframes blinkCta {
@@ -2077,6 +2077,16 @@
                 dot.className = 'stock-dot dot-orange'; stxt.textContent = `Chỉ còn ${p.stock} sản phẩm`;
             } else {
                 dot.className = 'stock-dot dot-green'; stxt.textContent = `Còn hàng · ${p.stock} sản phẩm`;
+            }
+
+            // Delivery
+            const deliveryEl = document.getElementById('prod-delivery');
+            if (p.fastDelivery) {
+                deliveryEl.style.color = '#27ae60';
+                deliveryEl.innerHTML = '🚚 Giao 2-3 ngày';
+            } else {
+                deliveryEl.style.color = '#2e8b57';
+                deliveryEl.innerHTML = '🚚 Order 7-10 ngày';
             }
 
             // Desc

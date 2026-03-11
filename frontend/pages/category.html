@@ -1752,7 +1752,7 @@
         <main class="main-col">
 
             <!-- BANNER -->
-            <div class="cat-banner" id="cat-banner">
+            <div class="cat-banner" id="cat-banner" style="display: none;">
 
                 <div class="cat-banner-text">
                     <h2 id="banner-title">Tất cả sản phẩm</h2>
@@ -1817,7 +1817,7 @@
         // ── State ──
         let activeCatId = null, priceMin = 0, priceMax = Infinity;
         let sortMode = '', viewMode = 'grid', page = 1;
-        const PER = 9;
+        const PER = 30;
         let filtered = [];
         let wished = new Set();
 
@@ -1913,7 +1913,7 @@
             const ttl = document.getElementById('page-title');
             
             if (window.filterFastDelivery) {
-                h2.textContent = '🚚 Giao hàng nhanh';
+                h2.textContent = '🚀 Giao hàng nhanh';
                 par.textContent = 'Sản phẩm có sẵn - Giao hàng 2-3 ngày';
                 ttl.textContent = 'Giao Hàng Nhanh — Figure Korea Shop';
             } else if (activeCatId == null) {
