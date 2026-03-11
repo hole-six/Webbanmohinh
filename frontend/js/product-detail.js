@@ -115,7 +115,40 @@ function renderProductDetail() {
 
     // Description
     const descEl = document.getElementById('product-description');
-    if (descEl) descEl.textContent = currentProduct.description || 'Đang cập nhật...';
+    if (descEl) {
+        let text = currentProduct.description || 'Đang cập nhật...';
+        
+        // Escape HTML to prevent XSS
+        const escapeHtml = (unsafe) => {
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        };
+        
+        let formattedText = escapeHtml(text);
+        
+        // Convert all newlines to <br>
+        formattedText = formattedText.replace(/\n/g, '<br>');
+        
+        // Add styling and icons for the specific note pattern safely
+        formattedText = formattedText
+            .replace(/MỘT SỐ LƯU Ý TRƯỚC KHI ĐẶT HÀNG/gi, '<br><strong style="color: #8b1a1a; font-size: 1.1em; display: inline-block; margin-bottom: 4px;">📌 MỘT SỐ LƯU Ý TRƯỚC KHI ĐẶT HÀNG</strong>')
+            .replace(/1\s*-\s*/g, '🔸 <strong>1 - </strong>')
+            .replace(/2\s*-\s*/g, '🔸 <strong>2 - </strong>')
+            .replace(/3\s*-\s*/g, '🔸 <strong>3 - </strong>')
+            .replace(/\*\*\s*/g, '<span style="color: #d35400;">✨ <strong>Lưu ý:</strong> </span>')
+            .replace(/Cảm ơn khách hàng đã tin tưởng và ủng hộ/gi, '<span style="color: #8b1a1a; font-weight: 500; display: block; margin-top: 12px; text-align: center;">❤️ Cảm ơn khách hàng đã tin tưởng và ủng hộ!</span>');
+        
+        // Remove excessive newlines
+        formattedText = formattedText.replace(/(<br>\s*){3,}/g, '<br><br>');
+
+        descEl.innerHTML = formattedText;
+        descEl.style.lineHeight = '1.8';
+        descEl.style.padding = '10px 0';
+    }
 
     // Badge
     if (currentProduct.badge) {

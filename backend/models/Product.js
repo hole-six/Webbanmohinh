@@ -53,6 +53,10 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    fastDelivery: {
+        type: Boolean,
+        default: false
+    },
     description: {
         type: String,
         default: ''
@@ -77,5 +81,6 @@ productSchema.index({ name: 'text', description: 'text' });
 productSchema.index({ categoryId: 1 });
 productSchema.index({ brandId: 1 });
 productSchema.index({ featured: 1 });
+productSchema.index({ fastDelivery: 1 });
 
 module.exports = mongoose.model('Product', productSchema);

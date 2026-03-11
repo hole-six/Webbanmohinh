@@ -158,7 +158,7 @@
                 </div>
                 <div class="form-group full">
                     <label>Mô Tả</label>
-                    <textarea id="description" rows="3" placeholder="Mô tả chi tiết sản phẩm..."></textarea>
+                    <textarea id="description" rows="10" placeholder="Mô tả chi tiết sản phẩm..."></textarea>
                 </div>
                 <div class="form-group full">
                     <label>Hình Ảnh (*) - Click hoặc kéo thả nhiều ảnh</label>
@@ -175,6 +175,12 @@
                     <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                         <input type="checkbox" id="featured">
                         <span>Hiển thị ở mục Sản Phẩm Nổi Bật</span>
+                    </label>
+                </div>
+                <div class="form-group full">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="fastDelivery">
+                        <span>🚚 Giao hàng nhanh (2-3 ngày) - Có sẵn</span>
                     </label>
                 </div>
                 <div class="form-group full">
@@ -214,6 +220,17 @@
         let token = localStorage.getItem('admin_token');
         let uploadedImages = [];
         let editingProductId = null;
+        
+        const defaultDescription = `MỘT SỐ LƯU Ý TRƯỚC KHI ĐẶT HÀNG 
+
+1 - Mô hình hoàn thiện thủ công pvc giá rẻ nên khó tránh khỏi khiếm khuyết nhỏ nếu soi kỹ,ae kỹ tính ocd nên cân nhắc trước khi mua.   
+2 - Chiều cao cân nặng có thể lệch nhẹ do đo lường thủ công   
+3 - Ae nên quay video unbox để được hỗ trợ sau mua hàng 1 cách tốt nhất   
+
+** Khi gửi hàng vỏ hộp có thế móp nhẹ do bên vận chuyển (không ảnh hưởng đến sp ), mô hình lắp ráp nên nếu chẳng may bị long rơi các bộ phận khi vận chuyển quý khách có thể tự lắp lại ( Dùng keo ) hoặc nhắn tin cho shop để được hướng dẫn tư vấn sử dụng.   
+** Sản phẩm mới chưa qua sử dụng là PVC giá rất rẻ ( các khớp được nhà sản xuất nối với nhau bằng keo ) không phải hàng Resin ( khớp nam châm ,tự dính) nên ngoại quan ,màu sắc và cấu tạo sẽ khác hàng Resin , ae nên tìm hiếu kỹ và phân biệt trước khi đặt hàng giúp mình. Có vấn đề gì ae vui lòng nhắn tin để shop tư vấn sử dụng.  
+
+Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
 
         // Load editing state from localStorage
         const savedEditingId = localStorage.getItem('temp_editing_product_id');
@@ -246,12 +263,15 @@
                     document.getElementById('brandId').value = formData.brandId || '';
                     document.getElementById('stock').value = formData.stock || '10';
                     document.getElementById('badge').value = formData.badge || '';
-                    document.getElementById('description').value = formData.description || '';
+                    document.getElementById('description').value = formData.description !== undefined ? formData.description : defaultDescription;
                     document.getElementById('featured').checked = formData.featured || false;
+                    document.getElementById('fastDelivery').checked = formData.fastDelivery || false;
                     console.log('Loaded form data from localStorage');
                 } catch (e) {
                     console.error('Error loading form data:', e);
                 }
+            } else {
+                document.getElementById('description').value = defaultDescription;
             }
         }
 
@@ -267,7 +287,8 @@
                 stock: document.getElementById('stock').value,
                 badge: document.getElementById('badge').value,
                 description: document.getElementById('description').value,
-                featured: document.getElementById('featured').checked
+                featured: document.getElementById('featured').checked,
+                fastDelivery: document.getElementById('fastDelivery').checked
             };
             localStorage.setItem('temp_product_form', JSON.stringify(formData));
             
@@ -341,7 +362,7 @@
             }
 
             // Auto-save form data on input
-            const formInputs = ['name', 'slug', 'price', 'oldPrice', 'categoryId', 'brandId', 'stock', 'badge', 'description', 'featured'];
+            const formInputs = ['name', 'slug', 'price', 'oldPrice', 'categoryId', 'brandId', 'stock', 'badge', 'description', 'featured', 'fastDelivery'];
             formInputs.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) {
@@ -520,7 +541,8 @@
                 badge: document.getElementById('badge').value || null,
                 description: document.getElementById('description').value,
                 images: uploadedImages,
-                featured: document.getElementById('featured').checked
+                featured: document.getElementById('featured').checked,
+                fastDelivery: document.getElementById('fastDelivery').checked
             };
 
             if (!product.name || !product.price || !product.categoryId || uploadedImages.length === 0) {
@@ -573,6 +595,7 @@
                     document.getElementById('badge').value = p.badge || '';
                     document.getElementById('description').value = p.description || '';
                     document.getElementById('featured').checked = p.featured || false;
+                    document.getElementById('fastDelivery').checked = p.fastDelivery || false;
                     
                     uploadedImages = p.images || [];
                     updatePreview();
@@ -598,12 +621,13 @@
             document.getElementById('slug').value = '';
             document.getElementById('price').value = '';
             document.getElementById('oldPrice').value = '';
-            document.getElementById('description').value = '';
+            document.getElementById('description').value = defaultDescription;
             document.getElementById('categoryId').value = '';
             document.getElementById('brandId').value = '';
             document.getElementById('stock').value = '10';
             document.getElementById('badge').value = '';
             document.getElementById('featured').checked = false;
+            document.getElementById('fastDelivery').checked = false;
             document.getElementById('cancelBtn').style.display = 'none';
             clearAllTempData();
         }

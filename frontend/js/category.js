@@ -165,7 +165,7 @@ function displayProducts() {
         const discount = p.oldPrice ? `<span class="price-off">-${API.getDiscountPercent(p.price, p.oldPrice)}%</span>` : '';
 
         return `
-            <div class="pcard" onclick="window.location.href='product-detail.html?id=${p._id}'">
+            <div class="pcard" onclick="window.location.href='product-detail.html?id=${p.id || p._id}'">
                 <div class="pcard-img">
                     <img src="${p.images[0]}" alt="${p.name}">
                     ${badge}
@@ -182,7 +182,7 @@ function displayProducts() {
                         ${discount}
                     </div>
                     <div class="pcard-delivery" style="color: #2e8b57; font-size: 10px; margin-top: 6px; margin-bottom: 10px; font-weight: 500; display: flex; align-items: center; gap: 4px;">🚚 Order 7-10 ngày</div>
-                    <a href="product-detail.html?id=${p._id}" class="btn-add">⚡ MUA NGAY</a>
+                    <a href="product-detail.html?id=${p.id || p._id}" class="btn-add">⚡ MUA NGAY</a>
                 </div>
             </div>
         `;

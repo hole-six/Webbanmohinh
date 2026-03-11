@@ -10,6 +10,7 @@ router.get('/', async (req, res) => {
             category, 
             brand, 
             featured, 
+            fastDelivery,
             search,
             minPrice,
             maxPrice,
@@ -23,6 +24,7 @@ router.get('/', async (req, res) => {
         if (category) query.categoryId = parseInt(category);
         if (brand) query.brandId = parseInt(brand);
         if (featured) query.featured = featured === 'true';
+        if (fastDelivery) query.fastDelivery = fastDelivery === 'true';
         if (search) query.$text = { $search: search };
         if (minPrice || maxPrice) {
             query.price = {};
