@@ -87,23 +87,38 @@
         /* ─── HEADER ─── */
         .site-header {
             background-color: #1a1a1a; /* Fallback color */
-            background-image: url('https://drive.google.com/thumbnail?id=1OKfpl8tUbUEQt1TJNPSD51tBnc0neJa5&sz=w2000');
-            background-size: contain;
-            background-position: center;
+            background-image: url('https://drive.google.com/thumbnail?id=1q_dPpZjHJJaTGeZ497PowfDr9G96Scva&sz=w2000');
+            background-size: cover; /* Changed from contain to cover */
+            background-position: center center;
             background-repeat: no-repeat;
             border-bottom: none;
             position: sticky;
             top: 0;
             z-index: 300;
-            min-height: 80px;
+            height: 120px; /* Fixed height for desktop */
+        }
+
+        /* Responsive header for mobile */
+        @media (max-width: 768px) {
+            .site-header {
+                height: 80px; /* Smaller height on mobile */
+                background-size: contain; /* Fit entire logo on mobile */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .site-header {
+                height: 60px; /* Even smaller on very small screens */
+            }
         }
 
         .header-inner {
             max-width: var(--max);
             margin: 0 auto;
             padding: 0;
-            height: 120px; /* Adjust height as needed */
+            height: 100%; /* Fill parent height */
             display: flex;
+        }
             align-items: center;
             justify-content: space-between;
             height: 72px;
