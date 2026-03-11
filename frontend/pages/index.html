@@ -86,6 +86,7 @@
 
         /* ─── HEADER ─── */
         .site-header {
+            display: none; /* Hidden on index page */
             background: var(--white);
             border-bottom: 1px solid var(--border);
             position: sticky;
@@ -1798,8 +1799,11 @@
     <!-- HEADER -->
     <header class="site-header">
         <div class="header-inner">
-            <div class="logo"><a href="index.html">Figure Korea <span>Shop</span><img
-                        src="https://flagcdn.com/16x12/kr.png"></a></div>
+            <div class="logo">
+                <a href="index.html" style="padding: 6px 0;">
+                    <img src="/uploads/logoweb.png" alt="Figure Korean Shop" style="height: 60px; object-fit: contain; vertical-align: middle;">
+                </a>
+            </div>
 
             <nav class="header-nav">
                 <a href="index.html">Trang chủ</a>
@@ -2156,26 +2160,26 @@
 
             console.log('✅ Hero slider rendered with', categories.length, 'slides');
 
-            // Start auto-slide
-            startAutoSlide();
+            // Auto-slide disabled - only manual swipe/click navigation
+            // startAutoSlide();
         }
 
         function goToSlide(index) {
             currentSlide = index;
             updateSlider();
-            resetAutoSlide();
+            // resetAutoSlide(); // Disabled auto-slide
         }
 
         function nextSlide() {
             currentSlide = (currentSlide + 1) % categories.length;
             updateSlider();
-            resetAutoSlide();
+            // resetAutoSlide(); // Disabled auto-slide
         }
 
         function prevSlide() {
             currentSlide = (currentSlide - 1 + categories.length) % categories.length;
             updateSlider();
-            resetAutoSlide();
+            // resetAutoSlide(); // Disabled auto-slide
         }
 
         function updateSlider() {
