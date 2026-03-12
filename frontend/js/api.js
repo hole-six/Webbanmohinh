@@ -2,7 +2,7 @@
 // Auto-detect API URL based on environment
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:5001/api'  // Local development
-    : 'https://www.figurekoreashop.com/api';  // Production (nginx proxy with HTTPS)
+    : `${window.location.protocol}//${window.location.hostname}/api`;  // Production - use current domain
 
 // Helper function to make API calls
 // Helper function to make API calls
