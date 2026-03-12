@@ -13,7 +13,6 @@
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <script src="../js/api.js"></script>
-    <script src="../js/mainF.js"></script>
     <style>
         *,
         *::before,
@@ -2257,10 +2256,10 @@
             categories = window.categories.slice(0, 6); // Take up to 6 categories
 
             slides.innerHTML = categories.map(cat => {
-                const imageUrl = convertGoogleDriveLink(cat.image);
+                const imageUrl = window.API.getAbsoluteImageUrl(cat.image);
                 return `
     <div class="hero-slide" onclick="location.href='category.html?cat=${cat.slug}'">
-      <img src="${imageUrl}" alt="${cat.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/1200x480?text=${encodeURIComponent(cat.name)}'">
+      <img src="${imageUrl}" alt="${cat.name}" loading="lazy" onerror="this.style.display='none'">
       <div class="hero-overlay">
         <div class="hero-cat">${cat.icon || ''}</div>
         <div class="hero-name">${cat.name}</div>

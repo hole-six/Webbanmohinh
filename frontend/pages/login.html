@@ -189,7 +189,7 @@
     <script>
         const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://localhost:5001/api'
-            : 'https://mohinhcaocap.wavestore.id.vn/api';
+            : `${window.location.protocol}//${window.location.hostname}/api`;
 
         // Check if already logged in
         const token = localStorage.getItem('admin_token');
