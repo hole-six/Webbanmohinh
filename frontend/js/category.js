@@ -60,7 +60,14 @@ async function loadCategoryPage() {
             
             if (saleFilter === 'true') {
                 console.log('💰 Applying sale filter...');
-                filteredProducts = allProducts.filter(p => p.oldPrice && p.oldPrice > 0);
+                console.log('📊 All products before filter:', allProducts.length);
+                console.log('� Products with oldPrice:', allProducts.filter(p => p.oldPrice).map(p => ({
+                    name: p.name,
+                    price: p.price,
+                    oldPrice: p.oldPrice
+                })));
+                
+                filteredProducts = allProducts.filter(p => p.oldPrice && p.oldPrice > p.price);
                 console.log('💰 Sale products found:', filteredProducts.length);
             }
             
