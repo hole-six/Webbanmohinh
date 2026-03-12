@@ -2128,6 +2128,13 @@
 
             let list = [...window.products];
 
+            // Filter by sale (oldPrice exists)
+            const urlParams = new URLSearchParams(window.location.search);
+            const saleFilter = urlParams.get('sale');
+            if (saleFilter === 'true') {
+                list = list.filter(p => p.oldPrice != null && p.oldPrice !== '');
+            }
+
             // Filter by category
             if (activeCatId != null) {
                 list = list.filter(p => p.categoryId == activeCatId);
