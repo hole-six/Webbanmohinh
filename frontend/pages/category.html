@@ -1453,14 +1453,17 @@
             .prod-grid.list .pcard {
                 display: flex;
                 flex-direction: row;
+                align-items: stretch;
+                min-height: 140px;
             }
 
             .prod-grid.list .pcard-img {
-                width: 120px;
-                min-width: 120px;
-                height: 120px;
+                width: 130px;
+                min-width: 130px;
+                height: auto;
                 background: #ffffff;
                 position: relative;
+                flex-shrink: 0;
             }
 
             .prod-grid.list .pcard-img::before {
@@ -1473,37 +1476,82 @@
                 width: 100%;
                 height: 100%;
                 object-fit: contain;
-                padding: 6px;
+                padding: 8px;
             }
 
             .prod-grid.list .pcard-body {
                 flex: 1;
                 border-left: 1px solid var(--border);
                 border-top: none;
-                padding: 10px;
+                padding: 12px 10px;
                 display: flex;
                 flex-direction: column;
+                justify-content: space-between;
             }
 
             .prod-grid.list .pcard-name {
-                font-size: 13px;
+                font-size: 14px;
+                font-weight: 500;
                 -webkit-line-clamp: 2;
                 min-height: auto;
+                margin-bottom: 6px;
+                line-height: 1.3;
+            }
+            
+            .prod-grid.list .pcard-rating {
+                font-size: 11px;
+                margin-bottom: 6px;
+            }
+            
+            .prod-grid.list .stock-warn {
+                font-size: 10px;
                 margin-bottom: 6px;
             }
 
             .prod-grid.list .pcard-price {
-                margin-bottom: 8px;
+                margin-bottom: 6px;
+                display: flex;
+                align-items: baseline;
+                gap: 6px;
+                flex-wrap: wrap;
             }
 
             .prod-grid.list .price-now {
-                font-size: 15px;
+                font-size: 16px;
+                font-weight: 700;
+            }
+            
+            .prod-grid.list .price-was {
+                font-size: 12px;
+            }
+            
+            .prod-grid.list .price-off {
+                font-size: 11px;
+            }
+            
+            .prod-grid.list .pcard-delivery {
+                font-size: 10px !important;
+                margin-top: 4px !important;
+                margin-bottom: 8px !important;
             }
 
             .prod-grid.list .btn-add {
-                padding: 8px;
-                font-size: 10px;
+                padding: 9px 12px;
+                font-size: 11px;
                 margin-top: auto;
+                width: 100%;
+            }
+            
+            .prod-grid.list .pwish {
+                top: 8px;
+                right: 8px;
+            }
+            
+            .prod-grid.list .pbadge {
+                top: 8px;
+                left: 8px;
+                font-size: 9px;
+                padding: 3px 8px;
             }
 
             /* Product card */
