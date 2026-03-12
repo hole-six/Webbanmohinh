@@ -67,7 +67,7 @@ async function loadCategoryPage() {
                     oldPrice: p.oldPrice
                 })));
                 
-                filteredProducts = allProducts.filter(p => p.oldPrice && p.oldPrice > p.price);
+                filteredProducts = allProducts.filter(p => p.oldPrice != null && p.oldPrice !== '');
                 console.log('💰 Sale products found:', filteredProducts.length);
             }
             
