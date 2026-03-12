@@ -69,6 +69,28 @@ async function getAllBrands() {
 // HELPER FUNCTIONS
 // ============================================
 
+// Convert image URL to absolute URL
+function getAbsoluteImageUrl(url) {
+    if (!url) return '';
+    
+    // If already absolute URL (starts with http:// or https://)
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+        // Replace old domain with current domain
+        if (url.includes('mohinhcaocap.wavestore.id.vn')) {
+            return url.replace('mohinhcaocap.wavestore.id.vn', window.location.hostname);
+        }
+        return url;
+    }
+    
+    // If relative path, make it absolute
+    if (url.startsWith('/')) {
+        return `${window.location.protocol}//${window.location.hostname}${url}`;
+    }
+    
+    // If just filename, assume it's in uploads folder
+    return `${window.location.protocol}//${window.location.hostname}/uploads/${url}`;
+}
+
 // Convert Google Drive URL to direct image URL
 function convertGoogleDriveUrl(url) {
     if (!url) return '';
@@ -84,10 +106,18 @@ function convertGoogleDriveUrl(url) {
     return url;
 }
 
-// Get product image with Google Drive URL conversion
+// Get product image with URL conversion
 function getProductImage(product, index = 0) {
     const imageUrl = product.images?.[index] || product.image || '';
-    return convertGoogleDriveUrl(imageUrl);
+    
+    // First try Google Drive conversion
+    const driveUrl = convertGoogleDriveUrl(imageUrl);
+    if (driveUrl !== imageUrl) {
+        return driveUrl;
+    }
+    
+    // Then convert to absolute URL
+    return getAbsoluteImageUrl(imageUrl);
 }
 
 function formatPrice(price) {
@@ -116,7 +146,9 @@ window.API = {
     getCategoryById,
     getAllBrands,
     formatPrice,
-    getDiscountPercent
+    getDiscountPercent,
+    getProductImage,
+    getAbsoluteImageUrl
 };
 
 window.reviews = [];
