@@ -999,35 +999,29 @@
         /* LIST VIEW */
         .prod-grid.list .pcard {
             display: flex;
+            flex-direction: row;
         }
 
         .prod-grid.list .pcard-img {
             width: 200px;
             min-width: 200px;
+            height: 200px;
             flex-shrink: 0;
             background: #ffffff;
+            position: relative;
         }
 
         .prod-grid.list .pcard-img::before {
-            padding-top: 0;
-            height: 100%;
             display: none;
         }
 
         .prod-grid.list .pcard-img img {
-            position: static;
-            width: 200px;
-            height: 200px;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
             padding: 8px;
-        }
-
-        .prod-grid.list .pcard-actions {
-            position: static;
-            transform: none;
-            flex-direction: column;
-            border: none;
-            width: auto;
         }
 
         .prod-grid.list .pcard-body {
@@ -1037,11 +1031,17 @@
             justify-content: space-between;
             border-top: none;
             border-left: 1px solid var(--border);
+            padding: 16px 18px 18px;
         }
 
         .prod-grid.list .pcard-name {
             min-height: auto;
             -webkit-line-clamp: 3;
+            margin-bottom: 10px;
+        }
+        
+        .prod-grid.list .btn-add {
+            margin-top: auto;
         }
 
         /* Empty state */
@@ -1460,6 +1460,7 @@
                 min-width: 120px;
                 height: 120px;
                 background: #ffffff;
+                position: relative;
             }
 
             .prod-grid.list .pcard-img::before {
@@ -1467,7 +1468,8 @@
             }
 
             .prod-grid.list .pcard-img img {
-                position: static;
+                position: absolute;
+                inset: 0;
                 width: 100%;
                 height: 100%;
                 object-fit: contain;
@@ -1479,6 +1481,8 @@
                 border-left: 1px solid var(--border);
                 border-top: none;
                 padding: 10px;
+                display: flex;
+                flex-direction: column;
             }
 
             .prod-grid.list .pcard-name {
@@ -1499,15 +1503,7 @@
             .prod-grid.list .btn-add {
                 padding: 8px;
                 font-size: 10px;
-            }
-
-            .prod-grid.list .pcard-actions {
-                position: static;
-                transform: none;
-                padding: 8px;
-                flex-direction: column;
-                gap: 6px;
-                border-top: none;
+                margin-top: auto;
             }
 
             /* Product card */
