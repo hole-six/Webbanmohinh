@@ -69,6 +69,27 @@ async function getAllBrands() {
 // HELPER FUNCTIONS
 // ============================================
 
+// Convert Google Drive URL to direct image URL
+function convertGoogleDriveUrl(url) {
+    if (!url) return '';
+    
+    // Check if it's a Google Drive link
+    const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (driveMatch) {
+        const fileId = driveMatch[1];
+        return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+    }
+    
+    // If already a direct link or other URL, return as is
+    return url;
+}
+
+// Get product image with Google Drive URL conversion
+function getProductImage(product, index = 0) {
+    const imageUrl = product.images?.[index] || product.image || '';
+    return convertGoogleDriveUrl(imageUrl);
+}
+
 function formatPrice(price) {
     return new Intl.NumberFormat('ko-KR', {
         style: 'currency',
