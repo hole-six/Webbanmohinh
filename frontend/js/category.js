@@ -53,6 +53,17 @@ async function loadCategoryPage() {
         if (productsData.success) {
             allProducts = productsData.data;
             filteredProducts = [...allProducts];
+            
+            // Check for sale filter from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const saleFilter = urlParams.get('sale');
+            
+            if (saleFilter === 'true') {
+                console.log('💰 Applying sale filter...');
+                filteredProducts = allProducts.filter(p => p.oldPrice && p.oldPrice > 0);
+                console.log('💰 Sale products found:', filteredProducts.length);
+            }
+            
             console.log('✅ Total products:', allProducts.length);
         } else {
             console.error('❌ Failed to load products:', productsData.message);
