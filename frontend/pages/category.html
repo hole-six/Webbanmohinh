@@ -389,7 +389,6 @@
             border-bottom-color: var(--border);
         }
 
-        .cat-nav-link.all,
         .cat-nav-link.active {
             color: var(--charcoal);
             border-bottom-color: var(--charcoal);
@@ -2194,12 +2193,12 @@
             const navBar = document.getElementById('category-nav-bar');
             if (!navBar) return;
             
-            const allLink = navBar.querySelector('.cat-nav-link.all');
+            const allHTML = `<a href="category.html" class="cat-nav-link all ${activeCatId == null ? 'active' : ''}">TẤT CẢ</a>`;
             const categoriesHTML = window.categories.map(c => 
-                `<a href="category.html?cat=${c.slug}" class="cat-nav-link ${activeCatId === c.id ? 'active' : ''}">${c.name.toUpperCase()}</a>`
+                `<a href="category.html?cat=${c.slug}" class="cat-nav-link ${activeCatId == c.id ? 'active' : ''}">${c.name.toUpperCase()}</a>`
             ).join('');
             
-            navBar.innerHTML = allLink.outerHTML + categoriesHTML;
+            navBar.innerHTML = allHTML + categoriesHTML;
         }
         
         // Toggle fast delivery filter
@@ -2247,6 +2246,7 @@
             } else {
                 document.getElementById('cr-' + activeCatId)?.classList.add('active');
             }
+            buildCategoryNavBar();
         }
 
         // Convert Google Drive link to direct image link
