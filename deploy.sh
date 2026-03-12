@@ -55,8 +55,21 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Reload Nginx configuration
+echo -e "${YELLOW}🌐 Updating Nginx configuration...${NC}"
+sudo cp nginx/mohinhcaocap.conf /etc/nginx/sites-available/mohinhcaocap.conf
+
+# Test Nginx configuration
+echo -e "${YELLOW}🔍 Testing Nginx configuration...${NC}"
+sudo nginx -t
+
+if [ $? -ne 0 ]; then
+    echo -e "${RED}❌ Nginx configuration test failed!${NC}"
+    exit 1
+fi
+
 # Reload Nginx
-echo -e "${YELLOW}🌐 Reloading Nginx...${NC}"
+echo -e "${YELLOW}🔄 Reloading Nginx...${NC}"
 sudo systemctl reload nginx
 
 if [ $? -ne 0 ]; then
