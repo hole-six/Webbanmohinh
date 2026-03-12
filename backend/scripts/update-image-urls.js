@@ -4,8 +4,8 @@ require('dotenv').config();
 const Product = require('../models/Product');
 const Category = require('../models/Category');
 
-const OLD_DOMAIN = 'https://mohinhcaocap.wavestore.id.vn';
-const NEW_DOMAIN = 'https://figurekoreashop.com';
+const OLD_DOMAIN = 'mohinhcaocap.wavestore.id.vn';
+const NEW_DOMAIN = 'figurekoreashop.com';
 
 async function updateImageUrls() {
     try {
@@ -22,15 +22,14 @@ async function updateImageUrls() {
             // Update images array
             if (product.images && product.images.length > 0) {
                 product.images = product.images.map(img => {
-                    if (img.includes(OLD_DOMAIN)) {
+                    // Remove any domain and keep only the path
+                    if (img.includes('://')) {
+                        // Extract path from full URL
+                        const url = new URL(img);
                         updated = true;
-                        return img.replace(OLD_DOMAIN, NEW_DOMAIN);
+                        return url.pathname; // Returns /uploads/...
                     }
-                    // If it's a relative path, make it absolute
-                    if (img.startsWith('/uploads/')) {
-                        updated = true;
-                        return NEW_DOMAIN + img;
-                    }
+                    // If already relative path, keep it
                     return img;
                 });
             }
@@ -49,14 +48,9 @@ async function updateImageUrls() {
         for (const category of categories) {
             let updated = false;
             
-            if (category.image && category.image.includes(OLD_DOMAIN)) {
-                category.image = category.image.replace(OLD_DOMAIN, NEW_DOMAIN);
-                updated = true;
-            }
-            
-            // If it's a relative path, make it absolute
-            if (category.image && category.image.startsWith('/uploads/')) {
-                category.image = NEW_DOMAIN + category.image;
+            if (category.image && category.image.includes('://')) {
+                const url = new URL(category.image);
+                category.image = url.pathname;
                 updated = true;
             }
             
@@ -70,6 +64,8 @@ async function updateImageUrls() {
         console.log('\n✅ Update completed!');
         console.log(`📦 Products updated: ${productCount}`);
         console.log(`📁 Categories updated: ${categoryCount}`);
+        console.log('\n💡 All URLs are now relative paths (e.g., /uploads/...)');
+        console.log('   Frontend will automatically use current domain');
         
         process.exit(0);
     } catch (error) {
