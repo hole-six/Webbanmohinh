@@ -151,6 +151,28 @@
             td img { width: 45px; height: 45px; border-radius: 8px; }
             .btn { padding: 8px 16px; font-size: 11px; }
             .table-responsive { overflow-x: auto; }
+            
+            /* Mobile-specific filters */
+            .card > div:first-of-type {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .card > div:first-of-type > * {
+                width: 100% !important;
+                min-width: auto !important;
+            }
+            
+            /* Mobile pagination */
+            #pagination {
+                justify-content: center;
+                gap: 5px;
+            }
+            
+            #pagination button {
+                padding: 6px 10px !important;
+                font-size: 12px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -158,6 +180,11 @@
             .menu-links a { padding: 8px 12px; font-size: 13px; }
             .card-title { font-size: 18px; }
             .preview-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+            
+            /* Stack product info vertically on very small screens */
+            .table-responsive table {
+                min-width: 600px;
+            }
         }
         
         /* Toast */
@@ -266,19 +293,53 @@
         <!-- Danh Sách Sản Phẩm -->
         <div class="card">
             <div class="card-title">📦 Danh Sách Sản Phẩm</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Ảnh</th>
-                        <th>Tên Sản Phẩm</th>
-                        <th class="hide-mobile">Giá</th>
-                        <th class="hide-mobile">Kho</th>
-                        <th class="hide-mobile">Danh Mục</th>
-                        <th>Hành Động</th>
-                    </tr>
-                </thead>
-                <tbody id="productList"></tbody>
-            </table>
+            
+            <!-- Filters và Search -->
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
+                <div style="flex: 1; min-width: 200px;">
+                    <input type="text" id="searchProducts" placeholder="🔍 Tìm kiếm sản phẩm..." 
+                           style="width: 100%; padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px; color: #fff;">
+                </div>
+                <select id="filterCategory" style="padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px; color: #fff;">
+                    <option value="">Tất cả danh mục</option>
+                </select>
+                <select id="filterBrand" style="padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px; color: #fff;">
+                    <option value="">Tất cả thương hiệu</option>
+                </select>
+                <select id="itemsPerPage" style="padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px; color: #fff;">
+                    <option value="10">10/trang</option>
+                    <option value="25" selected>25/trang</option>
+                    <option value="50">50/trang</option>
+                    <option value="100">100/trang</option>
+                </select>
+            </div>
+            
+            <!-- Products Info -->
+            <div style="margin-bottom: 15px; color: rgba(255,255,255,0.7); font-size: 14px;">
+                Hiển thị <span id="showingCount">0</span> / <span id="totalCount">0</span> sản phẩm
+            </div>
+            
+            <!-- Responsive Table -->
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ảnh</th>
+                            <th>Thông Tin Sản Phẩm</th>
+                            <th class="hide-mobile">Giá & Kho</th>
+                            <th class="hide-mobile">Danh Mục & Thương Hiệu</th>
+                            <th class="hide-mobile">Trạng Thái</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productList"></tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div id="pagination" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                <!-- Pagination buttons will be generated here -->
+            </div>
         </div>
     </div>
 
@@ -293,6 +354,14 @@
         let token = localStorage.getItem('admin_token');
         let uploadedImages = [];
         let editingProductId = null;
+        
+        // Pagination and filter variables
+        let allProducts = [];
+        let filteredProducts = [];
+        let currentPage = 1;
+        let itemsPerPage = 25;
+        let categories = [];
+        let brands = [];
         
         const defaultDescription = `MỘT SỐ LƯU Ý TRƯỚC KHI ĐẶT HÀNG 
 
@@ -443,6 +512,12 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                     element.addEventListener('change', saveFormData);
                 }
             });
+            
+            // Add event listeners for filters
+            document.getElementById('searchProducts').addEventListener('input', applyFilters);
+            document.getElementById('filterCategory').addEventListener('change', applyFilters);
+            document.getElementById('filterBrand').addEventListener('change', applyFilters);
+            document.getElementById('itemsPerPage').addEventListener('change', displayProducts);
 
             // Upload setup
             const uploadZone = document.getElementById('uploadZone');
@@ -569,36 +644,173 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
 
         // Load categories & brands
         async function loadSelects() {
-            const [cats, brands] = await Promise.all([
+            const [cats, brandsData] = await Promise.all([
                 fetch(`${API}/categories`).then(r => r.json()),
                 fetch(`${API}/brands`).then(r => r.json())
             ]);
 
-            document.getElementById('categoryId').innerHTML = '<option value="">-- Chọn --</option>' +
-                cats.data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            if (cats.success) {
+                categories = cats.data;
+                document.getElementById('categoryId').innerHTML = '<option value="">-- Chọn --</option>' +
+                    cats.data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                
+                // Populate filter dropdown
+                document.getElementById('filterCategory').innerHTML = '<option value="">Tất cả danh mục</option>' +
+                    cats.data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            }
             
-            document.getElementById('brandId').innerHTML = '<option value="">-- Chọn --</option>' +
-                brands.data.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+            if (brandsData.success) {
+                brands = brandsData.data;
+                document.getElementById('brandId').innerHTML = '<option value="">-- Chọn --</option>' +
+                    brandsData.data.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+                
+                // Populate filter dropdown
+                document.getElementById('filterBrand').innerHTML = '<option value="">Tất cả thương hiệu</option>' +
+                    brandsData.data.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+            }
         }
 
         // Load products
         async function loadProducts() {
-            const res = await fetch(`${API}/products`); // Remove limit to get all products
+            const res = await fetch(`${API}/products`);
             const data = await res.json();
             
-            document.getElementById('productList').innerHTML = data.data.map(p => `
+            if (data.success) {
+                allProducts = data.data;
+                applyFilters();
+            }
+        }
+        
+        // Apply filters and search
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchProducts').value.toLowerCase();
+            const categoryFilter = document.getElementById('filterCategory').value;
+            const brandFilter = document.getElementById('filterBrand').value;
+            
+            filteredProducts = allProducts.filter(product => {
+                const matchesSearch = !searchTerm || 
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    (product.description && product.description.toLowerCase().includes(searchTerm));
+                
+                const matchesCategory = !categoryFilter || product.categoryId == categoryFilter;
+                const matchesBrand = !brandFilter || product.brandId == brandFilter;
+                
+                return matchesSearch && matchesCategory && matchesBrand;
+            });
+            
+            currentPage = 1; // Reset to first page
+            displayProducts();
+        }
+        
+        // Display products with pagination
+        function displayProducts() {
+            itemsPerPage = parseInt(document.getElementById('itemsPerPage').value);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageProducts = filteredProducts.slice(startIndex, endIndex);
+            
+            // Update counts
+            document.getElementById('showingCount').textContent = pageProducts.length;
+            document.getElementById('totalCount').textContent = filteredProducts.length;
+            
+            // Helper functions
+            const getCategoryName = (id) => categories.find(c => c.id == id)?.name || 'N/A';
+            const getBrandName = (id) => brands.find(b => b.id == id)?.name || 'N/A';
+            
+            document.getElementById('productList').innerHTML = pageProducts.map(p => `
                 <tr>
-                    <td><img src="${p.images[0]}" alt="${p.name}"></td>
-                    <td>${p.name}</td>
-                    <td class="hide-mobile">₩${p.price.toLocaleString('ko-KR')}</td>
-                    <td class="hide-mobile">${p.stock}</td>
-                    <td class="hide-mobile">ID: ${p.categoryId}</td>
                     <td>
-                        <button class="btn btn-success" onclick="editProduct('${p._id}')">✏️ Sửa</button>
-                        <button class="btn btn-danger" onclick="deleteProduct('${p._id}')">🗑️ Xóa</button>
+                        <img src="${p.images[0]}" alt="${p.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+                    </td>
+                    <td>
+                        <div style="max-width: 200px;">
+                            <div style="font-weight: 600; margin-bottom: 4px; color: #fff;">${p.name}</div>
+                            <div style="font-size: 11px; color: rgba(255,255,255,0.6);">ID: ${p._id}</div>
+                            ${p.badge ? `<span style="background: #8b1a1a; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-top: 4px; display: inline-block;">${p.badge}</span>` : ''}
+                            ${p.fastDelivery ? `<span style="background: #27ae60; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 4px;">🚚 Nhanh</span>` : ''}
+                        </div>
+                    </td>
+                    <td class="hide-mobile">
+                        <div style="color: #fff; font-weight: 600;">₩${p.price.toLocaleString('ko-KR')}</div>
+                        ${p.oldPrice ? `<div style="color: rgba(255,255,255,0.5); text-decoration: line-through; font-size: 12px;">₩${p.oldPrice.toLocaleString('ko-KR')}</div>` : ''}
+                        <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 4px;">Kho: ${p.stock}</div>
+                    </td>
+                    <td class="hide-mobile">
+                        <div style="color: #fff; margin-bottom: 4px;">${getCategoryName(p.categoryId)}</div>
+                        <div style="color: rgba(255,255,255,0.7); font-size: 12px;">${getBrandName(p.brandId)}</div>
+                    </td>
+                    <td class="hide-mobile">
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            ${p.featured ? '<span style="background: #a78bfa; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px;">⭐ Nổi bật</span>' : ''}
+                            <span style="background: ${p.stock > 0 ? '#27ae60' : '#ef4444'}; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px;">
+                                ${p.stock > 0 ? '✅ Còn hàng' : '❌ Hết hàng'}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="btn btn-success" onclick="editProduct('${p._id}')" style="padding: 6px 12px; font-size: 11px;">✏️ Sửa</button>
+                            <button class="btn btn-danger" onclick="deleteProduct('${p._id}')" style="padding: 6px 12px; font-size: 11px;">🗑️ Xóa</button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
+            
+            renderPagination();
+        }
+        
+        // Render pagination
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            let paginationHTML = '';
+            
+            // Previous button
+            if (currentPage > 1) {
+                paginationHTML += `<button onclick="changePage(${currentPage - 1})" style="padding: 8px 12px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer;">‹ Trước</button>`;
+            }
+            
+            // Page numbers
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            
+            if (startPage > 1) {
+                paginationHTML += `<button onclick="changePage(1)" style="padding: 8px 12px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer;">1</button>`;
+                if (startPage > 2) {
+                    paginationHTML += `<span style="color: rgba(255,255,255,0.5); padding: 8px;">...</span>`;
+                }
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const isActive = i === currentPage;
+                paginationHTML += `<button onclick="changePage(${i})" style="padding: 8px 12px; background: ${isActive ? '#a78bfa' : 'rgba(255,255,255,0.1)'}; color: #fff; border: 1px solid ${isActive ? '#a78bfa' : 'rgba(255,255,255,0.2)'}; border-radius: 6px; cursor: pointer; font-weight: ${isActive ? '600' : '400'};">${i}</button>`;
+            }
+            
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHTML += `<span style="color: rgba(255,255,255,0.5); padding: 8px;">...</span>`;
+                }
+                paginationHTML += `<button onclick="changePage(${totalPages})" style="padding: 8px 12px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer;">${totalPages}</button>`;
+            }
+            
+            // Next button
+            if (currentPage < totalPages) {
+                paginationHTML += `<button onclick="changePage(${currentPage + 1})" style="padding: 8px 12px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer;">Sau ›</button>`;
+            }
+            
+            pagination.innerHTML = paginationHTML;
+        }
+        
+        // Change page
+        function changePage(page) {
+            currentPage = page;
+            displayProducts();
         }
 
         // Save product
@@ -638,7 +850,7 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                 
                 if (data.success) {
                     showToast(editingProductId ? 'Cập nhật sản phẩm thành công!' : 'Thêm sản phẩm thành công!');
-                    loadProducts();
+                    loadProducts(); // Reload products and refresh display
                     clearAllTempData();
                     cancelEdit();
                 } else {
@@ -720,7 +932,7 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                 
                 if (data.success) {
                     showToast('Đã xóa sản phẩm!');
-                    loadProducts();
+                    loadProducts(); // Reload products and refresh display
                 } else {
                     showToast(data.message, 'error');
                 }
