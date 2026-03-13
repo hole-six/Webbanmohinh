@@ -4,6 +4,7 @@ let currentCategory = null;
 let allProducts = [];
 let filteredProducts = [];
 let categories = [];
+let totalProductsCount = []; // Store all products for counting categories
 
 // Export to global scope for use in category.html
 window.filteredProducts = filteredProducts;
@@ -41,6 +42,13 @@ async function loadCategoryPage() {
             console.log('✅ Current category found:', currentCategory);
         }
 
+        // Always load all products for category counting
+        const allProductsData = await API.getAllProducts();
+        if (allProductsData.success) {
+            totalProductsCount = allProductsData.data;
+            console.log('📊 Total products loaded for counting:', totalProductsCount.length);
+        }
+
         // Load products based on category
         let productsData;
         if (currentCategory) {
@@ -48,7 +56,7 @@ async function loadCategoryPage() {
             productsData = await API.getProductsByCategory(currentCategory.id);
         } else {
             console.log('📦 Loading all products...');
-            productsData = await API.getAllProducts(); // Remove limit to get all products
+            productsData = allProductsData; // Use already loaded data
         }
 
         console.log('📦 Products loaded:', productsData);
@@ -149,14 +157,21 @@ function renderCategoriesList() {
 
     if (!list) return;
 
-    const totalProducts = allProducts.length;
+    // Use totalProductsCount for accurate counting
+    const totalProducts = totalProductsCount.length;
+    
+    console.log('🔢 Rendering categories with counts:');
+    console.log('   Total products for counting:', totalProducts);
+    console.log('   Current filtered products:', filteredProducts.length);
 
     if (countAll) {
         countAll.textContent = totalProducts;
     }
 
     list.innerHTML = categories.map(cat => {
-        const count = allProducts.filter(p => p.categoryId === cat.id).length;
+        // Always count from total products, not filtered products
+        const count = totalProductsCount.filter(p => p.categoryId === cat.id).length;
+        console.log(`   ${cat.name}: ${count} products`);
         return `
             <div class="cat-row ${currentCategory?.id === cat.id ? 'active' : ''}" 
                  onclick="window.location.href='category.html?cat=${cat.slug}'">
@@ -288,6 +303,7 @@ function filterByPrice() {
     const minPrice = parseInt(document.getElementById('price-min')?.value) || 0;
     const maxPrice = parseInt(document.getElementById('price-max')?.value) || Infinity;
 
+    // Filter from allProducts (current category products), not totalProductsCount
     filteredProducts = allProducts.filter(p =>
         p.price >= minPrice && p.price <= maxPrice
     );
