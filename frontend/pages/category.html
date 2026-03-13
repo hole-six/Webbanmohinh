@@ -2302,6 +2302,13 @@
 
         // ── Filters ──
         function applyFilters() {
+            // Wait for category.js to load first
+            if (!window.categoryJsLoaded || !window.filteredProducts || !Array.isArray(window.filteredProducts)) {
+                console.warn('⚠️ Waiting for category.js to load...');
+                setTimeout(applyFilters, 100); // Retry after 100ms
+                return;
+            }
+
             const kw = (document.getElementById('search-inp')?.value || '').toLowerCase().trim();
             const sortSel = document.getElementById('sort-sel');
             sortMode = sortSel ? sortSel.value : 'default';
@@ -2311,13 +2318,13 @@
             priceMin = minInput ? parseFloat(minInput) : 0;
             priceMax = maxInput ? parseFloat(maxInput) : Infinity;
 
-            // Use filteredProducts from category.js instead of all products
-            if (!window.filteredProducts || !Array.isArray(window.filteredProducts)) {
-                console.warn('⚠️ Filtered products not loaded yet');
-                return;
-            }
-
-            let list = [...window.filteredProducts]; // Use filtered products instead of all products
+            let list = [...window.filteredProducts]; // Use filtered products from category.js
+            
+            console.log('🔍 applyFilters called:');
+            console.log('   Original list length:', list.length);
+            console.log('   Keyword:', kw);
+            console.log('   Sort mode:', sortMode);
+            console.log('   Price range:', priceMin, '-', priceMax);
 
             // Filter by sale (oldPrice exists)
             const urlParams = new URLSearchParams(window.location.search);

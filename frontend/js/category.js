@@ -102,6 +102,9 @@ async function loadCategoryPage() {
         renderCategoriesList();
         updateCategoryBanner();
         displayProducts();
+        
+        // Signal that category.js has finished loading
+        window.categoryJsLoaded = true;
 
         console.log('✅ Category page loaded successfully');
     } catch (error) {
