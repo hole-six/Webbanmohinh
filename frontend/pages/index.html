@@ -406,16 +406,7 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             color: rgba(255, 255, 255, .6);
-            margin-bottom: 6px;
-        }
-
-        .hero-name {
-            font-family: var(--f-serif);
-            font-size: 22px;
-            font-weight: 700;
-            color: #fff;
-            line-height: 1.2;
-            margin-bottom: 8px;
+            margin-bottom: 8px; /* Increased margin since no hero-name */
         }
 
         .hero-desc {
@@ -1572,13 +1563,8 @@
             }
 
             .hero-cat {
-                display: none;
-            }
-
-            .hero-name {
-                font-size: 13px;
-                font-weight: 700;
-                margin-bottom: 0;
+                font-size: 8px;
+                margin-bottom: 6px;
             }
 
             .hero-desc {
@@ -2196,7 +2182,6 @@
       <img src="${imageUrl}" alt="${cat.name}" loading="lazy" onerror="this.style.display='none'">
       <div class="hero-overlay">
         <div class="hero-cat">${cat.icon || ''}</div>
-        <div class="hero-name">${cat.name}</div>
         <div class="hero-desc">${cat.description || ''}</div>
         <span class="hero-cta">Khám phá
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
