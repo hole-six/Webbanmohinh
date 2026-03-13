@@ -2311,13 +2311,13 @@
             priceMin = minInput ? parseFloat(minInput) : 0;
             priceMax = maxInput ? parseFloat(maxInput) : Infinity;
 
-            // Ensure products array exists
-            if (!window.products || !Array.isArray(window.products)) {
-                console.warn('⚠️ Products not loaded yet');
+            // Use filteredProducts from category.js instead of all products
+            if (!window.filteredProducts || !Array.isArray(window.filteredProducts)) {
+                console.warn('⚠️ Filtered products not loaded yet');
                 return;
             }
 
-            let list = [...window.products];
+            let list = [...window.filteredProducts]; // Use filtered products instead of all products
 
             // Filter by sale (oldPrice exists)
             const urlParams = new URLSearchParams(window.location.search);

@@ -5,6 +5,9 @@ let allProducts = [];
 let filteredProducts = [];
 let categories = [];
 
+// Export to global scope for use in category.html
+window.filteredProducts = filteredProducts;
+
 // Get category slug from URL
 function getCategoryFromURL() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -54,6 +57,9 @@ async function loadCategoryPage() {
             allProducts = productsData.data;
             filteredProducts = [...allProducts];
             
+            // Update global reference
+            window.filteredProducts = filteredProducts;
+            
             // Check for sale filter from URL
             const urlParams = new URLSearchParams(window.location.search);
             const saleFilter = urlParams.get('sale');
@@ -72,6 +78,9 @@ async function loadCategoryPage() {
                 
                 // Apply priority sorting for sale products
                 applyPrioritySorting();
+                
+                // Update global reference
+                window.filteredProducts = filteredProducts;
             }
             
             console.log('✅ Total products:', allProducts.length);
@@ -192,19 +201,22 @@ function applyPrioritySorting() {
         if (priorityDiff !== 0) return priorityDiff;
         return new Date(b.createdAt) - new Date(a.createdAt);
     });
+    
+    // Update global reference
+    window.filteredProducts = filteredProducts;
 }
 
 function displayProducts() {
     const grid = document.getElementById('products-list');
-    const resultCount = document.getElementById('results-count');
+    const resultTxt = document.getElementById('result-txt');
 
     if (!grid) return;
 
     // Apply priority sorting before displaying
     applyPrioritySorting();
 
-    if (resultCount) {
-        resultCount.textContent = filteredProducts.length;
+    if (resultTxt) {
+        resultTxt.innerHTML = `Hiển thị <strong>${filteredProducts.length}</strong> sản phẩm`;
     }
 
     if (filteredProducts.length === 0) {
@@ -255,7 +267,7 @@ function displayProducts() {
 // Show loading state
 function showLoading() {
     const grid = document.getElementById('products-list');
-    const resultCount = document.getElementById('results-count');
+    const resultTxt = document.getElementById('result-txt');
 
     if (grid) {
         grid.innerHTML = `
@@ -266,8 +278,8 @@ function showLoading() {
         `;
     }
 
-    if (resultCount) {
-        resultCount.textContent = '0';
+    if (resultTxt) {
+        resultTxt.innerHTML = 'Hiển thị <strong>0</strong> sản phẩm';
     }
 }
 
@@ -282,6 +294,10 @@ function filterByPrice() {
 
     // Apply priority sorting after filtering
     applyPrioritySorting();
+    
+    // Update global reference
+    window.filteredProducts = filteredProducts;
+    
     displayProducts();
 }
 
