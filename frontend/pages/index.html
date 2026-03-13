@@ -284,10 +284,19 @@
         }
 
         /* ─── HERO SLIDER ─── */
+        .hero-section {
+            background: #f0f0f0; /* Light gray background for sides */
+            padding: 0;
+        }
+        
         .hero-slider {
             position: relative;
             height: 480px;
             overflow: hidden;
+            max-width: var(--max); /* Limit max width */
+            margin: 0 auto; /* Center the slider */
+            background: #fff; /* White background for the actual slider */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
         }
 
         .hero-slides {
@@ -1317,6 +1326,7 @@
 
             .hero-slider {
                 height: 300px;
+                max-width: 100%; /* Full width on tablet */
             }
 
             .hero-search {
@@ -1519,6 +1529,7 @@
             /* Hero responsive */
             .hero-slider {
                 height: 250px;
+                max-width: 100%; /* Full width on mobile */
             }
 
             .hero-search {
@@ -1869,7 +1880,7 @@
     </header>
 
     <!-- HERO SLIDER -->
-    <section>
+    <section class="hero-section">
         <div class="hero-slider" id="hero-slider">
             <div class="hero-slides" id="hero-slides">
                 <!-- rendered by JS -->
@@ -2318,8 +2329,14 @@
                 return;
             }
 
-            // Take first 8 products for featured section
-            const featuredProducts = window.products.slice(0, 8);
+            // Use getFeaturedProducts function from api.js
+            const featuredProducts = window.getFeaturedProducts().slice(0, 8);
+            
+            if (featuredProducts.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px"><div style="font-size:14px;color:var(--muted)">Chưa có sản phẩm nổi bật nào (HOT, NEW, BEST SELLER)</div></div>';
+                return;
+            }
+            
             grid.innerHTML = featuredProducts.map(renderProductCard).join('');
             console.log('✅ Featured products rendered:', featuredProducts.length);
         }

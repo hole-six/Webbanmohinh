@@ -583,7 +583,7 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
 
         // Load products
         async function loadProducts() {
-            const res = await fetch(`${API}/products?limit=100`);
+            const res = await fetch(`${API}/products`); // Remove limit to get all products
             const data = await res.json();
             
             document.getElementById('productList').innerHTML = data.data.map(p => `

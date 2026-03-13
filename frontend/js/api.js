@@ -28,6 +28,10 @@ async function apiCall(endpoint, options = {}) {
 // PRODUCTS API
 // ============================================
 
+async function getFeaturedProducts() {
+    return await apiCall('/products?badge=HOT,NEW,BEST SELLER');
+}
+
 async function getAllProducts(params = {}) {
     const queryString = new URLSearchParams(params).toString();
     return await apiCall(`/products${queryString ? '?' + queryString : ''}`);
@@ -139,6 +143,7 @@ function getDiscountPercent(newPrice, oldPrice) {
 // Make functions available globally
 window.API = {
     getAllProducts,
+    getFeaturedProducts,  // Add new function
     getProductById,
     getProductsByCategory,
     searchProducts,
@@ -226,7 +231,10 @@ window.getBrandById = function (id) {
 };
 
 window.getFeaturedProducts = function () {
-    return window.appData.products.filter(p => p.featured || p.categoryId == 1).slice(0, 8);
+    // Only show products with HOT, NEW, or BEST SELLER badges
+    return window.appData.products.filter(p => 
+        p.badge && ['HOT', 'NEW', 'BEST SELLER'].includes(p.badge)
+    );
 };
 
 window.getSaleProducts = function () {
@@ -243,7 +251,7 @@ window.searchProducts = function (kw) {
 window.initApp = async function () {
     const [cR, pR, bR] = await Promise.all([
         window.API.getAllCategories(),
-        window.API.getAllProducts({ limit: 100 }),
+        window.API.getAllProducts(), // Remove limit to get all products
         window.API.getAllBrands()
     ]);
     if (cR.success) window.appData.categories = cR.data;

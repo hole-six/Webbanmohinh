@@ -45,7 +45,7 @@ async function loadCategoryPage() {
             productsData = await API.getProductsByCategory(currentCategory.id);
         } else {
             console.log('📦 Loading all products...');
-            productsData = await API.getAllProducts({ limit: 100 });
+            productsData = await API.getAllProducts(); // Remove limit to get all products
         }
 
         console.log('📦 Products loaded:', productsData);
@@ -69,6 +69,9 @@ async function loadCategoryPage() {
                 
                 filteredProducts = allProducts.filter(p => p.oldPrice != null && p.oldPrice !== '');
                 console.log('💰 Sale products found:', filteredProducts.length);
+                
+                // Apply priority sorting for sale products
+                applyPrioritySorting();
             }
             
             console.log('✅ Total products:', allProducts.length);
@@ -156,11 +159,49 @@ function renderCategoriesList() {
 }
 
 // Display products
+// Apply priority sorting to always show special products first
+function applyPrioritySorting() {
+    function getPriority(product) {
+        let priority = 0;
+        
+        // Highest priority: Products with badges (HOT, NEW, BEST SELLER)
+        if (product.badge && ['HOT', 'NEW', 'BEST SELLER'].includes(product.badge)) {
+            priority += 1000;
+            // Extra priority for specific badges
+            if (product.badge === 'HOT') priority += 100;
+            if (product.badge === 'BEST SELLER') priority += 80;
+            if (product.badge === 'NEW') priority += 60;
+        }
+        
+        // High priority: Fast delivery products
+        if (product.fastDelivery) {
+            priority += 500;
+        }
+        
+        // Medium priority: Products on sale (have oldPrice)
+        if (product.oldPrice && product.oldPrice > product.price) {
+            priority += 250;
+        }
+        
+        return priority;
+    }
+    
+    // Sort by priority first, then by creation date
+    filteredProducts.sort((a, b) => {
+        const priorityDiff = getPriority(b) - getPriority(a);
+        if (priorityDiff !== 0) return priorityDiff;
+        return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+}
+
 function displayProducts() {
     const grid = document.getElementById('products-list');
     const resultCount = document.getElementById('results-count');
 
     if (!grid) return;
+
+    // Apply priority sorting before displaying
+    applyPrioritySorting();
 
     if (resultCount) {
         resultCount.textContent = filteredProducts.length;
@@ -239,26 +280,72 @@ function filterByPrice() {
         p.price >= minPrice && p.price <= maxPrice
     );
 
+    // Apply priority sorting after filtering
+    applyPrioritySorting();
     displayProducts();
 }
 
-// Sort products
+// Sort products with priority for special items
 function sortProducts(sortBy) {
+    // First, create a priority sorting function
+    function getPriority(product) {
+        let priority = 0;
+        
+        // Highest priority: Products with badges (HOT, NEW, BEST SELLER)
+        if (product.badge && ['HOT', 'NEW', 'BEST SELLER'].includes(product.badge)) {
+            priority += 1000;
+        }
+        
+        // High priority: Fast delivery products
+        if (product.fastDelivery) {
+            priority += 500;
+        }
+        
+        // Medium priority: Products on sale (have oldPrice)
+        if (product.oldPrice && product.oldPrice > product.price) {
+            priority += 250;
+        }
+        
+        return priority;
+    }
+    
+    // Apply the requested sorting, but maintain priority order
     switch (sortBy) {
         case 'price-asc':
-            filteredProducts.sort((a, b) => a.price - b.price);
+            filteredProducts.sort((a, b) => {
+                const priorityDiff = getPriority(b) - getPriority(a);
+                if (priorityDiff !== 0) return priorityDiff;
+                return a.price - b.price;
+            });
             break;
         case 'price-desc':
-            filteredProducts.sort((a, b) => b.price - a.price);
+            filteredProducts.sort((a, b) => {
+                const priorityDiff = getPriority(b) - getPriority(a);
+                if (priorityDiff !== 0) return priorityDiff;
+                return b.price - a.price;
+            });
             break;
         case 'name':
-            filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+            filteredProducts.sort((a, b) => {
+                const priorityDiff = getPriority(b) - getPriority(a);
+                if (priorityDiff !== 0) return priorityDiff;
+                return a.name.localeCompare(b.name);
+            });
             break;
         case 'newest':
-            filteredProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            filteredProducts.sort((a, b) => {
+                const priorityDiff = getPriority(b) - getPriority(a);
+                if (priorityDiff !== 0) return priorityDiff;
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
             break;
         default:
-            filteredProducts = [...allProducts];
+            // Default sorting: Priority first, then by creation date
+            filteredProducts.sort((a, b) => {
+                const priorityDiff = getPriority(b) - getPriority(a);
+                if (priorityDiff !== 0) return priorityDiff;
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
     }
     displayProducts();
 }

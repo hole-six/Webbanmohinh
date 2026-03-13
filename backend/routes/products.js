@@ -14,9 +14,10 @@ router.get('/', async (req, res) => {
             search,
             minPrice,
             maxPrice,
+            badge,  // Add badge filter
             sort = '-createdAt',
             page = 1,
-            limit = 12
+            limit = req.query.limit || 0  // 0 means no limit
         } = req.query;
 
         const query = {};
@@ -26,16 +27,27 @@ router.get('/', async (req, res) => {
         if (featured) query.featured = featured === 'true';
         if (fastDelivery) query.fastDelivery = fastDelivery === 'true';
         if (search) query.$text = { $search: search };
+        if (badge) {
+            // Support multiple badges separated by comma
+            const badges = badge.split(',').map(b => b.trim());
+            query.badge = { $in: badges };
+        }
         if (minPrice || maxPrice) {
             query.price = {};
             if (minPrice) query.price.$gte = parseInt(minPrice);
             if (maxPrice) query.price.$lte = parseInt(maxPrice);
         }
 
-        const products = await Product.find(query)
-            .sort(sort)
-            .limit(parseInt(limit))
-            .skip((parseInt(page) - 1) * parseInt(limit));
+        let query_builder = Product.find(query).sort(sort);
+        
+        // Only apply limit and skip if limit is specified and > 0
+        if (parseInt(limit) > 0) {
+            query_builder = query_builder
+                .limit(parseInt(limit))
+                .skip((parseInt(page) - 1) * parseInt(limit));
+        }
+        
+        const products = await query_builder;
 
         const total = await Product.countDocuments(query);
 
@@ -44,9 +56,9 @@ router.get('/', async (req, res) => {
             data: products,
             pagination: {
                 page: parseInt(page),
-                limit: parseInt(limit),
+                limit: parseInt(limit) || 0,
                 total,
-                pages: Math.ceil(total / parseInt(limit))
+                pages: parseInt(limit) > 0 ? Math.ceil(total / parseInt(limit)) : 1
             }
         });
     } catch (error) {
