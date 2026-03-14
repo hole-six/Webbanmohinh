@@ -2302,6 +2302,35 @@
             }
         });
 
+        // Priority sorting function - prioritize HOT tag products
+        function sortProductsByPriority(products) {
+            return products.sort((a, b) => {
+                // Highest priority: HOT tag
+                const aIsHot = a.badge === 'HOT';
+                const bIsHot = b.badge === 'HOT';
+                
+                if (aIsHot && !bIsHot) return -1;
+                if (!aIsHot && bIsHot) return 1;
+                
+                // Second priority: Other badges (NEW, BEST SELLER)
+                const aHasBadge = a.badge && ['NEW', 'BEST SELLER'].includes(a.badge);
+                const bHasBadge = b.badge && ['NEW', 'BEST SELLER'].includes(b.badge);
+                
+                if (aHasBadge && !bHasBadge) return -1;
+                if (!aHasBadge && bHasBadge) return 1;
+                
+                // Third priority: Sale products (have oldPrice)
+                const aOnSale = a.oldPrice && a.oldPrice > a.price;
+                const bOnSale = b.oldPrice && b.oldPrice > b.price;
+                
+                if (aOnSale && !bOnSale) return -1;
+                if (!aOnSale && bOnSale) return 1;
+                
+                // Default: sort by creation date (newest first)
+                return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+            });
+        }
+
         function renderFeaturedProducts() {
             const grid = document.getElementById('featured-products-grid');
             if (!grid) return;
@@ -2314,8 +2343,9 @@
                 return;
             }
 
-            // Use getFeaturedProducts function from api.js
-            const featuredProducts = window.getFeaturedProducts().slice(0, 8);
+            // Use getFeaturedProducts function from api.js and apply priority sorting
+            let featuredProducts = window.getFeaturedProducts();
+            featuredProducts = sortProductsByPriority(featuredProducts).slice(0, 8);
             
             if (featuredProducts.length === 0) {
                 grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px"><div style="font-size:14px;color:var(--muted)">Chưa có sản phẩm nổi bật nào (HOT, NEW, BEST SELLER)</div></div>';
@@ -2332,8 +2362,9 @@
 
             console.log('🚚 Rendering fast delivery products...', window.products);
 
-            // Filter products with fastDelivery = true
-            const fastDeliveryProducts = window.products ? window.products.filter(p => p.fastDelivery) : [];
+            // Filter products with fastDelivery = true and apply priority sorting
+            let fastDeliveryProducts = window.products ? window.products.filter(p => p.fastDelivery) : [];
+            fastDeliveryProducts = sortProductsByPriority(fastDeliveryProducts);
             
             console.log('Fast delivery products found:', fastDeliveryProducts.length);
             
@@ -2416,8 +2447,9 @@
 
             console.log('💰 Rendering sale products...', window.products);
 
-            // Filter products with oldPrice (sale products)
-            const saleProducts = window.products ? window.products.filter(p => p.oldPrice) : [];
+            // Filter products with oldPrice (sale products) and apply priority sorting
+            let saleProducts = window.products ? window.products.filter(p => p.oldPrice) : [];
+            saleProducts = sortProductsByPriority(saleProducts);
             
             console.log('Sale products found:', saleProducts.length);
             
