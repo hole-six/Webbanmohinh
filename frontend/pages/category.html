@@ -2058,6 +2058,10 @@
                         <option value="rating">Đánh giá cao</option>
                         <option value="name">Tên A–Z</option>
                         <option value="disc">Giảm giá nhiều nhất</option>
+                        <option value="" disabled>──────────</option>
+                        <option value="fast-delivery">🚚 Giao hàng nhanh</option>
+                        <option value="featured">⭐ Sản phẩm nổi bật</option>
+                        <option value="sale">💰 Sản phẩm giảm giá</option>
                     </select>
                 </div>
                 <div class="view-wrap">
@@ -2134,6 +2138,13 @@
                 if (filterEl) {
                     filterEl.classList.add('active');
                 }
+            }
+            
+            // Handle sale filter
+            const saleParam = urlParams.get('sale');
+            if (saleParam === 'true') {
+                // Set a flag to filter sale products
+                window.filterSale = true;
             }
 
             updateCartUI();
@@ -2230,8 +2241,9 @@
 
         function selectCategory(id) {
             activeCatId = id; page = 1;
-            // Clear fast delivery filter when selecting a category
+            // Clear filters when selecting a category
             window.filterFastDelivery = false;
+            window.filterSale = false;
             const filterEl = document.getElementById('fast-delivery-filter');
             if (filterEl) {
                 filterEl.classList.remove('active');
@@ -2275,6 +2287,10 @@
                 h2.textContent = '🚀 Giao hàng nhanh';
                 par.textContent = 'Sản phẩm có sẵn - Giao hàng 2-3 ngày';
                 ttl.textContent = 'Giao Hàng Nhanh — Figure Korea Shop';
+            } else if (window.filterSale) {
+                h2.textContent = '💰 Sản phẩm giảm giá';
+                par.textContent = 'Ưu đãi đặc biệt - Tiết kiệm ngay hôm nay';
+                ttl.textContent = 'Sản Phẩm Giảm Giá — Figure Korea Shop';
             } else if (activeCatId == null) {
                 h2.textContent = 'Tất cả sản phẩm';
                 par.textContent = 'Khám phá bộ sưu tập mô hình cao cấp chính hãng';
@@ -2342,6 +2358,11 @@
             if (window.filterFastDelivery) {
                 list = list.filter(p => p.fastDelivery === true);
             }
+            
+            // Filter by sale products
+            if (window.filterSale) {
+                list = list.filter(p => p.oldPrice && p.oldPrice > p.price);
+            }
 
             // Filter by price range
             list = list.filter(p => p.price >= (priceMin || 0) && p.price <= (priceMax || Infinity));
@@ -2351,6 +2372,18 @@
                 list = list.filter(p =>
                     p.name.toLowerCase().includes(kw) || (p.description || '').toLowerCase().includes(kw)
                 );
+            }
+
+            // Handle special filter modes from dropdown
+            if (sortMode === 'fast-delivery') {
+                list = list.filter(p => p.fastDelivery === true);
+                sortMode = 'default'; // Reset to default sorting after filtering
+            } else if (sortMode === 'featured') {
+                list = list.filter(p => p.badge && ['HOT', 'NEW', 'BEST SELLER'].includes(p.badge));
+                sortMode = 'default'; // Reset to default sorting after filtering
+            } else if (sortMode === 'sale') {
+                list = list.filter(p => p.oldPrice && p.oldPrice > p.price);
+                sortMode = 'default'; // Reset to default sorting after filtering
             }
 
             // Sort
@@ -2407,6 +2440,47 @@
                     } 
                 });
             }
+            if (window.filterSale) {
+                tags.push({ 
+                    label: '💰 Sản phẩm giảm giá', 
+                    rm: () => { 
+                        window.filterSale = false; 
+                        updateBanner(); 
+                        applyFilters(); 
+                    } 
+                });
+            }
+            
+            // Check for dropdown filters
+            const sortSel = document.getElementById('sort-sel');
+            const currentSort = sortSel ? sortSel.value : '';
+            
+            if (currentSort === 'fast-delivery') {
+                tags.push({ 
+                    label: '🚚 Giao hàng nhanh', 
+                    rm: () => { 
+                        sortSel.value = '';
+                        applyFilters(); 
+                    } 
+                });
+            } else if (currentSort === 'featured') {
+                tags.push({ 
+                    label: '⭐ Sản phẩm nổi bật', 
+                    rm: () => { 
+                        sortSel.value = '';
+                        applyFilters(); 
+                    } 
+                });
+            } else if (currentSort === 'sale') {
+                tags.push({ 
+                    label: '💰 Sản phẩm giảm giá', 
+                    rm: () => { 
+                        sortSel.value = '';
+                        applyFilters(); 
+                    } 
+                });
+            }
+            
             const kw = document.getElementById('search-inp')?.value;
             if (kw) tags.push({ label: '"' + kw + '"', rm: () => { document.getElementById('search-inp').value = ''; applyFilters(); } });
             if (priceMin > 0 || priceMax < Infinity) {
@@ -2425,9 +2499,11 @@
         function clearAll() {
             activeCatId = null; priceMin = 0; priceMax = Infinity; page = 1;
             window.filterFastDelivery = false;
+            window.filterSale = false;
             document.getElementById('search-inp').value = '';
             document.getElementById('price-min').value = '';
             document.getElementById('price-max').value = '';
+            document.getElementById('sort-sel').value = ''; // Reset dropdown
             document.querySelectorAll('.price-opt').forEach(b => b.classList.remove('active'));
             const filterEl = document.getElementById('fast-delivery-filter');
             if (filterEl) {
