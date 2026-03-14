@@ -2116,6 +2116,7 @@
             const slug = p.get('cat');
             const searchQuery = p.get('search');
             const fastDeliveryParam = p.get('fastDelivery');
+            const saleParam = p.get('sale');
 
             if (slug) {
                 const c = window.categories.find(x => x.slug == slug || x.id == slug);
@@ -2141,17 +2142,27 @@
             }
             
             // Handle sale filter
-            const saleParam = urlParams.get('sale');
             if (saleParam === 'true') {
                 // Set a flag to filter sale products
                 window.filterSale = true;
             }
 
-            updateCartUI();
-            buildSidebar();
-            buildFooterCats();
-            updateBanner();
-            applyFilters();
+            // Wait for category.js to finish loading before building UI
+            const waitForCategoryJs = () => {
+                if (window.categoryJsLoaded && window.filteredProducts && window.products && window.categories) {
+                    console.log('✅ Category.js loaded, building UI...');
+                    updateCartUI();
+                    buildSidebar();
+                    buildFooterCats();
+                    updateBanner();
+                    applyFilters();
+                } else {
+                    console.log('⏳ Waiting for category.js to load...');
+                    setTimeout(waitForCategoryJs, 100);
+                }
+            };
+            
+            waitForCategoryJs();
 
             // Handle Enter key in category search input
             const categorySearchInput = document.getElementById('category-search-input');
@@ -2176,6 +2187,13 @@
 
         // ── Sidebar ──
         function buildSidebar() {
+            // Wait for products to be loaded
+            if (!window.products || !Array.isArray(window.products)) {
+                console.warn('⚠️ Products not loaded yet, retrying buildSidebar...');
+                setTimeout(buildSidebar, 100);
+                return;
+            }
+            
             document.getElementById('cnt-all').textContent = window.products.length;
             const el = document.getElementById('cat-items');
             el.innerHTML = window.categories.map(c => {
@@ -2203,6 +2221,13 @@
         function buildCategoryNavBar() {
             const navBar = document.getElementById('category-nav-bar');
             if (!navBar) return;
+            
+            // Wait for categories to be loaded
+            if (!window.categories || !Array.isArray(window.categories)) {
+                console.warn('⚠️ Categories not loaded yet, retrying buildCategoryNavBar...');
+                setTimeout(buildCategoryNavBar, 100);
+                return;
+            }
             
             const allHTML = `<a href="category.html" class="cat-nav-link all ${activeCatId == null ? 'active' : ''}">TẤT CẢ</a>`;
             const categoriesHTML = window.categories.map(c => 

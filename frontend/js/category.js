@@ -17,109 +17,97 @@ function getCategoryFromURL() {
 
 // Load page data
 async function loadCategoryPage() {
-    // Show loading state
-    showLoading();
-
     try {
         console.log('🔄 Starting to load category page...');
 
-        // Load categories first and wait for it
+        // Always load all products first - this is what category.html expects
+        const allProductsData = await API.getAllProducts();
+        if (allProductsData.success) {
+            allProducts = allProductsData.data;
+            totalProductsCount = allProductsData.data;
+            
+            // Set filteredProducts to all products initially
+            filteredProducts = [...allProducts];
+            
+            // Update global references for category.html
+            window.filteredProducts = filteredProducts;
+            window.products = allProducts; // Make sure category.html can access all products
+            
+            console.log('📊 All products loaded:', allProducts.length);
+        } else {
+            console.error('❌ Failed to load products:', allProductsData.message);
+            allProducts = [];
+            filteredProducts = [];
+            totalProductsCount = [];
+            window.filteredProducts = [];
+            window.products = [];
+        }
+
+        // Load categories
         const categoriesData = await API.getAllCategories();
         console.log('📁 Categories loaded:', categoriesData);
 
         if (categoriesData.success) {
             categories = categoriesData.data;
+            
+            // Make categories available globally for category.html
+            window.categories = categories;
+            
             loadTopCategories();
         }
 
         // Get category slug from URL
         const categorySlug = getCategoryFromURL();
-        console.log('🔍 Category slug from URL:', categorySlug);
+        console.log('� Category slug from URL:', categorySlug);
 
         // Find current category from loaded categories
         if (categorySlug && categories.length > 0) {
             currentCategory = categories.find(c => c.slug === categorySlug);
             console.log('✅ Current category found:', currentCategory);
-        }
-
-        // Always load all products for category counting
-        const allProductsData = await API.getAllProducts();
-        if (allProductsData.success) {
-            totalProductsCount = allProductsData.data;
-            console.log('📊 Total products loaded for counting:', totalProductsCount.length);
-        }
-
-        // Load products based on category
-        let productsData;
-        if (currentCategory) {
-            console.log('📦 Loading products for category ID:', currentCategory.id);
-            productsData = await API.getProductsByCategory(currentCategory.id);
-        } else {
-            console.log('📦 Loading all products...');
-            productsData = allProductsData; // Use already loaded data
-        }
-
-        console.log('📦 Products loaded:', productsData);
-
-        if (productsData.success) {
-            allProducts = productsData.data;
-            filteredProducts = [...allProducts];
             
-            // Update global reference
-            window.filteredProducts = filteredProducts;
-            
-            // Check for sale filter from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const saleFilter = urlParams.get('sale');
-            
-            if (saleFilter === 'true') {
-                console.log('💰 Applying sale filter...');
-                console.log('📊 All products before filter:', allProducts.length);
-                console.log('� Products with oldPrice:', allProducts.filter(p => p.oldPrice).map(p => ({
-                    name: p.name,
-                    price: p.price,
-                    oldPrice: p.oldPrice
-                })));
-                
-                filteredProducts = allProducts.filter(p => p.oldPrice != null && p.oldPrice !== '');
-                console.log('💰 Sale products found:', filteredProducts.length);
-                
-                // Apply priority sorting for sale products
-                applyPrioritySorting();
-                
-                // Update global reference
+            // Filter products by category if one is selected
+            if (currentCategory) {
+                filteredProducts = allProducts.filter(p => p.categoryId === currentCategory.id);
                 window.filteredProducts = filteredProducts;
+                console.log('📦 Filtered products for category:', filteredProducts.length);
             }
-            
-            console.log('✅ Total products:', allProducts.length);
-        } else {
-            console.error('❌ Failed to load products:', productsData.message);
-            allProducts = [];
-            filteredProducts = [];
         }
 
-        // Render UI after all data is loaded
-        renderCategoriesList();
-        updateCategoryBanner();
-        displayProducts();
+        // Check for special filters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const saleFilter = urlParams.get('sale');
+        const fastDeliveryFilter = urlParams.get('fastDelivery');
+        
+        if (saleFilter === 'true') {
+            console.log('💰 Applying sale filter...');
+            filteredProducts = filteredProducts.filter(p => p.oldPrice != null && p.oldPrice !== '');
+            window.filteredProducts = filteredProducts;
+            console.log('💰 Sale products found:', filteredProducts.length);
+        }
+        
+        if (fastDeliveryFilter === 'true') {
+            console.log('🚚 Applying fast delivery filter...');
+            filteredProducts = filteredProducts.filter(p => p.fastDelivery === true);
+            window.filteredProducts = filteredProducts;
+            console.log('� Fast delivery products found:', filteredProducts.length);
+        }
+
+        // Apply priority sorting
+        applyPrioritySorting();
         
         // Signal that category.js has finished loading
         window.categoryJsLoaded = true;
 
         console.log('✅ Category page loaded successfully');
+        console.log('📊 Final filtered products count:', filteredProducts.length);
+        
     } catch (error) {
         console.error('❌ Error loading category page:', error);
-        // Show error message to user
-        const grid = document.getElementById('products-list');
-        if (grid) {
-            grid.innerHTML = `
-                <div class="empty" style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
-                    <h3 style="font-size: 18px; margin-bottom: 10px;">Lỗi tải dữ liệu</h3>
-                    <p style="color: #999; margin-bottom: 20px;">Vui lòng thử lại sau</p>
-                    <button onclick="location.reload()" style="padding: 10px 20px; background: #8b1a1a; color: white; border: none; border-radius: 4px; cursor: pointer;">Tải lại trang</button>
-                </div>
-            `;
-        }
+        allProducts = [];
+        filteredProducts = [];
+        totalProductsCount = [];
+        window.filteredProducts = [];
+        window.categoryJsLoaded = true; // Still signal completion to prevent infinite waiting
     }
 }
 
