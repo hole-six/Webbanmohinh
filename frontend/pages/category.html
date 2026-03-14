@@ -2249,6 +2249,10 @@
                     filterEl.classList.add('active');
                 } else {
                     filterEl.classList.remove('active');
+                    // Clear URL parameter when turning off filter
+                    const url = new URL(window.location);
+                    url.searchParams.delete('fastDelivery');
+                    window.history.replaceState({}, '', url);
                 }
             }
             
@@ -2269,10 +2273,33 @@
             // Clear filters when selecting a category
             window.filterFastDelivery = false;
             window.filterSale = false;
+            
+            // Reset filteredProducts based on category selection
+            if (window.products && Array.isArray(window.products)) {
+                if (id === null) {
+                    // Show all products
+                    window.filteredProducts = [...window.products];
+                } else {
+                    // Filter by category
+                    window.filteredProducts = window.products.filter(p => p.categoryId == id);
+                }
+                console.log('🔄 Updated filteredProducts for category:', window.filteredProducts.length);
+            }
+            
             const filterEl = document.getElementById('fast-delivery-filter');
             if (filterEl) {
                 filterEl.classList.remove('active');
             }
+            
+            // Clear URL parameters when selecting category
+            const url = new URL(window.location);
+            url.searchParams.delete('sale');
+            url.searchParams.delete('fastDelivery');
+            if (id === null) {
+                url.searchParams.delete('cat');
+            }
+            window.history.replaceState({}, '', url);
+            
             syncCatUI(); updateBanner(); applyFilters(); closeSidebar();
         }
 
@@ -2344,7 +2371,7 @@
         // ── Filters ──
         function applyFilters() {
             // Wait for category.js to load first
-            if (!window.categoryJsLoaded || !window.filteredProducts || !Array.isArray(window.filteredProducts)) {
+            if (!window.categoryJsLoaded || !window.products || !Array.isArray(window.products)) {
                 console.warn('⚠️ Waiting for category.js to load...');
                 setTimeout(applyFilters, 100); // Retry after 100ms
                 return;
@@ -2359,56 +2386,69 @@
             priceMin = minInput ? parseFloat(minInput) : 0;
             priceMax = maxInput ? parseFloat(maxInput) : Infinity;
 
-            let list = [...window.filteredProducts]; // Use filtered products from category.js
+            // Always start from all products, not from window.filteredProducts
+            let list = [...window.products];
             
             console.log('🔍 applyFilters called:');
             console.log('   Original list length:', list.length);
             console.log('   Keyword:', kw);
             console.log('   Sort mode:', sortMode);
             console.log('   Price range:', priceMin, '-', priceMax);
+            console.log('   Active category:', activeCatId);
+            console.log('   Fast delivery filter:', window.filterFastDelivery);
+            console.log('   Sale filter:', window.filterSale);
 
-            // Filter by sale (oldPrice exists)
-            const urlParams = new URLSearchParams(window.location.search);
-            const saleFilter = urlParams.get('sale');
-            if (saleFilter === 'true') {
-                list = list.filter(p => p.oldPrice != null && p.oldPrice !== '');
-            }
-
-            // Filter by category
+            // Filter by category first
             if (activeCatId != null) {
                 list = list.filter(p => p.categoryId == activeCatId);
+                console.log('   After category filter:', list.length);
             }
 
             // Filter by fast delivery
             if (window.filterFastDelivery) {
                 list = list.filter(p => p.fastDelivery === true);
+                console.log('   After fast delivery filter:', list.length);
             }
             
             // Filter by sale products
             if (window.filterSale) {
                 list = list.filter(p => p.oldPrice && p.oldPrice > p.price);
+                console.log('   After sale filter:', list.length);
+            }
+
+            // Check URL for sale filter (for direct links)
+            const urlParams = new URLSearchParams(window.location.search);
+            const saleFilter = urlParams.get('sale');
+            if (saleFilter === 'true' && !window.filterSale) {
+                list = list.filter(p => p.oldPrice != null && p.oldPrice !== '');
+                console.log('   After URL sale filter:', list.length);
             }
 
             // Filter by price range
             list = list.filter(p => p.price >= (priceMin || 0) && p.price <= (priceMax || Infinity));
+            console.log('   After price filter:', list.length);
 
             // Filter by keyword
             if (kw) {
                 list = list.filter(p =>
                     p.name.toLowerCase().includes(kw) || (p.description || '').toLowerCase().includes(kw)
                 );
+                console.log('   After keyword filter:', list.length);
             }
 
             // Handle special filter modes from dropdown
             if (sortMode === 'fast-delivery') {
                 list = list.filter(p => p.fastDelivery === true);
                 sortMode = 'default'; // Reset to default sorting after filtering
+                console.log('   After dropdown fast delivery filter:', list.length);
             } else if (sortMode === 'featured') {
                 list = list.filter(p => p.badge && ['HOT', 'NEW', 'BEST SELLER'].includes(p.badge));
                 sortMode = 'default'; // Reset to default sorting after filtering
+                console.log('   After dropdown featured filter:', list.length);
             } else if (sortMode === 'sale') {
                 list = list.filter(p => p.oldPrice && p.oldPrice > p.price);
                 sortMode = 'default'; // Reset to default sorting after filtering
+                console.log('   After dropdown sale filter:', list.length);
             }
 
             // Sort
@@ -2435,6 +2475,8 @@
             }
 
             filtered = list;
+            console.log('   Final filtered count:', filtered.length);
+            
             renderActiveFilters();
             renderGrid();
             renderPagination();
@@ -2451,7 +2493,19 @@
             const tags = [];
             if (activeCatId != null) {
                 const c = window.categories.find(x => x.id == activeCatId);
-                if (c) tags.push({ label: c.name, rm: () => { activeCatId = null; syncCatUI(); updateBanner(); applyFilters(); } });
+                if (c) tags.push({ 
+                    label: c.name, 
+                    rm: () => { 
+                        activeCatId = null; 
+                        // Reset filteredProducts to all products
+                        if (window.products) {
+                            window.filteredProducts = [...window.products];
+                        }
+                        syncCatUI(); 
+                        updateBanner(); 
+                        applyFilters(); 
+                    } 
+                });
             }
             if (window.filterFastDelivery) {
                 tags.push({ 
@@ -2470,6 +2524,10 @@
                     label: '💰 Sản phẩm giảm giá', 
                     rm: () => { 
                         window.filterSale = false; 
+                        // Clear URL parameter
+                        const url = new URL(window.location);
+                        url.searchParams.delete('sale');
+                        window.history.replaceState({}, '', url);
                         updateBanner(); 
                         applyFilters(); 
                     } 
@@ -2525,6 +2583,13 @@
             activeCatId = null; priceMin = 0; priceMax = Infinity; page = 1;
             window.filterFastDelivery = false;
             window.filterSale = false;
+            
+            // Reset filteredProducts to all products
+            if (window.products && Array.isArray(window.products)) {
+                window.filteredProducts = [...window.products];
+                console.log('🔄 Reset filteredProducts to all products:', window.filteredProducts.length);
+            }
+            
             document.getElementById('search-inp').value = '';
             document.getElementById('price-min').value = '';
             document.getElementById('price-max').value = '';
@@ -2534,6 +2599,14 @@
             if (filterEl) {
                 filterEl.classList.remove('active');
             }
+            
+            // Clear URL parameters
+            const url = new URL(window.location);
+            url.searchParams.delete('sale');
+            url.searchParams.delete('fastDelivery');
+            url.searchParams.delete('cat');
+            window.history.replaceState({}, '', url);
+            
             syncCatUI(); updateBanner(); applyFilters();
         }
 
