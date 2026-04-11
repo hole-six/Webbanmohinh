@@ -1,8 +1,19 @@
 // API Configuration
 // Auto-detect API URL based on environment
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:5001/api'  // Local development
-    : `${window.location.protocol}//${window.location.hostname}/api`;  // Production - use current domain
+const API_URL = (() => {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    
+    // Local development detection
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:5000/api';  // Local backend server
+    }
+    
+    // Production - use current domain
+    return `${protocol}//${hostname}/api`;
+})();
+
+console.log('🔗 API URL:', API_URL);
 
 // Helper function to make API calls
 // Helper function to make API calls
@@ -189,6 +200,30 @@ window.addToCart = function (productId, quantity = 1) {
         window.cart.push({ productId, quantity });
     }
     window.saveCart();
+
+    // Update badge
+    const badge = document.getElementById('cart-count-badge');
+    if (badge) badge.textContent = window.getCartCount();
+
+    // Toast notification
+    const toast = document.createElement('div');
+    toast.textContent = '✓ Đã thêm vào giỏ hàng';
+    toast.style.cssText = `
+        position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+        background:#212529; color:#fff; padding:10px 20px;
+        border-radius:24px; font-size:13px; font-weight:700;
+        z-index:9999; white-space:nowrap;
+        animation: fadeInUp .25s ease;
+        font-family: 'Quicksand', sans-serif;
+    `;
+    if (!document.getElementById('toast-style')) {
+        const s = document.createElement('style');
+        s.id = 'toast-style';
+        s.textContent = '@keyframes fadeInUp{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
+        document.head.appendChild(s);
+    }
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
 };
 
 window.removeFromCart = function (productId) {

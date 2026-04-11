@@ -57,6 +57,14 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    deliveryTime: {
+        type: String,
+        default: '7-10 ngày'
+    },
+    isBestSeller: {
+        type: Boolean,
+        default: false
+    },
     description: {
         type: String,
         default: ''
@@ -82,5 +90,6 @@ productSchema.index({ categoryId: 1 });
 productSchema.index({ brandId: 1 });
 productSchema.index({ featured: 1 });
 productSchema.index({ fastDelivery: 1 });
+productSchema.index({ isBestSeller: 1 });
 
 module.exports = mongoose.model('Product', productSchema);

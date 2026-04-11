@@ -1,0 +1,81 @@
+name: 🚀 Auto Deploy to VPS
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+        
+    - name: 📦 Install dependencies
+      run: |
+        cd backend
+        npm ci --only=production
+        
+    - name: 🧪 Run tests (if any)
+      run: |
+        cd backend
+        # npm test (uncomment when you have tests)
+        echo "✅ Tests passed (placeholder)"
+        
+    - name: 🚀 Deploy to VPS
+      if: github.ref == 'refs/heads/master'
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: ${{ secrets.VPS_PORT }}
+        script: |
+          echo "🚀 Starting auto-deployment..."
+          
+          # Navigate to project directory
+          cd /var/www/mohinhcaocap || { echo "❌ Project directory not found"; exit 1; }
+          
+          # Pull latest code
+          echo "📥 Pulling latest code..."
+          git pull origin master
+          
+          # Install backend dependencies
+          echo "📦 Installing dependencies..."
+          cd backend
+          npm install --production
+          
+          # Create uploads directory if not exists
+          mkdir -p uploads
+          chmod 755 uploads
+          
+          # Restart backend service
+          echo "🔄 Restarting backend..."
+          pm2 restart mohinhcaocap-api || pm2 start server.js --name mohinhcaocap-api
+          
+          # Update Nginx config if changed
+          echo "🌐 Updating Nginx..."
+          cd ..
+          sudo cp nginx/mohinhcaocap.conf /etc/nginx/sites-available/mohinhcaocap.conf
+          sudo nginx -t && sudo systemctl reload nginx
+          
+          echo "✅ Deployment completed!"
+          
+    - name: 📊 Deployment Status
+      if: always()
+      run: |
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "✅ Deployment successful!"
+        else
+          echo "❌ Deployment failed!"
+        fi

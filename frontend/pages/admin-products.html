@@ -232,7 +232,7 @@
                     <input type="number" id="price" placeholder="550000">
                 </div>
                 <div class="form-group">
-                    <label>Giá Gốc (nếu sale)</label>
+                    <label>Giá Khuyến Mãi (nếu có)</label>
                     <input type="number" id="oldPrice" placeholder="700000">
                 </div>
                 <div class="form-group">
@@ -240,21 +240,31 @@
                     <select id="categoryId"></select>
                 </div>
                 <div class="form-group">
-                    <label>Thương Hiệu</label>
-                    <select id="brandId"></select>
+                    <label>Thời Gian Giao Hàng</label>
+                    <select id="deliveryTime">
+                        <option value="1-2 ngày">🚚 1-2 ngày (Hàng có sẵn)</option>
+                        <option value="7-10 ngày" selected>📦 7-10 ngày (Order)</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>Số Lượng Kho</label>
-                    <input type="number" id="stock" value="10">
-                </div>
-                <div class="form-group">
-                    <label>Tem Nhãn</label>
+                    <label>Badge</label>
                     <select id="badge">
                         <option value="">Không có</option>
                         <option value="HOT">🔥 HOT</option>
                         <option value="NEW">✨ NEW</option>
-                        <option value="BEST SELLER">👑 BEST SELLER</option>
+                        <option value="SALE">💰 SALE</option>
+                        <option value="BEST SELLER">⭐ BEST SELLER</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label>Tồn Kho</label>
+                    <input type="number" id="stock" placeholder="999" value="999" min="0">
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 28px;">
+                        <input type="checkbox" id="isBestSeller" style="width: 20px; height: 20px; cursor: pointer;">
+                        <span>⭐ Sản phẩm bán chạy</span>
+                    </label>
                 </div>
                 <div class="form-group full">
                     <label>Mô Tả</label>
@@ -270,18 +280,6 @@
                     </div>
                     <div class="preview-grid" id="previewGrid"></div>
                     <input type="hidden" id="images">
-                </div>
-                <div class="form-group full">
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                        <input type="checkbox" id="featured">
-                        <span>Hiển thị ở mục Sản Phẩm Nổi Bật</span>
-                    </label>
-                </div>
-                <div class="form-group full">
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                        <input type="checkbox" id="fastDelivery">
-                        <span>🚚 Giao hàng nhanh (2-3 ngày) - Có sẵn</span>
-                    </label>
                 </div>
                 <div class="form-group full">
                     <button class="btn btn-primary" onclick="saveProduct()">💾 Lưu Sản Phẩm</button>
@@ -303,9 +301,6 @@
                 <select id="filterCategory" style="padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px; color: #fff;">
                     <option value="">Tất cả danh mục</option>
                 </select>
-                <select id="filterBrand" style="padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px; color: #fff;">
-                    <option value="">Tất cả thương hiệu</option>
-                </select>
                 <select id="itemsPerPage" style="padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px; color: #fff;">
                     <option value="10">10/trang</option>
                     <option value="25" selected>25/trang</option>
@@ -326,9 +321,8 @@
                         <tr>
                             <th>Ảnh</th>
                             <th>Thông Tin Sản Phẩm</th>
-                            <th class="hide-mobile">Giá & Kho</th>
-                            <th class="hide-mobile">Danh Mục & Thương Hiệu</th>
-                            <th class="hide-mobile">Trạng Thái</th>
+                            <th class="hide-mobile">Giá & Giao Hàng</th>
+                            <th class="hide-mobile">Danh Mục</th>
                             <th>Hành Động</th>
                         </tr>
                     </thead>
@@ -348,7 +342,7 @@
 
     <script>
         const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-            ? 'http://localhost:5001/api'
+            ? 'http://localhost:5000/api'
             : `${window.location.protocol}//${window.location.hostname}/api`;
 
         let token = localStorage.getItem('admin_token');
@@ -402,12 +396,8 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                     document.getElementById('price').value = formData.price || '';
                     document.getElementById('oldPrice').value = formData.oldPrice || '';
                     document.getElementById('categoryId').value = formData.categoryId || '';
-                    document.getElementById('brandId').value = formData.brandId || '';
-                    document.getElementById('stock').value = formData.stock || '10';
-                    document.getElementById('badge').value = formData.badge || '';
+                    document.getElementById('deliveryTime').value = formData.deliveryTime || '7-10 ngày';
                     document.getElementById('description').value = formData.description !== undefined ? formData.description : defaultDescription;
-                    document.getElementById('featured').checked = formData.featured || false;
-                    document.getElementById('fastDelivery').checked = formData.fastDelivery || false;
                     console.log('Loaded form data from localStorage');
                 } catch (e) {
                     console.error('Error loading form data:', e);
@@ -425,12 +415,8 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                 price: document.getElementById('price').value,
                 oldPrice: document.getElementById('oldPrice').value,
                 categoryId: document.getElementById('categoryId').value,
-                brandId: document.getElementById('brandId').value,
-                stock: document.getElementById('stock').value,
-                badge: document.getElementById('badge').value,
-                description: document.getElementById('description').value,
-                featured: document.getElementById('featured').checked,
-                fastDelivery: document.getElementById('fastDelivery').checked
+                deliveryTime: document.getElementById('deliveryTime').value,
+                description: document.getElementById('description').value
             };
             localStorage.setItem('temp_product_form', JSON.stringify(formData));
             
@@ -504,7 +490,7 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
             }
 
             // Auto-save form data on input
-            const formInputs = ['name', 'slug', 'price', 'oldPrice', 'categoryId', 'brandId', 'stock', 'badge', 'description', 'featured', 'fastDelivery'];
+            const formInputs = ['name', 'slug', 'price', 'oldPrice', 'categoryId', 'deliveryTime', 'description'];
             formInputs.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) {
@@ -516,7 +502,6 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
             // Add event listeners for filters
             document.getElementById('searchProducts').addEventListener('input', applyFilters);
             document.getElementById('filterCategory').addEventListener('change', applyFilters);
-            document.getElementById('filterBrand').addEventListener('change', applyFilters);
             document.getElementById('itemsPerPage').addEventListener('change', displayProducts);
 
             // Upload setup
@@ -642,12 +627,9 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
             clearFormData();
         }
 
-        // Load categories & brands
+        // Load categories
         async function loadSelects() {
-            const [cats, brandsData] = await Promise.all([
-                fetch(`${API}/categories`).then(r => r.json()),
-                fetch(`${API}/brands`).then(r => r.json())
-            ]);
+            const cats = await fetch(`${API}/categories`).then(r => r.json());
 
             if (cats.success) {
                 categories = cats.data;
@@ -657,16 +639,6 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                 // Populate filter dropdown
                 document.getElementById('filterCategory').innerHTML = '<option value="">Tất cả danh mục</option>' +
                     cats.data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-            }
-            
-            if (brandsData.success) {
-                brands = brandsData.data;
-                document.getElementById('brandId').innerHTML = '<option value="">-- Chọn --</option>' +
-                    brandsData.data.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
-                
-                // Populate filter dropdown
-                document.getElementById('filterBrand').innerHTML = '<option value="">Tất cả thương hiệu</option>' +
-                    brandsData.data.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
             }
         }
 
@@ -685,7 +657,6 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
         function applyFilters() {
             const searchTerm = document.getElementById('searchProducts').value.toLowerCase();
             const categoryFilter = document.getElementById('filterCategory').value;
-            const brandFilter = document.getElementById('filterBrand').value;
             
             filteredProducts = allProducts.filter(product => {
                 const matchesSearch = !searchTerm || 
@@ -693,9 +664,8 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                     (product.description && product.description.toLowerCase().includes(searchTerm));
                 
                 const matchesCategory = !categoryFilter || product.categoryId == categoryFilter;
-                const matchesBrand = !brandFilter || product.brandId == brandFilter;
                 
-                return matchesSearch && matchesCategory && matchesBrand;
+                return matchesSearch && matchesCategory;
             });
             
             currentPage = 1; // Reset to first page
@@ -715,7 +685,6 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
             
             // Helper functions
             const getCategoryName = (id) => categories.find(c => c.id == id)?.name || 'N/A';
-            const getBrandName = (id) => brands.find(b => b.id == id)?.name || 'N/A';
             
             document.getElementById('productList').innerHTML = pageProducts.map(p => `
                 <tr>
@@ -726,26 +695,20 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                         <div style="max-width: 200px;">
                             <div style="font-weight: 600; margin-bottom: 4px; color: #fff;">${p.name}</div>
                             <div style="font-size: 11px; color: rgba(255,255,255,0.6);">ID: ${p._id}</div>
-                            ${p.badge ? `<span style="background: #8b1a1a; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-top: 4px; display: inline-block;">${p.badge}</span>` : ''}
-                            ${p.fastDelivery ? `<span style="background: #27ae60; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 4px;">🚚 Nhanh</span>` : ''}
+                            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
+                            ${p.deliveryTime ? `<span style="background: ${p.deliveryTime === '1-2 ngày' ? '#27ae60' : '#3498db'}; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px;">${p.deliveryTime === '1-2 ngày' ? '🚚' : '📦'} ${p.deliveryTime}</span>` : ''}
+                            ${p.badge ? `<span style="background:${p.badge==='HOT'?'#e53935':p.badge==='NEW'?'#1565c0':p.badge==='SALE'?'#2e7d32':'#6a1b9a'}; color:#fff; padding:2px 6px; border-radius:4px; font-size:10px;">${p.badge}</span>` : ''}
+                            ${p.isBestSeller ? `<span style="background:#f57f17; color:#fff; padding:2px 6px; border-radius:4px; font-size:10px;">⭐ Bán chạy</span>` : ''}
+                            </div>
                         </div>
                     </td>
                     <td class="hide-mobile">
                         <div style="color: #fff; font-weight: 600;">₩${p.price.toLocaleString('ko-KR')}</div>
                         ${p.oldPrice ? `<div style="color: rgba(255,255,255,0.5); text-decoration: line-through; font-size: 12px;">₩${p.oldPrice.toLocaleString('ko-KR')}</div>` : ''}
-                        <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 4px;">Kho: ${p.stock}</div>
+                        <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 4px;">${p.deliveryTime || '7-10 ngày'}</div>
                     </td>
                     <td class="hide-mobile">
                         <div style="color: #fff; margin-bottom: 4px;">${getCategoryName(p.categoryId)}</div>
-                        <div style="color: rgba(255,255,255,0.7); font-size: 12px;">${getBrandName(p.brandId)}</div>
-                    </td>
-                    <td class="hide-mobile">
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            ${p.featured ? '<span style="background: #a78bfa; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px;">⭐ Nổi bật</span>' : ''}
-                            <span style="background: ${p.stock > 0 ? '#27ae60' : '#ef4444'}; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px;">
-                                ${p.stock > 0 ? '✅ Còn hàng' : '❌ Hết hàng'}
-                            </span>
-                        </div>
                     </td>
                     <td>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -821,16 +784,18 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                 price: Number(document.getElementById('price').value),
                 oldPrice: Number(document.getElementById('oldPrice').value) || null,
                 categoryId: Number(document.getElementById('categoryId').value),
-                brandId: Number(document.getElementById('brandId').value) || null,
-                stock: Number(document.getElementById('stock').value),
-                badge: document.getElementById('badge').value || null,
                 description: document.getElementById('description').value,
                 images: uploadedImages,
-                featured: document.getElementById('featured').checked,
-                fastDelivery: document.getElementById('fastDelivery').checked
+                deliveryTime: document.getElementById('deliveryTime').value,
+                brandId: 1,
+                stock: Number(document.getElementById('stock').value) || 999,
+                badge: document.getElementById('badge').value || null,
+                featured: false,
+                fastDelivery: document.getElementById('deliveryTime').value === '1-2 ngày',
+                isBestSeller: document.getElementById('isBestSeller').checked
             };
 
-            console.log('Saving product with description:', product.description);
+            console.log('Saving product with delivery time:', product.deliveryTime);
 
             if (!product.name || !product.price || !product.categoryId || uploadedImages.length === 0) {
                 showToast('Vui lòng điền đầy đủ thông tin bắt buộc!', 'error');
@@ -877,12 +842,11 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                     document.getElementById('price').value = p.price;
                     document.getElementById('oldPrice').value = p.oldPrice || '';
                     document.getElementById('categoryId').value = p.categoryId;
-                    document.getElementById('brandId').value = p.brandId || '';
-                    document.getElementById('stock').value = p.stock;
-                    document.getElementById('badge').value = p.badge || '';
                     document.getElementById('description').value = p.description || '';
-                    document.getElementById('featured').checked = p.featured || false;
-                    document.getElementById('fastDelivery').checked = p.fastDelivery || false;
+                    document.getElementById('deliveryTime').value = p.deliveryTime || (p.fastDelivery ? '1-2 ngày' : '7-10 ngày');
+                    document.getElementById('badge').value = p.badge || '';
+                    document.getElementById('stock').value = p.stock || 999;
+                    document.getElementById('isBestSeller').checked = p.isBestSeller || false;
                     
                     uploadedImages = p.images || [];
                     updatePreview();
@@ -910,11 +874,7 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
             document.getElementById('oldPrice').value = '';
             document.getElementById('description').value = defaultDescription;
             document.getElementById('categoryId').value = '';
-            document.getElementById('brandId').value = '';
-            document.getElementById('stock').value = '10';
-            document.getElementById('badge').value = '';
-            document.getElementById('featured').checked = false;
-            document.getElementById('fastDelivery').checked = false;
+            document.getElementById('deliveryTime').value = '7-10 ngày';
             document.getElementById('cancelBtn').style.display = 'none';
             clearAllTempData();
         }

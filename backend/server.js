@@ -5,8 +5,35 @@ require('dotenv').config();
 
 const app = express();
 
+// CORS Configuration for dual environment
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        const allowedOrigins = [
+            'http://localhost:3000',
+            'http://localhost:5500',
+            'http://127.0.0.1:3000',
+            'http://127.0.0.1:5500',
+            'https://mohinhcaocap.wavestore.id.vn',
+            'http://mohinhcaocap.wavestore.id.vn'
+        ];
+        
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.log('CORS blocked origin:', origin);
+            callback(null, true); // Allow all for now, can be restricted later
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -21,7 +48,11 @@ mongoose.connect(process.env.MONGODB_URI, {
     socketTimeoutMS: 45000, // Increase to 45 seconds
     connectTimeoutMS: 30000 // Increase to 30 seconds
 })
-    .then(() => console.log('✅ MongoDB Connected'))
+    .then(() => {
+        console.log('✅ MongoDB Connected');
+        console.log(`🌍 Environment: ${process.env.ENVIRONMENT || 'production'}`);
+        console.log(`📊 Database: ${process.env.MONGODB_URI.includes('localhost') ? 'Local' : 'Cloud (Atlas)'}`);
+    })
     .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
 // Routes
@@ -81,5 +112,13 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📍 API: http://localhost:${PORT}/api`);
+    console.log(`📍 Local API: http://localhost:${PORT}/api`);
+    console.log(`🌐 Environment: ${process.env.ENVIRONMENT || 'production'}`);
+    
+    if (process.env.ENVIRONMENT === 'local') {
+        console.log('🔧 Running in LOCAL mode - using cloud database');
+        console.log('💡 Frontend should use: http://localhost:5000/api');
+    } else {
+        console.log('🚀 Running in PRODUCTION mode');
+    }
 });

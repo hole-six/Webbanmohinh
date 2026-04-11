@@ -77,6 +77,7 @@ async function loadCategoryPage() {
         const urlParams = new URLSearchParams(window.location.search);
         const saleFilter = urlParams.get('sale');
         const fastDeliveryFilter = urlParams.get('fastDelivery');
+        const bestSellerFilter = urlParams.get('isBestSeller');
         
         if (saleFilter === 'true') {
             console.log('💰 Applying sale filter...');
@@ -90,6 +91,13 @@ async function loadCategoryPage() {
             filteredProducts = filteredProducts.filter(p => p.fastDelivery === true);
             window.filteredProducts = filteredProducts;
             console.log('� Fast delivery products found:', filteredProducts.length);
+        }
+
+        if (bestSellerFilter === 'true') {
+            console.log('⭐ Applying best seller filter...');
+            filteredProducts = filteredProducts.filter(p => p.isBestSeller === true);
+            window.filteredProducts = filteredProducts;
+            console.log('⭐ Best seller products found:', filteredProducts.length);
         }
 
         // Apply priority sorting

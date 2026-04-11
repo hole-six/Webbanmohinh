@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Connection</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔧 API Connection Test</h1>
+    
+    <div id="environment-info" class="status info">
+        <strong>Environment Detection:</strong><br>
+        <span id="env-details"></span>
+    </div>
+    
+    <div>
+        <button onclick="testConnection()">Test API Connection</button>
+        <button onclick="testProducts()">Test Products API</button>
+        <button onclick="testCategories()">Test Categories API</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        // Same API detection logic as main app
+        const API_URL = (() => {
+            const hostname = window.location.hostname;
+            const protocol = window.location.protocol;
+            
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return 'http://localhost:5000/api';
+            }
+            
+            return `${protocol}//${hostname}/api`;
+        })();
+
+        // Display environment info
+        document.getElementById('env-details').innerHTML = `
+            Hostname: ${window.location.hostname}<br>
+            Protocol: ${window.location.protocol}<br>
+            API URL: ${API_URL}<br>
+            Environment: ${window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'Local Development' : 'Production'}
+        `;
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            document.getElementById('results').appendChild(div);
+        }
+
+        async function testConnection() {
+            document.getElementById('results').innerHTML = '';
+            addResult('🔄 Testing API connection...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult(`✅ API Connection Successful!<br><pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
+                } else {
+                    addResult(`❌ API Error: ${response.status}<br><pre>${JSON.stringify(data, null, 2)}</pre>`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Connection Failed: ${error.message}<br>Make sure backend server is running on port 5000`, 'error');
+            }
+        }
+
+        async function testProducts() {
+            addResult('🔄 Testing Products API...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/products?limit=3`);
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    addResult(`✅ Products API Working! Found ${data.data.length} products<br><pre>${JSON.stringify(data.data[0], null, 2)}</pre>`, 'success');
+                } else {
+                    addResult(`❌ Products API Error<br><pre>${JSON.stringify(data, null, 2)}</pre>`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Products API Failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCategories() {
+            addResult('🔄 Testing Categories API...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/categories`);
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    addResult(`✅ Categories API Working! Found ${data.data.length} categories<br><pre>${JSON.stringify(data.data.slice(0, 2), null, 2)}</pre>`, 'success');
+                } else {
+                    addResult(`❌ Categories API Error<br><pre>${JSON.stringify(data, null, 2)}</pre>`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Categories API Failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-test on load
+        window.onload = () => {
+            setTimeout(testConnection, 1000);
+        };
+    </script>
+</body>
+</html>

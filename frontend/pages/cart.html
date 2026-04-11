@@ -1,170 +1,415 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" type="image/png" href="https://flagcdn.com/32x24/kr.png">
-    <title>Giỏ Hàng - Yolopark</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/cart.css">
-</head>
+    <title>Giỏ Hàng — FigureKorea</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="../js/api.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --main: #ffc700; --main2: #ffd231;
+            --red: #e53935; --green: #41b100;
+            --dark: #212529; --text: #4c4c4c;
+            --muted: #929292; --bg: #f4f4f4;
+            --white: #fff; --border: #eee; --radius: 12px;
+        }
+        body { font-family: 'Quicksand', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        a { text-decoration: none; color: inherit; }
+        img { max-width: 100%; display: block; }
+        button { font-family: inherit; cursor: pointer; border: none; background: none; }
 
+        /* HEADER */
+        .site-header {
+            position: sticky; top: 0; z-index: 500;
+            background: linear-gradient(135deg, var(--main) 0%, var(--main2) 50%, var(--main) 100%);
+            box-shadow: 0 2px 12px rgba(255,199,0,.3);
+        }
+        .header-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; max-width: 900px; margin: 0 auto;
+        }
+        .back-btn {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 13px; font-weight: 700; color: var(--dark);
+            background: rgba(0,0,0,.1); border-radius: 20px;
+            padding: 8px 14px; transition: .2s;
+        }
+        .back-btn:hover { background: rgba(0,0,0,.2); }
+        .back-btn svg { width: 16px; height: 16px; }
+        .header-title { font-size: 16px; font-weight: 800; color: var(--dark); }
+        .header-spacer { width: 90px; }
+
+        /* PAGE */
+        .cart-page { max-width: 900px; margin: 0 auto; padding: 16px 0 60px; }
+
+        /* EMPTY */
+        .empty-cart {
+            background: var(--white); border-radius: var(--radius);
+            margin: 12px 10px; padding: 60px 20px; text-align: center;
+        }
+        .empty-cart svg { width: 60px; height: 60px; color: #ddd; margin: 0 auto 16px; }
+        .empty-cart h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .empty-cart p { color: var(--muted); margin-bottom: 24px; font-size: 14px; }
+        .btn-shop {
+            display: inline-block; padding: 12px 32px;
+            background: var(--main); color: var(--dark);
+            font-weight: 700; border-radius: 24px; font-size: 14px; transition: .2s;
+        }
+        .btn-shop:hover { filter: brightness(1.05); }
+
+        /* SECTION LABEL */
+        .section-label {
+            font-size: 13px; font-weight: 700; color: var(--muted);
+            padding: 12px 14px 6px; text-transform: uppercase; letter-spacing: .5px;
+        }
+
+        /* CART ITEMS */
+        .cart-items-wrap {
+            background: var(--white); border-radius: var(--radius);
+            margin: 0 0 10px; overflow: hidden;
+        }
+        .cart-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px; border-bottom: 1px solid var(--border);
+        }
+        .cart-item:last-child { border-bottom: none; }
+        .ci-img {
+            width: 76px; height: 76px; flex-shrink: 0;
+            border-radius: 8px; overflow: hidden;
+            border: 2px solid #ffc700; background: #fafafa; cursor: pointer;
+        }
+        .ci-img img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+        .ci-info { flex: 1; min-width: 0; }
+        .ci-name {
+            font-size: 13px; font-weight: 700; color: var(--dark);
+            line-height: 1.4; margin-bottom: 4px; cursor: pointer;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .ci-name:hover { color: var(--main); }
+        .ci-price { font-size: 14px; font-weight: 700; color: var(--green); margin-bottom: 8px; }
+        .qty-row { display: flex; align-items: center; gap: 8px; }
+        .qty-btn {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--bg); border: 1px solid var(--border);
+            font-size: 18px; font-weight: 700; color: var(--dark);
+            display: flex; align-items: center; justify-content: center; transition: .2s;
+        }
+        .qty-btn:hover { background: var(--main); border-color: var(--main); }
+        .qty-val { font-size: 14px; font-weight: 700; min-width: 24px; text-align: center; }
+        .ci-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
+        .ci-total { font-size: 14px; font-weight: 700; color: var(--dark); white-space: nowrap; }
+        .btn-del {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: #fff0f0; color: var(--red);
+            display: flex; align-items: center; justify-content: center; transition: .2s;
+        }
+        .btn-del:hover { background: var(--red); color: #fff; }
+        .btn-del svg { width: 14px; height: 14px; }
+
+        /* SUMMARY */
+        .cart-summary {
+            background: var(--white); border-radius: var(--radius);
+            margin: 0 0 10px; padding: 16px 14px;
+        }
+        .sum-title { font-size: 15px; font-weight: 800; margin-bottom: 14px; }
+        .sum-row {
+            display: flex; justify-content: space-between;
+            font-size: 13px; padding: 5px 0; color: var(--text);
+        }
+        .sum-row.total {
+            font-size: 16px; font-weight: 800; color: var(--dark);
+            border-top: 2px solid var(--border); margin-top: 8px; padding-top: 12px;
+        }
+        .sum-row.total span:last-child { color: var(--red); }
+
+        /* ORDER BUTTONS */
+        .order-wrap { padding: 0 0 8px; }
+        .order-note { font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 10px; }
+        .btn-order {
+            width: 100%; padding: 15px 14px;
+            border-radius: 10px; font-size: 14px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-bottom: 10px; transition: .2s;
+        }
+        .btn-order svg { width: 20px; height: 20px; flex-shrink: 0; }
+        .btn-order.messenger { background: #0084ff; color: #fff; }
+        .btn-order.messenger:hover { background: #006fd6; }
+        .btn-order.phone { background: var(--green); color: #fff; }
+        .btn-order.phone:hover { filter: brightness(1.1); }
+        .btn-order.copy-btn { background: var(--white); color: var(--dark); border: 1.5px solid var(--border); }
+        .btn-order.copy-btn:hover { border-color: var(--main); background: #fffbe6; }
+
+        /* MODAL */
+        .modal-ov {
+            position: fixed; inset: 0; background: rgba(0,0,0,.55);
+            z-index: 9999; display: flex; align-items: flex-end;
+            padding: 0;
+        }
+        @media(min-width:600px){ .modal-ov { align-items: center; padding: 20px; } }
+        .modal-box {
+            background: var(--white); width: 100%;
+            border-radius: var(--radius) var(--radius) 0 0;
+            padding: 24px 16px 32px; max-height: 90vh; overflow-y: auto;
+        }
+        @media(min-width:600px){ .modal-box { border-radius: var(--radius); max-width: 480px; margin: 0 auto; } }
+        .modal-title { font-size: 17px; font-weight: 800; margin-bottom: 16px; }
+        .modal-order-text {
+            background: var(--bg); border-radius: 8px; padding: 14px;
+            font-size: 12px; line-height: 1.8; max-height: 220px;
+            overflow-y: auto; white-space: pre-wrap; font-family: monospace;
+            margin-bottom: 16px; border: 1px solid var(--border);
+        }
+        .modal-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+        .mbtn {
+            flex: 1; min-width: 100px; padding: 12px 8px;
+            border-radius: 8px; font-size: 13px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            cursor: pointer; border: none; transition: .2s; font-family: inherit;
+        }
+        .mbtn.blue { background: #0084ff; color: #fff; }
+        .mbtn.green { background: var(--green); color: #fff; }
+        .mbtn.gray { background: var(--bg); color: var(--dark); border: 1px solid var(--border); }
+        .mbtn:hover { filter: brightness(1.08); }
+    </style>
+</head>
 <body>
-    <!-- Header -->
-    <div class="top-bar">
-        <div class="container">
-            <nav class="top-nav" id="top-nav">
-                <!-- Categories will be loaded from database -->
-            </nav>
-        </div>
+
+<header class="site-header">
+    <div class="header-bar">
+        <a href="index.html" class="back-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+            Mua tiếp
+        </a>
+        <div class="header-title">Giỏ hàng</div>
+        <div class="header-spacer"></div>
+    </div>
+</header>
+
+<main class="cart-page" id="cart-page">
+    <div style="padding:40px;text-align:center;color:#aaa;font-size:14px">Đang tải...</div>
+</main>
+
+<script>
+(async function () {
+    await window.initApp();
+    window.loadCart();
+    renderCart();
+})();
+
+function fmt(n) {
+    return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(n);
+}
+
+function getP(id) {
+    return window.appData.products.find(p => (p._id || p.id) == id);
+}
+
+function renderCart() {
+    const page = document.getElementById('cart-page');
+    window.loadCart();
+    const cart = window.cart;
+
+    if (!cart.length) {
+        page.innerHTML = `
+        <div class="empty-cart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
+            </svg>
+            <h2>Giỏ hàng trống</h2>
+            <p>Chưa có sản phẩm nào trong giỏ hàng</p>
+            <a href="index.html" class="btn-shop">Tiếp tục mua sắm</a>
+        </div>`;
+        return;
+    }
+
+    let itemsHtml = '';
+    let subtotal = 0, totalQty = 0;
+
+    // Lọc bỏ items không tìm thấy sản phẩm
+    const validCart = cart.filter(item => getP(item.productId));
+    if (validCart.length !== cart.length) {
+        // Cập nhật localStorage bỏ items cũ/không hợp lệ
+        window.cart = validCart;
+        window.saveCart();
+    }
+
+    if (!validCart.length) {
+        page.innerHTML = `
+        <div class="empty-cart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
+            </svg>
+            <h2>Giỏ hàng trống</h2>
+            <p>Chưa có sản phẩm nào trong giỏ hàng</p>
+            <a href="index.html" class="btn-shop">Tiếp tục mua sắm</a>
+        </div>`;
+        return;
+    }
+
+    validCart.forEach(item => {
+        const p = getP(item.productId);
+        if (!p) return;
+        const pid = p._id || p.id;
+        const img = p.images?.[0] ? window.API.getAbsoluteImageUrl(p.images[0]) : '';
+        const line = p.price * item.quantity;
+        subtotal += line;
+        totalQty += item.quantity;
+
+        itemsHtml += `
+        <div class="cart-item">
+            <div class="ci-img" onclick="location.href='product-detail.html?id=${pid}'">
+                <img src="${img}" alt="${p.name}" loading="lazy">
+            </div>
+            <div class="ci-info">
+                <div class="ci-name" onclick="location.href='product-detail.html?id=${pid}'">${p.name}</div>
+                <div class="ci-price">${fmt(p.price)}</div>
+                <div class="qty-row">
+                    <button class="qty-btn" onclick="chQty('${pid}',-1)">−</button>
+                    <span class="qty-val">${item.quantity}</span>
+                    <button class="qty-btn" onclick="chQty('${pid}',1)">+</button>
+                </div>
+            </div>
+            <div class="ci-right">
+                <div class="ci-total">${fmt(line)}</div>
+                <button class="btn-del" onclick="delItem('${pid}')" title="Xóa">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/>
+                    </svg>
+                </button>
+            </div>
+        </div>`;
+    });
+
+    page.innerHTML = `
+    <div class="section-label">Sản phẩm (${totalQty})</div>
+    <div class="cart-items-wrap">${itemsHtml}</div>
+
+    <div class="cart-summary">
+        <div class="sum-title">Tổng đơn hàng</div>
+        <div class="sum-row"><span>Tạm tính</span><span>${fmt(subtotal)}</span></div>
+        <div class="sum-row"><span>Phí vận chuyển</span><span style="color:var(--green)">Liên hệ</span></div>
+        <div class="sum-row total"><span>Tổng cộng</span><span>${fmt(subtotal)}</span></div>
     </div>
 
-    <header class="main-header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <a href="index.html">
-                        <h1>🇰🇷 FIGURE KOREA SHOP</h1>
-                    </a>
-                </div>
+    <div class="section-label">Đặt hàng</div>
+    <div class="order-wrap">
+        <p class="order-note">Chọn kênh liên hệ để hoàn tất đơn hàng</p>
+        <button class="btn-order messenger" onclick="doMessenger()">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.5 2 2 6.14 2 11.25c0 2.88 1.44 5.46 3.7 7.15V22l3.58-1.96c.95.26 1.96.4 3 .4 5.5 0 10-4.14 10-9.25S17.5 2 12 2zm1 12.5l-2.5-2.67-4.88 2.67L11 9l2.5 2.67L18.5 9 13 14.5z"/>
+            </svg>
+            Đặt hàng qua Messenger
+        </button>
+        <button class="btn-order copy-btn" onclick="doCopyOrder()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+            </svg>
+            Copy thông tin đơn hàng
+        </button>
+    </div>`;
+}
 
-                <nav class="main-nav" id="main-nav">
-                    <!-- Main categories will be loaded from database -->
-                </nav>
+function chQty(pid, delta) {
+    window.loadCart();
+    const item = window.cart.find(i => i.productId == pid);
+    if (!item) return;
+    const nq = item.quantity + delta;
+    if (nq <= 0) { delItem(pid); return; }
+    window.updateCartQuantity(pid, nq);
+    renderCart();
+    syncBadge();
+}
 
-                <div class="header-actions">
-                    <a href="index.html" class="back-btn">← Tiếp tục mua sắm</a>
-                </div>
-            </div>
+function delItem(pid) {
+    window.removeFromCart(pid);
+    renderCart();
+    syncBadge();
+}
+
+function syncBadge() {
+    const b = document.getElementById('cart-count-badge');
+    if (b) b.textContent = window.getCartCount();
+}
+
+function buildOrderTxt() {
+    window.loadCart();
+    let txt = '🛒 ĐƠN HÀNG MỚI\n\n';
+    let total = 0;
+    window.cart.forEach((item, i) => {
+        const p = getP(item.productId);
+        if (!p) return;
+        const line = p.price * item.quantity;
+        total += line;
+        txt += `${i+1}. ${p.name}\n   SL: ${item.quantity}  —  ${fmt(line)}\n\n`;
+    });
+    txt += `━━━━━━━━━━━━━━━━━━\nTỔNG: ${fmt(total)}\n\nVui lòng xác nhận và cung cấp địa chỉ giao hàng!`;
+    return txt;
+}
+
+function doMessenger() {
+    window.open('https://www.facebook.com/share/1Hhthgd4LD/?mibextid=wwXIfr', '_blank');
+}
+
+function doPhone() {
+    const txt = buildOrderTxt();
+    openModal(`
+        <div class="modal-title">📞 Gọi điện đặt hàng</div>
+        <p style="font-size:26px;font-weight:900;color:var(--green);text-align:center;margin:8px 0 4px">0123 456 789</p>
+        <p style="color:var(--muted);text-align:center;margin-bottom:16px;font-size:12px">Giờ làm việc: 8:00 – 22:00</p>
+        <div class="modal-order-text">${txt}</div>
+        <div class="modal-btns">
+            <a href="tel:0123456789" class="mbtn blue">📞 Gọi ngay</a>
+            <button class="mbtn gray" onclick="closeModal()">Đóng</button>
         </div>
-    </header>
+    `);
+}
 
-    <!-- Cart Content -->
-    <section class="cart-section">
-        <div class="container">
-            <h1 class="cart-title">🛒 Giỏ Hàng Của Bạn</h1>
-
-            <div class="cart-layout">
-                <!-- Cart Items -->
-                <div class="cart-items">
-                    <div id="cart-items-container">
-                        <!-- Cart items will be loaded here -->
-                    </div>
-
-                    <div id="empty-cart" class="empty-cart" style="display: none;">
-                        <div class="empty-cart-icon">🛒</div>
-                        <h2>Giỏ hàng trống</h2>
-                        <p>Bạn chưa có sản phẩm nào trong giỏ hàng</p>
-                        <a href="index.html" class="btn-continue">Tiếp tục mua sắm</a>
-                    </div>
-                </div>
-
-                <!-- Cart Summary -->
-                <div class="cart-summary">
-                    <h3>Tổng Đơn Hàng</h3>
-
-                    <div class="summary-row">
-                        <span>Tạm tính:</span>
-                        <span id="subtotal">0đ</span>
-                    </div>
-
-                    <div class="summary-row">
-                        <span>Số lượng:</span>
-                        <span id="total-items">0 sản phẩm</span>
-                    </div>
-
-                    <div class="summary-divider"></div>
-
-                    <div class="summary-row total">
-                        <span>Tổng cộng:</span>
-                        <span id="total">0đ</span>
-                    </div>
-
-                    <div class="summary-note">
-                        <p>💡 Phí vận chuyển sẽ được tính khi đặt hàng</p>
-                    </div>
-
-                    <div class="order-buttons">
-                        <button class="btn-order messenger" onclick="orderViaMessenger()">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                <path
-                                    d="M12 2C6.5 2 2 6.14 2 11.25c0 2.88 1.44 5.46 3.7 7.15V22l3.58-1.96c.95.26 1.96.4 3 .4 5.5 0 10-4.14 10-9.25S17.5 2 12 2zm1 12.5l-2.5-2.67-4.88 2.67L11 9l2.5 2.67L18.5 9 13 14.5z" />
-                            </svg>
-                            Đặt hàng qua Messenger
-                        </button>
-
-                        <button class="btn-order facebook" onclick="orderViaFacebook()">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                <path
-                                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                            </svg>
-                            Đặt hàng qua Facebook
-                        </button>
-
-                        <button class="btn-order phone" onclick="orderViaPhone()">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path
-                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                            </svg>
-                            Gọi điện đặt hàng
-                        </button>
-                    </div>
-
-                    <div class="contact-info">
-                        <h4>📞 Liên hệ</h4>
-                        <p><strong>Hotline:</strong> 0123 456 789</p>
-                        <p><strong>Email:</strong> contact@yolopark.vn</p>
-                        <p><strong>Giờ làm việc:</strong> 8:00 - 22:00</p>
-                    </div>
-                </div>
-            </div>
+function doCopyOrder() {
+    const txt = buildOrderTxt();
+    openModal(`
+        <div class="modal-title">📋 Thông tin đơn hàng</div>
+        <div class="modal-order-text">${txt}</div>
+        <div class="modal-btns">
+            <button class="mbtn green" id="copy-btn" onclick="execCopy(this)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                Copy
+            </button>
+            <button class="mbtn blue" onclick="doMessenger()">💬 Messenger</button>
+            <button class="mbtn gray" onclick="closeModal()">Đóng</button>
         </div>
-    </section>
+    `);
+}
 
-    <!-- Footer -->
-    <footer class="main-footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-col">
-                    <h4>VỀ CHÚNG TÔI</h4>
-                    <p>Chuyên cung cấp mô hình cao cấp Transformers, Marvel, DC và các dòng sản phẩm collectibles chính
-                        hãng.</p>
-                </div>
-                <div class="footer-col">
-                    <h4>LIÊN KẾT</h4>
-                    <ul>
-                        <li><a href="index.html">Trang chủ</a></li>
-                        <li><a href="category.html">Sản phẩm</a></li>
-                        <li><a href="cart.html">Giỏ hàng</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>HỖ TRỢ</h4>
-                    <ul>
-                        <li><a href="#">Chính sách đổi trả</a></li>
-                        <li><a href="#">Vận chuyển</a></li>
-                        <li><a href="#">Hướng dẫn đặt hàng</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>LIÊN HỆ</h4>
-                    <p>📞 0123 456 789</p>
-                    <p>📧 contact@yolopark.vn</p>
-                    <p>📍 Hà Nội, Việt Nam</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 Figure Korea Shop. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+function execCopy(btn) {
+    navigator.clipboard.writeText(buildOrderTxt()).then(() => {
+        btn.innerHTML = '✓ Đã copy!';
+        btn.style.background = 'var(--green)';
+    });
+}
 
-    <!-- API Client -->
-    <script src="../js/api.js"></script>
-    <!-- Cart JS -->
-    <script src="../js/cart.js"></script>
+function openModal(html) {
+    closeModal();
+    const ov = document.createElement('div');
+    ov.className = 'modal-ov'; ov.id = 'cart-modal';
+    ov.onclick = e => { if (e.target === ov) closeModal(); };
+    ov.innerHTML = `<div class="modal-box">${html}</div>`;
+    document.body.appendChild(ov);
+}
+
+function closeModal() {
+    document.getElementById('cart-modal')?.remove();
+}
+</script>
 </body>
-
 </html>

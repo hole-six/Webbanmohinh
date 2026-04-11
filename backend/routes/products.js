@@ -11,6 +11,7 @@ router.get('/', async (req, res) => {
             brand, 
             featured, 
             fastDelivery,
+            isBestSeller,
             search,
             minPrice,
             maxPrice,
@@ -26,6 +27,7 @@ router.get('/', async (req, res) => {
         if (brand) query.brandId = parseInt(brand);
         if (featured) query.featured = featured === 'true';
         if (fastDelivery) query.fastDelivery = fastDelivery === 'true';
+        if (isBestSeller) query.isBestSeller = isBestSeller === 'true';
         if (search) query.$text = { $search: search };
         if (badge) {
             // Support multiple badges separated by comma
@@ -108,16 +110,25 @@ router.post('/', authMiddleware, async (req, res) => {
 // PUT update product (Admin only)
 router.put('/:id', authMiddleware, async (req, res) => {
     try {
+        console.log('PUT /products/:id - body:', JSON.stringify({
+            isBestSeller: req.body.isBestSeller,
+            deliveryTime: req.body.deliveryTime,
+            fastDelivery: req.body.fastDelivery,
+            badge: req.body.badge
+        }));
+
         const product = await Product.findByIdAndUpdate(
             req.params.id,
-            req.body,
-            { new: true, runValidators: true }
+            { $set: req.body },
+            { new: true, runValidators: false }
         );
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
+        console.log('Updated product isBestSeller:', product.isBestSeller, 'deliveryTime:', product.deliveryTime);
         res.json({ success: true, data: product });
     } catch (error) {
+        console.error('PUT error:', error);
         res.status(400).json({ success: false, message: error.message });
     }
 });
