@@ -96,14 +96,18 @@ function getAbsoluteImageUrl(url) {
         }
         return url;
     }
+
+    // Determine API base (handles localhost:5000 vs production)
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const base = isLocal ? 'http://localhost:5000' : `${window.location.protocol}//${window.location.hostname}`;
     
-    // If relative path, make it absolute
+    // If relative path starting with /
     if (url.startsWith('/')) {
-        return `${window.location.protocol}//${window.location.hostname}${url}`;
+        return `${base}${url}`;
     }
     
     // If just filename, assume it's in uploads folder
-    return `${window.location.protocol}//${window.location.hostname}/uploads/${url}`;
+    return `${base}/uploads/${url}`;
 }
 
 // Convert Google Drive URL to direct image URL

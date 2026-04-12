@@ -578,9 +578,23 @@
 
     .gallery-main-wrap {
       position: relative;
-      background: #fff;
+      background: #f0f0f0;
+      background-image: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmerLoad 1.5s infinite;
       aspect-ratio: 1/1;
       overflow: hidden;
+    }
+
+    .gallery-main-wrap.loaded {
+      background: #fff;
+      animation: none;
+      background-image: none;
+    }
+
+    @keyframes shimmerLoad {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
 
     .gallery-main-wrap img {
@@ -1675,9 +1689,9 @@
         const cat = window.categories?.find(c => c.id == p.categoryId || c._id == p.categoryId);
         const brand = window.brands?.find(b => b.id == p.brandId || b._id == p.brandId);
         let badgeHTML = '';
-        if (p.fastDelivery) badgeHTML += '<span class="badge-pill green">Hàng Sẵn Ship Ngay</span>';
+        if (p.fastDelivery) badgeHTML += `<span class="badge-pill green">${i18n[currentLang].fastShip}</span>`;
         if (p.badge === 'HOT') badgeHTML += '<span class="badge-pill red">HOT</span>';
-        if (p.badge === 'NEW') badgeHTML += '<span class="badge-pill yellow">MỚI</span>';
+        if (p.badge === 'NEW') badgeHTML += `<span class="badge-pill yellow">${i18n[currentLang].newBadge}</span>`;
         if (p.badge === 'BEST SELLER') badgeHTML += '<span class="badge-pill red">BEST SELLER</span>';
         if (p.badge === 'SALE') badgeHTML += '<span class="badge-pill red">SALE</span>';
         document.getElementById('prod-badges').innerHTML = badgeHTML;
@@ -1697,7 +1711,8 @@
 
         // Price
         document.getElementById('price-now').textContent = formatVnd(p.price);
-        document.getElementById('ab-price').textContent = formatVnd(p.price);
+        const abPrice = document.getElementById('ab-price');
+        if (abPrice) abPrice.textContent = formatVnd(p.price);
 
         if (p.oldPrice && p.oldPrice > p.price) {
           const disc = Math.round((p.oldPrice - p.price) / p.oldPrice * 100);
@@ -1708,23 +1723,10 @@
         }
 
         // Delivery
-        if (p.fastDelivery) {
-          document.getElementById('delivery-txt').textContent = 'Giao 2-3 ngày';
-        } else {
-          document.getElementById('delivery-txt').textContent = 'Order 7-10 ngày';
-        }
+        renderDelivery(p);
 
         // Stock
-        const dot = document.getElementById('stock-dot');
-        const stxt = document.getElementById('stock-txt');
-        if (!p.stock || p.stock === 0) {
-          dot.className = 'stock-dot dot-red'; stxt.textContent = 'Hết hàng';
-          document.getElementById('btn-cart').style.opacity = '.6';
-        } else if (p.stock <= 5) {
-          dot.className = 'stock-dot dot-orange'; stxt.textContent = `Chỉ còn ${p.stock} sản phẩm`;
-        } else {
-          dot.className = 'stock-dot dot-green'; stxt.textContent = `Còn hàng · ${p.stock} sản phẩm`;
-        }
+        renderStockText(p);
 
         // Desc
         if (p.description) {
@@ -1761,11 +1763,44 @@
         const mi = document.getElementById('main-img');
         const thumbsEl = document.getElementById('gallery-thumbs');
         if (!images.length) { document.getElementById('gallery-area').style.display = 'none'; return; }
-        curImg = 0;
-        mi.src = images[0]; mi.alt = product.name;
+
+        const norm = img => {
+          if (!img) return '';
+          if (window.API?.getAbsoluteImageUrl) return window.API.getAbsoluteImageUrl(img);
+          if (img.startsWith('http')) return img;
+          return img.startsWith('/') ? `${location.protocol}//${location.host}${img}` : `${location.protocol}//${location.host}/uploads/${img}`;
+        };
+        images = images.map(norm).filter(Boolean);
+
         thumbsEl.innerHTML = images.slice(0, 8).map((img, i) =>
           `<div class="thumb ${i === 0 ? 'active' : ''}" onclick="setImg(${i})"><img src="${img}" alt="${i}" loading="lazy"></div>`
         ).join('');
+
+        mi.alt = product.name;
+        mi.style.display = '';
+
+        if (images.length > 1) {
+          // Hiện ảnh 1 trước (load nhanh hơn vì không phải ảnh đầu bị lỗi cache)
+          curImg = 1;
+          mi.src = images[1];
+          document.querySelectorAll('.gallery-thumbs .thumb').forEach((t, i) =>
+            t.classList.toggle('active', i === 1));
+
+          // Preload ảnh 0 trong nền, khi xong thì tự về ảnh 0
+          const preload0 = new Image();
+          preload0.onload = () => {
+            setImg(0);
+            document.getElementById('gallery-main').classList.add('loaded');
+          };
+          preload0.onerror = () => {
+            document.getElementById('gallery-main').classList.add('loaded');
+          };
+          preload0.src = images[0];
+        } else {
+          curImg = 0;
+          mi.src = images[0];
+          mi.onload = () => document.getElementById('gallery-main').classList.add('loaded');
+        }
       }
 
       function setImg(idx) {
@@ -1808,23 +1843,85 @@
       // ── Language toggle ──
       let currentLang = localStorage.getItem('lang') || 'vi';
       const i18n = {
-        vi: { addCart: 'Thêm vào giỏ', buyNow: 'Mua ngay', inStock: 'Còn hàng', outStock: 'Hết hàng', delivery: 'Giao hàng', desc: 'Mô tả sản phẩm', related: 'Sản phẩm liên quan' },
-        en: { addCart: 'Add to cart', buyNow: 'Buy now', inStock: 'In stock', outStock: 'Out of stock', delivery: 'Delivery', desc: 'Product description', related: 'Related products' }
+        vi: {
+          addCart: 'Thêm vào giỏ', buyNow: 'Mua ngay',
+          inStock: 'Còn hàng', outStock: 'Hết hàng', lowStock: 'Chỉ còn',
+          delivery: 'Giao hàng', desc: 'Mô tả sản phẩm', related: 'Sản phẩm liên quan',
+          fastShip: 'Hàng Sẵn Ship Ngay', newBadge: 'MỚI',
+          brand: 'Thương hiệu', category: 'Danh mục', status: 'Tình trạng',
+          height: 'Chiều cao', material: 'Chất liệu', origin: 'Xuất xứ', year: 'Năm phát hành',
+          deliveryFast: 'Giao 2-3 ngày', deliverySlow: 'Order 7-10 ngày',
+          items: 'sản phẩm'
+        },
+        en: {
+          addCart: 'Add to cart', buyNow: 'Buy now',
+          inStock: 'In stock', outStock: 'Out of stock', lowStock: 'Only',
+          delivery: 'Delivery', desc: 'Product description', related: 'Related products',
+          fastShip: 'In Stock · Ships Now', newBadge: 'NEW',
+          brand: 'Brand', category: 'Category', status: 'Status',
+          height: 'Height', material: 'Material', origin: 'Origin', year: 'Year',
+          deliveryFast: '2-3 days delivery', deliverySlow: 'Order 7-10 days',
+          items: 'items'
+        }
       };
       function toggleLang() {
         currentLang = currentLang === 'vi' ? 'en' : 'vi';
         localStorage.setItem('lang', currentLang);
-        document.getElementById('langFlag').textContent = currentLang === 'vi' ? '🇻🇳' : '🇬🇧';
         applyLang();
+        // Re-render badges, specs, delivery với ngôn ngữ mới
+        if (product) {
+          renderBadges(product);
+          renderDelivery(product);
+          renderStockText(product);
+          const cat = window.categories?.find(c => c.id == product.categoryId || c._id == product.categoryId);
+          const brand = window.brands?.find(b => b.id == product.brandId || b._id == product.brandId);
+          renderSpecs(product, cat, brand);
+        }
       }
       function applyLang() {
         document.getElementById('langFlag').textContent = currentLang === 'vi' ? '🇻🇳' : '🇬🇧';
         const t = i18n[currentLang];
         const btnCart = document.getElementById('btn-cart');
         const btnBuy = document.getElementById('btn-buy');
-        if (btnCart) btnCart.textContent = t.addCart;
+        if (btnCart) btnCart.querySelector ? (btnCart.childNodes[0].textContent = t.addCart) : (btnCart.textContent = t.addCart);
         if (btnBuy) btnBuy.textContent = t.buyNow;
       }
+
+      function renderBadges(p) {
+        const t = i18n[currentLang];
+        let badgeHTML = '';
+        if (p.fastDelivery) badgeHTML += `<span class="badge-pill green">${t.fastShip}</span>`;
+        if (p.badge === 'HOT') badgeHTML += '<span class="badge-pill red">HOT</span>';
+        if (p.badge === 'NEW') badgeHTML += `<span class="badge-pill yellow">${t.newBadge}</span>`;
+        if (p.badge === 'BEST SELLER') badgeHTML += '<span class="badge-pill red">BEST SELLER</span>';
+        if (p.badge === 'SALE') badgeHTML += '<span class="badge-pill red">SALE</span>';
+        document.getElementById('prod-badges').innerHTML = badgeHTML;
+      }
+
+      function renderDelivery(p) {
+        const t = i18n[currentLang];
+        const el = document.getElementById('delivery-txt');
+        if (el) el.textContent = p.fastDelivery ? t.deliveryFast : t.deliverySlow;
+      }
+
+      function renderStockText(p) {
+        const t = i18n[currentLang];
+        const dot = document.getElementById('stock-dot');
+        const stxt = document.getElementById('stock-txt');
+        if (!dot || !stxt) return;
+        if (!p.stock || p.stock === 0) {
+          dot.className = 'stock-dot dot-red'; stxt.textContent = t.outStock;
+          const btn = document.getElementById('btn-cart');
+          if (btn) btn.style.opacity = '.6';
+        } else if (p.stock <= 5) {
+          dot.className = 'stock-dot dot-orange';
+          stxt.textContent = `${t.lowStock} ${p.stock} ${t.items}`;
+        } else {
+          dot.className = 'stock-dot dot-green';
+          stxt.textContent = `${t.inStock} · ${p.stock} ${t.items}`;
+        }
+      }
+
       document.addEventListener('DOMContentLoaded', () => applyLang());
 
       function addThisToCart() {
@@ -1846,16 +1943,17 @@
 
       // ── Specs ──
       function renderSpecs(p, cat, brand) {
+        const t = i18n[currentLang];
         const specs = {};
-        if (brand) specs['Thương hiệu'] = brand.name;
-        if (cat) specs['Danh mục'] = cat.name;
-        specs['Tình trạng'] = p.stock > 0 ? 'Còn hàng' : 'Hết hàng';
-        if (p.height) specs['Chiều cao'] = p.height;
-        if (p.material) specs['Chất liệu'] = p.material;
+        if (brand) specs[t.brand] = brand.name;
+        if (cat) specs[t.category] = cat.name;
+        specs[t.status] = p.stock > 0 ? t.inStock : t.outStock;
+        if (p.height) specs[t.height] = p.height;
+        if (p.material) specs[t.material] = p.material;
         if (p.articulations) specs['Khớp cử động'] = p.articulations;
         if (p.accessories) specs['Phụ kiện'] = p.accessories;
-        if (p.origin) specs['Xuất xứ'] = p.origin;
-        if (p.year) specs['Năm phát hành'] = p.year;
+        if (p.origin) specs[t.origin] = p.origin;
+        if (p.year) specs[t.year] = p.year;
 
         const rows = Object.entries(specs).map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
         if (rows) {
