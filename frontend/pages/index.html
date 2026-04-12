@@ -2153,6 +2153,10 @@
             currentLang = currentLang === 'vi' ? 'en' : 'vi';
             localStorage.setItem('lang', currentLang);
             applyLang();
+            // Re-render cards để cập nhật badge "Có sẵn" / "IN STOCK"
+            renderFlashSale();
+            renderBestSeller();
+            renderAllProducts(true);
         }
 
         function applyLang() {
