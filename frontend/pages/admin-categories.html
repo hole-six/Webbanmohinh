@@ -208,6 +208,12 @@
                     Nhập URL ảnh cho danh mục (không bắt buộc)
                 </small>
             </div>
+            <div class="form-group" style="margin-bottom:16px;">
+                <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:600;">
+                    <input type="checkbox" id="isAccessory" style="width:18px;height:18px;cursor:pointer;">
+                    🎒 Danh mục Phụ kiện (hiển thị trong section Phụ kiện ở trang chủ)
+                </label>
+            </div>
             <button class="btn btn-primary" onclick="save()" id="saveBtn">💾 Thêm Danh Mục</button>
             <button class="btn btn-warning" onclick="cancelEdit()" id="cancelBtn"
                 style="display:none; margin-left: 10px;">❌ Hủy</button>
@@ -226,6 +232,72 @@
                 </thead>
                 <tbody id="list"></tbody>
             </table>
+        </div>
+
+        <!-- ═══ BANNER TRANG CHỦ ═══ -->
+        <div class="card">
+            <div class="card-title" style="justify-content:space-between;">
+                <span>🖼️ Banner 3 Ảnh Trang Chủ (Phía Trên Sản Phẩm Bán Chạy)</span>
+                <button class="btn btn-primary" onclick="openBannerModal()">✏️ Chỉnh Sửa Banner</button>
+            </div>
+            <div id="banner-preview" style="display:flex; gap:12px; flex-wrap:wrap;">
+                <p style="color:rgba(255,255,255,0.4); font-size:13px;">Đang tải...</p>
+            </div>
+        </div>
+
+        <!-- ═══ BANNER SLIDER TRANG CHỦ ═══ -->
+        <div class="card">
+            <div class="card-title" style="justify-content:space-between;">
+                <span>🎠 Banner Slider Trang Chủ (Slideshow đầu trang)</span>
+                <button class="btn btn-primary" onclick="openSliderModal()">✏️ Chỉnh Sửa Slider</button>
+            </div>
+            <div id="slider-preview" style="display:flex; gap:12px; flex-wrap:wrap;">
+                <p style="color:rgba(255,255,255,0.4); font-size:13px;">Đang tải...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ MODAL BANNER SLIDER ═══ -->
+    <div id="sliderModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; overflow-y:auto; padding:20px;">
+        <div style="max-width:700px; margin:40px auto; background:#1e1e28; border-radius:16px; padding:30px; border:1px solid rgba(255,255,255,0.1);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h2 style="color:#fff; font-size:18px;">🎠 Banner Slider Trang Chủ</h2>
+                <button onclick="closeSliderModal()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">✕</button>
+            </div>
+            <p style="color:rgba(255,255,255,0.4); font-size:12px; margin-bottom:20px;">Thêm bao nhiêu ảnh cũng được. Slideshow sẽ tự chạy theo thứ tự.</p>
+            <div id="slider-slots"></div>
+            <button onclick="addSliderSlot()" style="width:100%; padding:14px; background:rgba(167,139,250,0.1); border:2px dashed rgba(167,139,250,0.4); border-radius:12px; color:#a78bfa; font-size:14px; font-weight:700; cursor:pointer; transition:0.2s; margin-bottom:20px;"
+                onmouseover="this.style.background='rgba(167,139,250,0.2)'" onmouseout="this.style.background='rgba(167,139,250,0.1)'">
+                ＋ Thêm Ảnh Slider
+            </button>
+            <div style="display:flex; gap:12px;">
+                <button class="btn btn-primary" onclick="saveSlider()" style="flex:1;">💾 Lưu Slider</button>
+                <button class="btn btn-danger" onclick="closeSliderModal()">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ MODAL BANNER ═══ -->
+    <div id="bannerModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; overflow-y:auto; padding:20px;">
+        <div style="max-width:700px; margin:40px auto; background:#1e1e28; border-radius:16px; padding:30px; border:1px solid rgba(255,255,255,0.1);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h2 style="color:#fff; font-size:18px;">🖼️ Banner Trang Chủ</h2>
+                <button onclick="closeBannerModal()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">✕</button>
+            </div>
+            <p style="color:rgba(255,255,255,0.4); font-size:12px; margin-bottom:20px;">Thêm bao nhiêu ảnh cũng được. Mỗi ảnh có URL + link khi click (không bắt buộc).</p>
+
+            <div id="banner-slots"></div>
+
+            <!-- Nút thêm banner -->
+            <button onclick="addBannerSlot()" style="width:100%; padding:14px; background:rgba(167,139,250,0.1); border:2px dashed rgba(167,139,250,0.4); border-radius:12px; color:#a78bfa; font-size:14px; font-weight:700; cursor:pointer; transition:0.2s; margin-bottom:20px;"
+                onmouseover="this.style.background='rgba(167,139,250,0.2)'" onmouseout="this.style.background='rgba(167,139,250,0.1)'">
+                ＋ Thêm Banner
+            </button>
+
+            <div style="display:flex; gap:12px;">
+                <button class="btn btn-primary" onclick="saveBanners()" style="flex:1;">💾 Lưu Banner</button>
+                <button class="btn btn-danger" onclick="closeBannerModal()">Hủy</button>
+            </div>
         </div>
     </div>
 
@@ -328,7 +400,8 @@
             const category = {
                 name: name,
                 slug: slug || name.toLowerCase().replace(/\s+/g, '-'),
-                image: image || ''
+                image: image || '',
+                isAccessory: document.getElementById('isAccessory').checked
             };
 
             if (!editId) {
@@ -367,6 +440,7 @@
                 document.getElementById('name').value = data.data.name;
                 document.getElementById('slug').value = data.data.slug;
                 document.getElementById('image').value = data.data.image || '';
+                document.getElementById('isAccessory').checked = data.data.isAccessory || false;
                 document.getElementById('formTitle').textContent = '✏️ Sửa Danh Mục';
                 document.getElementById('saveBtn').textContent = '💾 Cập Nhật';
                 document.getElementById('cancelBtn').style.display = 'inline-block';
@@ -380,6 +454,7 @@
             document.getElementById('name').value = '';
             document.getElementById('slug').value = '';
             document.getElementById('image').value = '';
+            document.getElementById('isAccessory').checked = false;
             document.getElementById('formTitle').textContent = '➕ Thêm Danh Mục Mới';
             document.getElementById('saveBtn').textContent = '💾 Thêm Danh Mục';
             document.getElementById('cancelBtn').style.display = 'none';
@@ -387,14 +462,12 @@
 
         async function del(numericId) {
             if (!confirm('Xác nhận xóa danh mục này?')) return;
-
             try {
                 const res = await fetch(`${API}/categories/${numericId}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();
-
                 if (data.success) {
                     showToast('Đã xóa danh mục!');
                     load();
@@ -406,7 +479,272 @@
             }
         }
 
+        // ═══ BANNER MANAGEMENT ═══
+        let currentBanners = [{image:'',link:'',alt:''},{image:'',link:'',alt:''},{image:'',link:'',alt:''}];
+
+        function syncBannersFromDOM() {
+            currentBanners = currentBanners.map((b, i) => ({
+                image: document.getElementById(`b-img-${i}`)?.value?.trim() || '',
+                link: document.getElementById(`b-link-${i}`)?.value?.trim() || '',
+                alt: b.alt || ''
+            }));
+        }
+
+        function renderBannerSlots() {
+            document.getElementById('banner-slots').innerHTML = currentBanners.map((b, i) => `
+                <div id="banner-slot-${i}" style="background:rgba(0,0,0,0.3); border-radius:12px; padding:16px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.08);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span style="font-weight:700; color:#a78bfa; font-size:13px;">Banner ${i+1}</span>
+                        <button onclick="removeBannerSlot(${i})" title="Xóa banner này"
+                            style="background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; border-radius:6px; padding:4px 10px; cursor:pointer; font-size:12px; font-weight:700;">
+                            ✕ Xóa
+                        </button>
+                    </div>
+                    ${b.image ? `<img src="${b.image}" style="width:100%; height:110px; object-fit:cover; border-radius:8px; margin-bottom:10px;" onerror="this.style.display='none'">` : ''}
+                    <div style="margin-bottom:8px;">
+                        <label style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:5px;">URL Ảnh *</label>
+                        <input type="text" id="b-img-${i}" value="${b.image || ''}" placeholder="https://... hoặc /uploads/..."
+                            oninput="currentBanners[${i}].image=this.value; refreshPreview(${i});"
+                            style="padding:9px 12px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.4); border-radius:8px; font-size:13px; color:#fff; width:100%; font-family:inherit;">
+                    </div>
+                    <div>
+                        <label style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:5px;">Link khi click (tuỳ chọn)</label>
+                        <input type="text" id="b-link-${i}" value="${b.link || ''}" placeholder="category.html?cat=naruto"
+                            oninput="currentBanners[${i}].link=this.value"
+                            style="padding:9px 12px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.4); border-radius:8px; font-size:13px; color:#fff; width:100%; font-family:inherit;">
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function refreshPreview(i) {
+            // Update preview image without full re-render (keeps focus)
+            const slot = document.getElementById(`banner-slot-${i}`);
+            if (!slot) return;
+            const url = currentBanners[i].image;
+            let img = slot.querySelector('img');
+            if (url) {
+                if (!img) {
+                    img = document.createElement('img');
+                    img.style.cssText = 'width:100%; height:110px; object-fit:cover; border-radius:8px; margin-bottom:10px;';
+                    img.onerror = () => img.style.display = 'none';
+                    slot.querySelector('div:nth-child(2)').before(img);
+                }
+                img.src = url;
+                img.style.display = 'block';
+            } else if (img) {
+                img.style.display = 'none';
+            }
+        }
+
+        function addBannerSlot() {
+            syncBannersFromDOM();
+            currentBanners.push({image:'', link:'', alt:''});
+            renderBannerSlots();
+            // Scroll to new slot
+            setTimeout(() => {
+                const slots = document.getElementById('banner-slots');
+                slots.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 50);
+        }
+
+        function removeBannerSlot(i) {
+            syncBannersFromDOM();
+            currentBanners.splice(i, 1);
+            if (currentBanners.length === 0) currentBanners.push({image:'', link:'', alt:''});
+            renderBannerSlots();
+        }
+
+        async function openBannerModal() {
+            try {
+                const res = await fetch(`${API}/settings/homeBanners`);
+                const data = await res.json();
+                if (data.data && data.data.length) {
+                    currentBanners = data.data;
+                } else {
+                    currentBanners = [{image:'',link:'',alt:''},{image:'',link:'',alt:''},{image:'',link:'',alt:''}];
+                }
+            } catch(e) {
+                currentBanners = [{image:'',link:'',alt:''},{image:'',link:'',alt:''},{image:'',link:'',alt:''}];
+            }
+            renderBannerSlots();
+            document.getElementById('bannerModal').style.display = 'block';
+        }
+
+        function closeBannerModal() {
+            document.getElementById('bannerModal').style.display = 'none';
+        }
+
+        async function saveBanners() {
+            syncBannersFromDOM();
+            const valid = currentBanners.filter(b => b.image);
+            if (!valid.length) {
+                showToast('Vui lòng nhập ít nhất 1 ảnh banner!', 'error');
+                return;
+            }
+            try {
+                const res = await fetch(`${API}/settings/homeBanners`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ value: valid })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(`Đã lưu ${valid.length} banner!`);
+                    closeBannerModal();
+                    loadBannerPreview();
+                } else {
+                    showToast(data.message || 'Lỗi lưu banner', 'error');
+                }
+            } catch(e) {
+                showToast('Lỗi: ' + e.message, 'error');
+            }
+        }
+
+        async function loadBannerPreview() {
+            const el = document.getElementById('banner-preview');
+            try {
+                const res = await fetch(`${API}/settings/homeBanners`);
+                const data = await res.json();
+                const banners = data.data;
+                if (banners && banners.filter(b=>b.image).length) {
+                    el.innerHTML = banners.filter(b=>b.image).map((b,i) => `
+                        <div style="flex:1; min-width:120px; max-width:200px;">
+                            <img src="${b.image}" style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:2px solid rgba(167,139,250,0.4);" onerror="this.style.display='none'">
+                            <p style="color:rgba(255,255,255,0.4); font-size:11px; margin-top:4px; text-align:center;">Banner ${i+1}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    el.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:13px;">Chưa có banner tùy chỉnh — đang dùng ảnh từ danh mục</p>';
+                }
+            } catch(e) {
+                el.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:13px;">Chưa có banner tùy chỉnh</p>';
+            }
+        }
+
+        // ═══ SLIDER MANAGEMENT ═══
+        let currentSlider = [{image:'',link:'',alt:''}];
+
+        function syncSliderFromDOM() {
+            currentSlider = currentSlider.map((b, i) => ({
+                image: document.getElementById(`s-img-${i}`)?.value?.trim() || '',
+                link: document.getElementById(`s-link-${i}`)?.value?.trim() || '',
+                alt: b.alt || ''
+            }));
+        }
+
+        function renderSliderSlots() {
+            document.getElementById('slider-slots').innerHTML = currentSlider.map((b, i) => `
+                <div id="slider-slot-${i}" style="background:rgba(0,0,0,0.3); border-radius:12px; padding:16px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.08);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span style="font-weight:700; color:#a78bfa; font-size:13px;">Slide ${i+1}</span>
+                        <button onclick="removeSliderSlot(${i})" style="background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; border-radius:6px; padding:4px 10px; cursor:pointer; font-size:12px; font-weight:700;">✕ Xóa</button>
+                    </div>
+                    ${b.image ? `<img src="${b.image}" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:10px;" onerror="this.style.display='none'">` : ''}
+                    <div style="margin-bottom:8px;">
+                        <label style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:5px;">URL Ảnh *</label>
+                        <input type="text" id="s-img-${i}" value="${b.image || ''}" placeholder="https://..."
+                            oninput="currentSlider[${i}].image=this.value; refreshSliderPreview(${i});"
+                            style="padding:9px 12px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.4); border-radius:8px; font-size:13px; color:#fff; width:100%; font-family:inherit;">
+                    </div>
+                    <div>
+                        <label style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:5px;">Link khi click (tuỳ chọn)</label>
+                        <input type="text" id="s-link-${i}" value="${b.link || ''}" placeholder="category.html?cat=naruto"
+                            oninput="currentSlider[${i}].link=this.value"
+                            style="padding:9px 12px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.4); border-radius:8px; font-size:13px; color:#fff; width:100%; font-family:inherit;">
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function refreshSliderPreview(i) {
+            const slot = document.getElementById(`slider-slot-${i}`);
+            if (!slot) return;
+            const url = currentSlider[i].image;
+            let img = slot.querySelector('img');
+            if (url) {
+                if (!img) {
+                    img = document.createElement('img');
+                    img.style.cssText = 'width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:10px;';
+                    img.onerror = () => img.style.display = 'none';
+                    slot.querySelector('div:nth-child(2)').before(img);
+                }
+                img.src = url; img.style.display = 'block';
+            } else if (img) { img.style.display = 'none'; }
+        }
+
+        function addSliderSlot() {
+            syncSliderFromDOM();
+            currentSlider.push({image:'', link:'', alt:''});
+            renderSliderSlots();
+            setTimeout(() => document.getElementById('slider-slots').lastElementChild?.scrollIntoView({ behavior:'smooth', block:'center' }), 50);
+        }
+
+        function removeSliderSlot(i) {
+            syncSliderFromDOM();
+            currentSlider.splice(i, 1);
+            if (!currentSlider.length) currentSlider.push({image:'', link:'', alt:''});
+            renderSliderSlots();
+        }
+
+        async function openSliderModal() {
+            try {
+                const res = await fetch(`${API}/settings/homeBannerSlider`);
+                const data = await res.json();
+                currentSlider = (data.data && data.data.length) ? data.data : [{image:'',link:'',alt:''}];
+            } catch(e) {
+                currentSlider = [{image:'',link:'',alt:''}];
+            }
+            renderSliderSlots();
+            document.getElementById('sliderModal').style.display = 'block';
+        }
+
+        function closeSliderModal() {
+            document.getElementById('sliderModal').style.display = 'none';
+        }
+
+        async function saveSlider() {
+            syncSliderFromDOM();
+            const valid = currentSlider.filter(b => b.image);
+            if (!valid.length) { showToast('Vui lòng nhập ít nhất 1 ảnh!', 'error'); return; }
+            try {
+                const res = await fetch(`${API}/settings/homeBannerSlider`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ value: valid })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(`Đã lưu ${valid.length} slide!`);
+                    closeSliderModal();
+                    loadSliderPreview();
+                } else { showToast(data.message || 'Lỗi lưu slider', 'error'); }
+            } catch(e) { showToast('Lỗi: ' + e.message, 'error'); }
+        }
+
+        async function loadSliderPreview() {
+            const el = document.getElementById('slider-preview');
+            try {
+                const res = await fetch(`${API}/settings/homeBannerSlider`);
+                const data = await res.json();
+                const banners = data.data;
+                if (banners && banners.filter(b=>b.image).length) {
+                    el.innerHTML = banners.filter(b=>b.image).map((b,i) => `
+                        <div style="flex:1; min-width:120px; max-width:200px;">
+                            <img src="${b.image}" style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:2px solid rgba(167,139,250,0.4);" onerror="this.style.display='none'">
+                            <p style="color:rgba(255,255,255,0.4); font-size:11px; margin-top:4px; text-align:center;">Slide ${i+1}</p>
+                        </div>`).join('');
+                } else {
+                    el.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:13px;">Chưa có slider tùy chỉnh — đang dùng ảnh từ danh mục</p>';
+                }
+            } catch(e) {
+                el.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:13px;">Chưa có slider tùy chỉnh</p>';
+            }
+        }
+
         load();
+        loadBannerPreview();
+        loadSliderPreview();
     </script>
 </body>
 

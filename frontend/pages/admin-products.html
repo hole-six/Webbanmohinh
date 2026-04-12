@@ -301,6 +301,11 @@
                 <select id="filterCategory" style="padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px; color: #fff;">
                     <option value="">Tất cả danh mục</option>
                 </select>
+                <select id="filterDelivery" onchange="applyFilters()" style="padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px; color: #fff;">
+                    <option value="">Tất cả giao hàng</option>
+                    <option value="1-2 ngày">🚚 Hàng có sẵn (1-2 ngày)</option>
+                    <option value="7-10 ngày">📦 Order (7-10 ngày)</option>
+                </select>
                 <select id="itemsPerPage" style="padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px; color: #fff;">
                     <option value="10">10/trang</option>
                     <option value="25" selected>25/trang</option>
@@ -657,6 +662,7 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
         function applyFilters() {
             const searchTerm = document.getElementById('searchProducts').value.toLowerCase();
             const categoryFilter = document.getElementById('filterCategory').value;
+            const deliveryFilter = document.getElementById('filterDelivery')?.value || '';
             
             filteredProducts = allProducts.filter(product => {
                 const matchesSearch = !searchTerm || 
@@ -664,8 +670,9 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                     (product.description && product.description.toLowerCase().includes(searchTerm));
                 
                 const matchesCategory = !categoryFilter || product.categoryId == categoryFilter;
+                const matchesDelivery = !deliveryFilter || product.deliveryTime === deliveryFilter;
                 
-                return matchesSearch && matchesCategory;
+                return matchesSearch && matchesCategory && matchesDelivery;
             });
             
             currentPage = 1; // Reset to first page

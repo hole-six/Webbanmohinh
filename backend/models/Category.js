@@ -27,6 +27,10 @@ const categorySchema = new mongoose.Schema({
     description: {
         type: String,
         default: ''
+    },
+    isAccessory: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
