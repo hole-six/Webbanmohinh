@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Filter Logic</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 3px; }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .product { margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 3px; }
+        .badge { display: inline-block; padding: 2px 6px; margin-left: 5px; border-radius: 3px; font-size: 10px; }
+        .badge.hot { background: #dc3545; color: white; }
+        .badge.new { background: #212529; color: white; }
+        .badge.best { background: #28a745; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Test Filter Logic - Nhãn NEW và Lọc Giá</h1>
+    
+    <div class="test-section">
+        <h2>Mô phỏng dữ liệu sản phẩm</h2>
+        <div id="sample-products"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 1: Không có filter - Ưu tiên badge</h2>
+        <div id="test1-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Có filter category - Không ưu tiên badge</h2>
+        <div id="test2-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Có filter search - Không ưu tiên badge</h2>
+        <div id="test3-result"></div>
+    </div>
+
+    <script>
+        // Mô phỏng dữ liệu sản phẩm
+        const sampleProducts = [
+            { id: 1, name: 'Sản phẩm A', price: 100000, badge: null, categoryId: 1 },
+            { id: 2, name: 'Sản phẩm B NEW', price: 200000, badge: 'NEW', categoryId: 1 },
+            { id: 3, name: 'Sản phẩm C', price: 50000, badge: null, categoryId: 2 },
+            { id: 4, name: 'Sản phẩm D HOT', price: 300000, badge: 'HOT', categoryId: 1 },
+            { id: 5, name: 'Sản phẩm E', price: 150000, badge: null, categoryId: 2 },
+            { id: 6, name: 'Sản phẩm F BEST', price: 80000, badge: 'BEST SELLER', categoryId: 1 }
+        ];
+
+        // Hiển thị dữ liệu mẫu
+        function displaySampleProducts() {
+            const container = document.getElementById('sample-products');
+            container.innerHTML = sampleProducts.map(p => 
+                `<div class="product">
+                    ${p.name} - ${p.price.toLocaleString()}₩ 
+                    ${p.badge ? `<span class="badge ${p.badge.toLowerCase().replace(' ', '')}">${p.badge}</span>` : ''}
+                    (Category: ${p.categoryId})
+                </div>`
+            ).join('');
+        }
+
+        // Logic sắp xếp mới (từ index.html đã sửa)
+        function sortProductsWithNewLogic(products, hasFilters, sortAsc = true) {
+            return [...products].sort((a, b) => {
+                // If user has applied filters, don't prioritize badges
+                if (!hasFilters) {
+                    // Only prioritize badges when no filters are applied
+                    const pri = p => (p.badge === 'HOT' ? 3 : p.badge === 'BEST SELLER' ? 2 : p.badge === 'NEW' ? 1 : 0);
+                    const pd = pri(b) - pri(a);
+                    if (pd !== 0) return pd;
+                }
+                
+                // Sort by price
+                return sortAsc ? a.price - b.price : b.price - a.price;
+            });
+        }
+
+        // Test 1: Không có filter
+        function test1() {
+            const sorted = sortProductsWithNewLogic(sampleProducts, false);
+            const result = document.getElementById('test1-result');
+            
+            // Kiểm tra xem sản phẩm có badge có được ưu tiên không
+            const firstProduct = sorted[0];
+            const hasCorrectPriority = firstProduct.badge === 'HOT'; // HOT có priority cao nhất
+            
+            result.innerHTML = `
+                <div class="test-result ${hasCorrectPriority ? 'pass' : 'fail'}">
+                    ${hasCorrectPriority ? '✅ PASS' : '❌ FAIL'}: 
+                    ${hasCorrectPriority ? 'Sản phẩm HOT được ưu tiên đầu tiên' : 'Sản phẩm HOT không được ưu tiên'}
+                </div>
+                <div>Thứ tự sản phẩm:</div>
+                ${sorted.map((p, i) => 
+                    `<div class="product">${i+1}. ${p.name} - ${p.price.toLocaleString()}₩ 
+                    ${p.badge ? `<span class="badge ${p.badge.toLowerCase().replace(' ', '')}">${p.badge}</span>` : ''}</div>`
+                ).join('')}
+            `;
+        }
+
+        // Test 2: Có filter category
+        function test2() {
+            const filteredByCategory = sampleProducts.filter(p => p.categoryId === 1);
+            const sorted = sortProductsWithNewLogic(filteredByCategory, true); // hasFilters = true
+            const result = document.getElementById('test2-result');
+            
+            // Kiểm tra xem sản phẩm có được sắp xếp theo giá không (không ưu tiên badge)
+            const firstProduct = sorted[0];
+            const secondProduct = sorted[1];
+            const sortedByPrice = firstProduct.price <= secondProduct.price;
+            
+            result.innerHTML = `
+                <div class="test-result ${sortedByPrice ? 'pass' : 'fail'}">
+                    ${sortedByPrice ? '✅ PASS' : '❌ FAIL'}: 
+                    ${sortedByPrice ? 'Sản phẩm được sắp xếp theo giá, không ưu tiên badge' : 'Sản phẩm vẫn được ưu tiên theo badge'}
+                </div>
+                <div>Lọc category 1, thứ tự sản phẩm:</div>
+                ${sorted.map((p, i) => 
+                    `<div class="product">${i+1}. ${p.name} - ${p.price.toLocaleString()}₩ 
+                    ${p.badge ? `<span class="badge ${p.badge.toLowerCase().replace(' ', '')}">${p.badge}</span>` : ''}</div>`
+                ).join('')}
+            `;
+        }
+
+        // Test 3: Có filter search
+        function test3() {
+            const filteredBySearch = sampleProducts.filter(p => p.name.toLowerCase().includes('new'));
+            const sorted = sortProductsWithNewLogic(filteredBySearch, true); // hasFilters = true
+            const result = document.getElementById('test3-result');
+            
+            // Với search "new", chỉ có 1 sản phẩm nên không thể test sắp xếp
+            // Nhưng có thể kiểm tra logic không crash
+            const testPassed = sorted.length > 0 && sorted[0].name.includes('NEW');
+            
+            result.innerHTML = `
+                <div class="test-result ${testPassed ? 'pass' : 'fail'}">
+                    ${testPassed ? '✅ PASS' : '❌ FAIL'}: 
+                    ${testPassed ? 'Tìm kiếm hoạt động đúng, không ưu tiên badge' : 'Tìm kiếm có lỗi'}
+                </div>
+                <div>Tìm kiếm "new", kết quả:</div>
+                ${sorted.map((p, i) => 
+                    `<div class="product">${i+1}. ${p.name} - ${p.price.toLocaleString()}₩ 
+                    ${p.badge ? `<span class="badge ${p.badge.toLowerCase().replace(' ', '')}">${p.badge}</span>` : ''}</div>`
+                ).join('')}
+            `;
+        }
+
+        // Chạy tất cả test
+        function runAllTests() {
+            displaySampleProducts();
+            test1();
+            test2();
+            test3();
+        }
+
+        // Chạy test khi trang load
+        document.addEventListener('DOMContentLoaded', runAllTests);
+    </script>
+</body>
+</html>

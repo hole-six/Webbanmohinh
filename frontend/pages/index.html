@@ -2042,7 +2042,7 @@
     <!-- ═══ 7. ALL PRODUCTS ═══ -->
     <section class="all-products-section" id="all-products">
         <div class="products-header">
-            <div class="section-title">Tất cả sản phẩm</div>
+            <div class="section-title">Tất cả sản phẩm <span id="total-products-count" style="font-size: 14px; color: #999; font-weight: 400;">(0)</span></div>
             <button class="sort-btn" onclick="toggleSort()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M11 5h10M11 9h7M11 13h4" />
@@ -2052,6 +2052,7 @@
             </button>
         </div>
         <div class="product-grid" id="product-grid"></div>
+        
         <div class="load-more-wrap" id="load-more-wrap">
             <button class="btn-load-more" onclick="loadMoreProducts()">Xem thêm sản phẩm ▾</button>
         </div>
@@ -2093,6 +2094,7 @@
         // ── State ──
         let bSlide = 0, bInterval;
         let sortAsc = true;
+        let userHasSorted = false; // Track if user has manually sorted
         let shown = 100;
         const PER_PAGE = 100;
         const MAX_PRODUCTS = 1000;
@@ -2194,23 +2196,40 @@
             const nav = document.getElementById('categoryNav');
             if (!nav || !window.categories?.length) return;
 
-            const categoryItems = window.categories.map(cat =>
+            // Separate models and accessories
+            const modelCategories = window.categories.filter(cat => !cat.isAccessory);
+            const accessoryCategories = window.categories.filter(cat => cat.isAccessory);
+
+            // Create category items - models first, then accessories
+            const modelItems = modelCategories.map(cat =>
                 `<div class="category-item" onclick="filterByCategory('${cat.id}', this)">${cat.name}</div>`
+            ).join('');
+
+            const accessoryItems = accessoryCategories.map(cat =>
+                `<div class="category-item" onclick="filterByCategory('${cat.id}', this)" style="opacity: 0.7; font-style: italic;">${cat.name} (Phụ kiện)</div>`
             ).join('');
 
             nav.innerHTML = `
                 <div class="category-item active" onclick="filterByCategory('', this)">Tất cả</div>
-                ${categoryItems}
+                ${modelItems}
+                ${accessoryItems}
             `;
 
-            // Populate desktop nav
+            // Populate desktop nav - also separate models and accessories
             const dNav = document.getElementById('desktop-nav-inner');
             if (dNav) {
+                const desktopModelItems = modelCategories.map(cat =>
+                    `<span class="desktop-nav-link" onclick="filterByCategory('${cat.id}', this)">${cat.name}</span>`
+                ).join('');
+
+                const desktopAccessoryItems = accessoryCategories.map(cat =>
+                    `<span class="desktop-nav-link" onclick="filterByCategory('${cat.id}', this)" style="opacity: 0.7; font-style: italic;">${cat.name}</span>`
+                ).join('');
+
                 dNav.innerHTML = `
                     <span class="desktop-nav-link active" onclick="filterByCategory('', this)">Tất cả</span>
-                    ${window.categories.map(cat =>
-                    `<span class="desktop-nav-link" onclick="filterByCategory('${cat.id}', this)">${cat.name}</span>`
-                ).join('')}
+                    ${desktopModelItems}
+                    ${desktopAccessoryItems}
                     <span class="desktop-nav-link" onclick="filterBySpecial('instock')" style="color:#e53935">⚡ Hàng có sẵn</span>
                     <span class="desktop-nav-link" onclick="filterBySpecial('bestseller')" style="color:#d4a000">⭐ Bán chạy</span>
                 `;
@@ -2227,16 +2246,9 @@
             document.querySelectorAll('.category-item, .desktop-nav-link').forEach(item => item.classList.remove('active'));
             if (el) el.classList.add('active');
 
-            // Ẩn/hiện flash + bestseller section khi lọc danh mục
-            const flashEl = document.getElementById('flash-sale');
-            const bestEl = document.getElementById('bestseller-section');
-            if (categoryId) {
-                if (flashEl) flashEl.style.display = 'none';
-                if (bestEl) bestEl.style.display = 'none';
-            } else {
-                if (flashEl) flashEl.style.display = '';
-                if (bestEl) bestEl.style.display = '';
-            }
+            // Re-render sections with new filter logic
+            renderFlashSale();
+            renderBestSeller();
 
             updateClearFilterButton();
             updateSectionTitle();
@@ -2254,6 +2266,10 @@
             // Reset category active
             document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
 
+            // Re-render sections with new filter logic
+            renderFlashSale();
+            renderBestSeller();
+
             updateClearFilterButton();
             updateSectionTitle();
             shown = PER_PAGE;
@@ -2268,6 +2284,10 @@
             currentSpecialFilter = '';
 
             document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+
+            // Re-render sections with new filter logic
+            renderFlashSale();
+            renderBestSeller();
 
             updateClearFilterButton();
             updateSectionTitle();
@@ -2315,22 +2335,36 @@
             currentCategoryFilter = '';
             currentSpecialFilter = '';
             currentSearchQuery = '';
+            userHasSorted = false; // Reset manual sorting
+            sortAsc = true; // Reset to default sort
             document.getElementById('search-input').value = '';
+            document.getElementById('sort-label').textContent = 'Giá tăng dần'; // Reset sort label
 
-            // Reset filter bar về tất cả danh mục
+            // Reset filter bar về tất cả danh mục (models only by default)
             const nav = document.getElementById('categoryNav');
             if (nav && window.categories) {
+                // Separate models and accessories
+                const modelCategories = window.categories.filter(cat => !cat.isAccessory);
+                const accessoryCategories = window.categories.filter(cat => cat.isAccessory);
+
+                const modelItems = modelCategories.map(cat =>
+                    `<div class="category-item" onclick="filterByCategory('${cat.id}', this)">${cat.name}</div>`
+                ).join('');
+
+                const accessoryItems = accessoryCategories.map(cat =>
+                    `<div class="category-item" onclick="filterByCategory('${cat.id}', this)" style="opacity: 0.7; font-style: italic;">${cat.name} (Phụ kiện)</div>`
+                ).join('');
+
                 nav.innerHTML = `
                     <div class="category-item active" onclick="filterByCategory('', this)">Tất cả</div>
-                    ${window.categories.map(cat => `<div class="category-item" onclick="filterByCategory('${cat.id}', this)">${cat.name}</div>`).join('')}
+                    ${modelItems}
+                    ${accessoryItems}
                 `;
             }
 
-            // Hiện lại 2 section
-            const flashEl = document.getElementById('flash-sale');
-            const bestEl = document.getElementById('bestseller-section');
-            if (flashEl) flashEl.style.display = '';
-            if (bestEl) bestEl.style.display = '';
+            // Re-render sections with no filters (badge priority restored, accessories hidden)
+            renderFlashSale();
+            renderBestSeller();
 
             updateClearFilterButton();
             updateSectionTitle();
@@ -2441,11 +2475,9 @@
                 `;
             }
 
-            // Ẩn flash/bestseller
-            const flashEl = document.getElementById('flash-sale');
-            const bestEl = document.getElementById('bestseller-section');
-            if (flashEl) flashEl.style.display = 'none';
-            if (bestEl) bestEl.style.display = 'none';
+            // Re-render sections with new filter logic
+            renderFlashSale();
+            renderBestSeller();
 
             updateClearFilterButton();
             updateSectionTitle();
@@ -2479,6 +2511,7 @@
                 </div>
                 <div class="pCard-info">
                     <div class="pCard-name">${p.name}</div>
+                    <div style="font-size: 10px; color: #999; margin-bottom: 4px;">Mã: ${pid.slice(-6).toUpperCase()}</div>
                     <div class="pCard-bottom">
                         <div class="pCard-price">
                             <span class="pCard-price-new">${formatPrice(p.price)}</span>
@@ -2500,10 +2533,42 @@
 
             let fastProducts = window.products.filter(p => p.deliveryTime === '1-2 ngày' || p.fastDelivery === true);
 
-            fastProducts.sort((a, b) => {
-                const pri = p => p.badge === 'HOT' ? 3 : p.badge === 'BEST SELLER' ? 2 : p.badge === 'NEW' ? 1 : 0;
-                return pri(b) - pri(a);
-            });
+            // IMPORTANT: By default, exclude accessory products unless specifically filtering for them
+            const isFilteringAccessories = currentCategoryFilter && window.categories?.find(c => c.id == currentCategoryFilter)?.isAccessory;
+            
+            if (!isFilteringAccessories) {
+                // Filter out accessory products by default
+                fastProducts = fastProducts.filter(p => {
+                    const category = window.categories?.find(c => c.id === p.categoryId);
+                    return !category?.isAccessory;
+                });
+            }
+
+            // Apply category filter if active
+            if (currentCategoryFilter) {
+                fastProducts = fastProducts.filter(p => p.categoryId == currentCategoryFilter);
+            }
+
+            // Apply search filter if active
+            if (currentSearchQuery) {
+                const kw = currentSearchQuery.toLowerCase();
+                fastProducts = fastProducts.filter(p =>
+                    p.name?.toLowerCase().includes(kw) ||
+                    p.description?.toLowerCase().includes(kw) ||
+                    p.tags?.some(t => t.toLowerCase().includes(kw))
+                );
+            }
+
+            // Only sort by badge priority when no filters are applied
+            if (!currentCategoryFilter && !currentSearchQuery) {
+                fastProducts.sort((a, b) => {
+                    const pri = p => p.badge === 'HOT' ? 3 : p.badge === 'BEST SELLER' ? 2 : p.badge === 'NEW' ? 1 : 0;
+                    return pri(b) - pri(a);
+                });
+            } else {
+                // When filters are applied, sort by price instead
+                fastProducts.sort((a, b) => a.price - b.price);
+            }
 
             const display = fastProducts.slice(0, 8);
 
@@ -2512,6 +2577,7 @@
                 return;
             }
 
+            document.getElementById('flash-sale').style.display = '';
             el.innerHTML = display.map(p => renderProductCard(p, true)).join('');
             renderSectionDots('flash-dots', display.length, 'flash-products');
         }
@@ -2519,11 +2585,18 @@
         // ── Sản phẩm bán chạy ──
         function getBestSellerProducts() {
             if (!window.products) return [];
-            let list = window.products.filter(p => p.isBestSeller === true || p.badge === 'BEST SELLER');
+            
+            // Filter out accessories by default
+            const nonAccessoryProducts = window.products.filter(p => {
+                const category = window.categories?.find(c => c.id === p.categoryId);
+                return !category?.isAccessory;
+            });
+            
+            let list = nonAccessoryProducts.filter(p => p.isBestSeller === true || p.badge === 'BEST SELLER');
             // Fallback: HOT badge
-            if (!list.length) list = window.products.filter(p => p.badge === 'HOT');
-            // Fallback: tất cả sản phẩm sort theo giá giảm dần
-            if (!list.length) list = [...window.products].sort((a, b) => b.price - a.price);
+            if (!list.length) list = nonAccessoryProducts.filter(p => p.badge === 'HOT');
+            // Fallback: tất cả sản phẩm sort theo giá giảm dần (excluding accessories)
+            if (!list.length) list = [...nonAccessoryProducts].sort((a, b) => b.price - a.price);
             return list;
         }
 
@@ -2531,11 +2604,44 @@
             const el = document.getElementById('bestseller-products');
             if (!el || !window.products) return;
 
-            const bestSellerProducts = getBestSellerProducts();
-            bestSellerProducts.sort((a, b) => {
-                const pri = p => p.badge === 'HOT' ? 3 : p.badge === 'BEST SELLER' ? 2 : p.badge === 'NEW' ? 1 : 0;
-                return pri(b) - pri(a);
-            });
+            let bestSellerProducts = getBestSellerProducts();
+
+            // IMPORTANT: By default, exclude accessory products unless specifically filtering for them
+            const isFilteringAccessories = currentCategoryFilter && window.categories?.find(c => c.id == currentCategoryFilter)?.isAccessory;
+            
+            if (!isFilteringAccessories) {
+                // Filter out accessory products by default
+                bestSellerProducts = bestSellerProducts.filter(p => {
+                    const category = window.categories?.find(c => c.id === p.categoryId);
+                    return !category?.isAccessory;
+                });
+            }
+
+            // Apply category filter if active
+            if (currentCategoryFilter) {
+                bestSellerProducts = bestSellerProducts.filter(p => p.categoryId == currentCategoryFilter);
+            }
+
+            // Apply search filter if active
+            if (currentSearchQuery) {
+                const kw = currentSearchQuery.toLowerCase();
+                bestSellerProducts = bestSellerProducts.filter(p =>
+                    p.name?.toLowerCase().includes(kw) ||
+                    p.description?.toLowerCase().includes(kw) ||
+                    p.tags?.some(t => t.toLowerCase().includes(kw))
+                );
+            }
+
+            // Only sort by badge priority when no filters are applied
+            if (!currentCategoryFilter && !currentSearchQuery) {
+                bestSellerProducts.sort((a, b) => {
+                    const pri = p => p.badge === 'HOT' ? 3 : p.badge === 'BEST SELLER' ? 2 : p.badge === 'NEW' ? 1 : 0;
+                    return pri(b) - pri(a);
+                });
+            } else {
+                // When filters are applied, sort by price instead
+                bestSellerProducts.sort((a, b) => a.price - b.price);
+            }
 
             const display = bestSellerProducts.slice(0, 8);
 
@@ -2544,6 +2650,7 @@
                 return;
             }
 
+            document.getElementById('bestseller-section').style.display = '';
             el.innerHTML = display.map(p => renderProductCard(p, false)).join('');
             renderSectionDots('bestseller-dots', display.length, 'bestseller-products');
         }
@@ -2643,12 +2750,31 @@
             if (!window.products) return [];
             let s = [...window.products];
 
+            // IMPORTANT: By default, exclude accessory products unless specifically filtering for them
+            const isFilteringAccessories = currentCategoryFilter && window.categories?.find(c => c.id == currentCategoryFilter)?.isAccessory;
+            
+            if (!isFilteringAccessories) {
+                // Filter out accessory products by default
+                s = s.filter(p => {
+                    const category = window.categories?.find(c => c.id === p.categoryId);
+                    return !category?.isAccessory;
+                });
+            }
+
             // Apply special filter
             if (currentSpecialFilter === 'instock') {
                 s = s.filter(p => p.deliveryTime === '1-2 ngày' || p.fastDelivery === true);
             } else if (currentSpecialFilter === 'bestseller') {
                 // Dùng cùng logic với renderBestSeller
                 s = getBestSellerProducts();
+                
+                // Also filter out accessories unless specifically filtering for them
+                if (!isFilteringAccessories) {
+                    s = s.filter(p => {
+                        const category = window.categories?.find(c => c.id === p.categoryId);
+                        return !category?.isAccessory;
+                    });
+                }
             }
 
             // Apply category filter
@@ -2666,11 +2792,19 @@
                 );
             }
 
-            // Sort: priority badges first, then by price
+            // Sort: Only prioritize badges when no filters are applied AND user hasn't manually sorted
             s.sort((a, b) => {
-                const pri = p => (p.badge === 'HOT' ? 3 : p.badge === 'BEST SELLER' ? 2 : p.badge === 'NEW' ? 1 : 0);
-                const pd = pri(b) - pri(a);
-                if (pd !== 0) return pd;
+                // If user has applied category filter, search, or manual sorting, don't prioritize badges
+                const hasFilters = currentCategoryFilter || currentSearchQuery;
+                
+                if (!hasFilters && !userHasSorted) {
+                    // Only prioritize badges when no filters and no manual sorting
+                    const pri = p => (p.badge === 'HOT' ? 3 : p.badge === 'BEST SELLER' ? 2 : p.badge === 'NEW' ? 1 : 0);
+                    const pd = pri(b) - pri(a);
+                    if (pd !== 0) return pd;
+                }
+                
+                // Sort by price
                 return sortAsc ? a.price - b.price : b.price - a.price;
             });
 
@@ -2707,10 +2841,16 @@
                     </div>
                     <div class="pCard-info">
                         <div class="pCard-name">${p.name}</div>
+                        <div style="font-size: 10px; color: #999; margin-bottom: 4px;">Mã: ${pid.slice(-6).toUpperCase()}</div>
                         <div class="pCard-bottom">
                             <div class="pCard-price">
-                                <span class="pCard-price-new">${formatPrice(p.price)}</span>
-                                ${p.oldPrice ? `<span class="pCard-price-old">${formatPrice(p.oldPrice)}</span>` : ''}
+                                ${p.oldPrice && p.oldPrice > p.price ? 
+                                    // Nếu có oldPrice và oldPrice > price (đang giảm giá) - hiển thị giá cao trên, giá thấp dưới
+                                    `<span class="pCard-price-old">${formatPrice(p.oldPrice)}</span>
+                                     <span class="pCard-price-new">${formatPrice(p.price)}</span>` :
+                                    // Giá bình thường
+                                    `<span class="pCard-price-new">${formatPrice(p.price)}</span>`
+                                }
                             </div>
                             <div class="pCard-cart-btn" onclick="event.stopPropagation(); addToCart('${pid}')" title="Thêm vào giỏ">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
@@ -2722,11 +2862,24 @@
 
             const btn = document.getElementById('load-more-wrap');
             if (btn) btn.style.display = shown >= all.length ? 'none' : 'block';
+            
+            // Update product count summary
+            updateProductCount(all.length);
         }
 
         function loadMoreProducts() { shown += PER_PAGE; renderAllProducts(); }
+        
+        // Update product count display
+        function updateProductCount(count) {
+            const countEl = document.getElementById('total-products-count');
+            if (countEl) {
+                countEl.textContent = `(${count})`;
+            }
+        }
+        
         function toggleSort() {
             sortAsc = !sortAsc;
+            userHasSorted = true; // User has manually sorted
             document.getElementById('sort-label').textContent = sortAsc ? 'Giá tăng dần' : 'Giá giảm dần';
             renderAllProducts(true);
         }

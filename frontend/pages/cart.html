@@ -41,7 +41,16 @@
         .back-btn:hover { background: rgba(0,0,0,.2); }
         .back-btn svg { width: 16px; height: 16px; }
         .header-title { font-size: 16px; font-weight: 800; color: var(--dark); }
-        .header-spacer { width: 90px; }
+        
+        /* Language Switcher */
+        .lang-switcher { width: 90px; display: flex; justify-content: flex-end; }
+        .lang-btn {
+            display: flex; align-items: center; gap: 4px;
+            background: rgba(0,0,0,.1); border-radius: 20px;
+            padding: 6px 12px; font-size: 12px; font-weight: 700;
+            color: var(--dark); transition: .2s;
+        }
+        .lang-btn:hover { background: rgba(0,0,0,.2); }
 
         /* PAGE */
         .cart-page { max-width: 900px; margin: 0 auto; padding: 16px 0 60px; }
@@ -188,7 +197,12 @@
             Mua tiếp
         </a>
         <div class="header-title">Giỏ hàng</div>
-        <div class="header-spacer"></div>
+        <div class="lang-switcher">
+            <button onclick="toggleLanguage()" class="lang-btn">
+                <span id="lang-flag">🇻🇳</span>
+                <span id="lang-text">VI</span>
+            </button>
+        </div>
     </div>
 </header>
 
@@ -197,6 +211,89 @@
 </main>
 
 <script>
+// Language functionality
+let currentLang = localStorage.getItem('language') || 'vi';
+
+const translations = {
+    vi: {
+        cartTitle: 'Giỏ hàng',
+        backBtn: 'Quay lại',
+        continueBtn: 'Mua tiếp',
+        emptyTitle: 'Giỏ hàng trống',
+        emptyDesc: 'Bạn chưa có sản phẩm nào trong giỏ hàng',
+        shopNow: 'Mua sắm ngay',
+        cartItems: 'Sản phẩm trong giỏ',
+        productCode: 'Mã SP:',
+        quantity: 'Số lượng:',
+        total: 'Tổng cộng:',
+        checkout: 'Thanh toán',
+        remove: 'Xóa',
+        update: 'Cập nhật'
+    },
+    en: {
+        cartTitle: 'Shopping Cart',
+        backBtn: 'Back',
+        continueBtn: 'Continue Shopping',
+        emptyTitle: 'Cart is Empty',
+        emptyDesc: 'You have no items in your cart',
+        shopNow: 'Shop Now',
+        cartItems: 'Cart Items',
+        productCode: 'Code:',
+        quantity: 'Quantity:',
+        total: 'Total:',
+        checkout: 'Checkout',
+        remove: 'Remove',
+        update: 'Update'
+    }
+};
+
+function toggleLanguage() {
+    currentLang = currentLang === 'vi' ? 'en' : 'vi';
+    localStorage.setItem('language', currentLang);
+    updateLanguageDisplay();
+    updatePageLanguage();
+}
+
+function updateLanguageDisplay() {
+    const flag = document.getElementById('lang-flag');
+    const text = document.getElementById('lang-text');
+    
+    if (currentLang === 'vi') {
+        flag.textContent = '🇻🇳';
+        text.textContent = 'VI';
+    } else {
+        flag.textContent = '🇺🇸';
+        text.textContent = 'EN';
+    }
+}
+
+function updatePageLanguage() {
+    const t = translations[currentLang];
+    
+    // Update header
+    document.querySelector('.header-title').textContent = t.cartTitle;
+    document.querySelector('.back-btn').innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        ${t.continueBtn}
+    `;
+    
+    // Update page title
+    document.title = `${t.cartTitle} — FigureKorea`;
+    
+    // Re-render cart to update language
+    if (window.loadCart) {
+        window.loadCart();
+    }
+}
+
+// Initialize language on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateLanguageDisplay();
+    updatePageLanguage();
+});
+
 (async function () {
     await window.initApp();
     window.loadCart();
@@ -215,6 +312,7 @@ function renderCart() {
     const page = document.getElementById('cart-page');
     window.loadCart();
     const cart = window.cart;
+    const t = translations[currentLang];
 
     if (!cart.length) {
         page.innerHTML = `
@@ -223,9 +321,9 @@ function renderCart() {
                 <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
                 <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
             </svg>
-            <h2>Giỏ hàng trống</h2>
-            <p>Chưa có sản phẩm nào trong giỏ hàng</p>
-            <a href="index.html" class="btn-shop">Tiếp tục mua sắm</a>
+            <h2>${t.emptyTitle}</h2>
+            <p>${t.emptyDesc}</p>
+            <a href="index.html" class="btn-shop">${t.shopNow}</a>
         </div>`;
         return;
     }
@@ -248,9 +346,9 @@ function renderCart() {
                 <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
                 <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
             </svg>
-            <h2>Giỏ hàng trống</h2>
-            <p>Chưa có sản phẩm nào trong giỏ hàng</p>
-            <a href="index.html" class="btn-shop">Tiếp tục mua sắm</a>
+            <h2>${t.emptyTitle}</h2>
+            <p>${t.emptyDesc}</p>
+            <a href="index.html" class="btn-shop">${t.shopNow}</a>
         </div>`;
         return;
     }
@@ -271,6 +369,7 @@ function renderCart() {
             </div>
             <div class="ci-info">
                 <div class="ci-name" onclick="location.href='product-detail.html?id=${pid}'">${p.name}</div>
+                <div style="font-size: 11px; color: var(--muted); margin-bottom: 4px;">${t.productCode} <span style="font-weight: 700; color: var(--red);">${pid.slice(-6).toUpperCase()}</span></div>
                 <div class="ci-price">${fmt(p.price)}</div>
                 <div class="qty-row">
                     <button class="qty-btn" onclick="chQty('${pid}',-1)">−</button>
@@ -280,7 +379,7 @@ function renderCart() {
             </div>
             <div class="ci-right">
                 <div class="ci-total">${fmt(line)}</div>
-                <button class="btn-del" onclick="delItem('${pid}')" title="Xóa">
+                <button class="btn-del" onclick="delItem('${pid}')" title="${t.remove}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="3 6 5 6 21 6"/>
                         <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/>
@@ -290,15 +389,19 @@ function renderCart() {
         </div>`;
     });
 
+    const summaryLabels = currentLang === 'vi' ? 
+        { orderSummary: 'Tổng đơn hàng', subtotal: 'Tạm tính', shipping: 'Phí vận chuyển', contact: 'Liên hệ' } :
+        { orderSummary: 'Order Summary', subtotal: 'Subtotal', shipping: 'Shipping', contact: 'Contact' };
+
     page.innerHTML = `
-    <div class="section-label">Sản phẩm (${totalQty})</div>
+    <div class="section-label">${t.cartItems} (${totalQty})</div>
     <div class="cart-items-wrap">${itemsHtml}</div>
 
     <div class="cart-summary">
-        <div class="sum-title">Tổng đơn hàng</div>
-        <div class="sum-row"><span>Tạm tính</span><span>${fmt(subtotal)}</span></div>
-        <div class="sum-row"><span>Phí vận chuyển</span><span style="color:var(--green)">Liên hệ</span></div>
-        <div class="sum-row total"><span>Tổng cộng</span><span>${fmt(subtotal)}</span></div>
+        <div class="sum-title">${summaryLabels.orderSummary}</div>
+        <div class="sum-row"><span>${summaryLabels.subtotal}</span><span>${fmt(subtotal)}</span></div>
+        <div class="sum-row"><span>${summaryLabels.shipping}</span><span style="color:var(--green)">${summaryLabels.contact}</span></div>
+        <div class="sum-row total"><span>${t.total}</span><span>${fmt(subtotal)}</span></div>
     </div>
 
     <div class="section-label">Đặt hàng</div>

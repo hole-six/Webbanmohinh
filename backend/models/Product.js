@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
+    productCode: {
+        type: String,
+        unique: true,
+        sparse: true  // Allow null/undefined values, only enforce uniqueness for non-null values
+    },
     name: {
         type: String,
         required: true,
@@ -85,7 +90,8 @@ const productSchema = new mongoose.Schema({
 });
 
 // Indexes
-productSchema.index({ name: 'text', description: 'text' });
+productSchema.index({ name: 'text', description: 'text', productCode: 'text' });
+productSchema.index({ productCode: 1 });
 productSchema.index({ categoryId: 1 });
 productSchema.index({ brandId: 1 });
 productSchema.index({ featured: 1 });

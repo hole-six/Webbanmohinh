@@ -3,6 +3,33 @@ const router = express.Router();
 const Product = require('../models/Product');
 const { authMiddleware } = require('../middleware/auth');
 
+// Function to generate next product code
+async function generateProductCode() {
+    try {
+        // Find the latest product by productCode
+        const latestProduct = await Product.findOne({}, {}, { sort: { 'productCode': -1 } });
+        
+        if (!latestProduct || !latestProduct.productCode) {
+            return 'SP001';
+        }
+        
+        // Extract number from productCode (e.g., "SP001" -> 1)
+        const match = latestProduct.productCode.match(/SP(\d+)/);
+        if (!match) {
+            return 'SP001';
+        }
+        
+        const lastNumber = parseInt(match[1]);
+        const nextNumber = lastNumber + 1;
+        
+        // Format with leading zeros (SP001, SP002, etc.)
+        return `SP${nextNumber.toString().padStart(3, '0')}`;
+    } catch (error) {
+        console.error('Error generating product code:', error);
+        return 'SP001';
+    }
+}
+
 // GET all products
 router.get('/', async (req, res) => {
     try {
@@ -28,7 +55,19 @@ router.get('/', async (req, res) => {
         if (featured) query.featured = featured === 'true';
         if (fastDelivery) query.fastDelivery = fastDelivery === 'true';
         if (isBestSeller) query.isBestSeller = isBestSeller === 'true';
-        if (search) query.$text = { $search: search };
+        if (search) {
+            const searchTerm = search.trim();
+            console.log('🔍 Searching for:', searchTerm);
+            
+            query.$or = [
+                // Search by name
+                { name: { $regex: searchTerm, $options: 'i' } },
+                // Search by description  
+                { description: { $regex: searchTerm, $options: 'i' } }
+            ];
+            
+            console.log('🔍 Search query created');
+        }
         if (badge) {
             // Support multiple badges separated by comma
             const badges = badge.split(',').map(b => b.trim());

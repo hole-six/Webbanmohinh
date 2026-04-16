@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Accessory Filter Logic</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 3px; }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .product { margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 3px; }
+        .accessory { background: #fff3cd; border-left: 3px solid #ffc107; }
+        .model { background: #d1ecf1; border-left: 3px solid #17a2b8; }
+        .category { font-weight: bold; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Test Logic Ẩn Phụ Kiện</h1>
+    
+    <div class="test-section">
+        <h2>Mô phỏng dữ liệu</h2>
+        <div id="sample-data"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 1: Mặc định - Chỉ hiển thị mô hình</h2>
+        <div id="test1-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Lọc category mô hình - Hiển thị mô hình đó</h2>
+        <div id="test2-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Lọc category phụ kiện - Hiển thị phụ kiện</h2>
+        <div id="test3-result"></div>
+    </div>
+
+    <script>
+        // Mô phỏng dữ liệu categories
+        const sampleCategories = [
+            { id: 1, name: 'Dragon Ball', isAccessory: false },
+            { id: 2, name: 'One Piece', isAccessory: false },
+            { id: 3, name: 'Naruto', isAccessory: false },
+            { id: 4, name: 'Đế trưng bày', isAccessory: true },
+            { id: 5, name: 'Hộp bảo quản', isAccessory: true }
+        ];
+
+        // Mô phỏng dữ liệu products
+        const sampleProducts = [
+            { id: 1, name: 'Goku Super Saiyan', price: 500000, categoryId: 1, badge: 'HOT' },
+            { id: 2, name: 'Luffy Gear 4', price: 450000, categoryId: 2, badge: 'NEW' },
+            { id: 3, name: 'Naruto Sage Mode', price: 400000, categoryId: 3, badge: null },
+            { id: 4, name: 'Đế mica trong suốt', price: 50000, categoryId: 4, badge: null },
+            { id: 5, name: 'Hộp nhựa bảo quản', price: 30000, categoryId: 5, badge: null },
+            { id: 6, name: 'Vegeta Blue', price: 520000, categoryId: 1, badge: 'BEST SELLER' },
+            { id: 7, name: 'Đế gỗ cao cấp', price: 80000, categoryId: 4, badge: null }
+        ];
+
+        // Hiển thị dữ liệu mẫu
+        function displaySampleData() {
+            const container = document.getElementById('sample-data');
+            
+            let html = '<div class="category">📦 Categories:</div>';
+            sampleCategories.forEach(cat => {
+                html += `<div class="product ${cat.isAccessory ? 'accessory' : 'model'}">
+                    ${cat.name} ${cat.isAccessory ? '(Phụ kiện)' : '(Mô hình)'}
+                </div>`;
+            });
+            
+            html += '<div class="category">🎯 Products:</div>';
+            sampleProducts.forEach(p => {
+                const category = sampleCategories.find(c => c.id === p.categoryId);
+                html += `<div class="product ${category.isAccessory ? 'accessory' : 'model'}">
+                    ${p.name} - ${p.price.toLocaleString()}₩ 
+                    ${p.badge ? `[${p.badge}]` : ''} 
+                    (${category.name})
+                </div>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Logic filter mới (từ index.html đã sửa)
+        function filterProducts(products, categories, currentCategoryFilter) {
+            // Check if filtering for accessories
+            const isFilteringAccessories = currentCategoryFilter && 
+                categories.find(c => c.id == currentCategoryFilter)?.isAccessory;
+            
+            if (!isFilteringAccessories) {
+                // Filter out accessory products by default
+                return products.filter(p => {
+                    const category = categories.find(c => c.id === p.categoryId);
+                    return !category?.isAccessory;
+                });
+            }
+            
+            // If filtering for accessories, apply category filter
+            if (currentCategoryFilter) {
+                return products.filter(p => p.categoryId == currentCategoryFilter);
+            }
+            
+            return products;
+        }
+
+        // Test 1: Mặc định - Chỉ hiển thị mô hình
+        function test1() {
+            const filtered = filterProducts(sampleProducts, sampleCategories, null);
+            const result = document.getElementById('test1-result');
+            
+            const hasOnlyModels = filtered.every(p => {
+                const category = sampleCategories.find(c => c.id === p.categoryId);
+                return !category.isAccessory;
+            });
+            
+            const accessoryCount = sampleProducts.filter(p => {
+                const category = sampleCategories.find(c => c.id === p.categoryId);
+                return category.isAccessory;
+            }).length;
+            
+            result.innerHTML = `
+                <div class="test-result ${hasOnlyModels ? 'pass' : 'fail'}">
+                    ${hasOnlyModels ? '✅ PASS' : '❌ FAIL'}: 
+                    ${hasOnlyModels ? 'Chỉ hiển thị mô hình, ẩn phụ kiện' : 'Vẫn hiển thị phụ kiện'}
+                </div>
+                <div>Tổng sản phẩm: ${sampleProducts.length} | Phụ kiện bị ẩn: ${accessoryCount} | Hiển thị: ${filtered.length}</div>
+                <div>Sản phẩm hiển thị:</div>
+                ${filtered.map(p => {
+                    const category = sampleCategories.find(c => c.id === p.categoryId);
+                    return `<div class="product model">${p.name} (${category.name})</div>`;
+                }).join('')}
+            `;
+        }
+
+        // Test 2: Lọc category mô hình
+        function test2() {
+            const dragonBallCategoryId = 1; // Dragon Ball category
+            const filtered = filterProducts(sampleProducts, sampleCategories, dragonBallCategoryId);
+            const result = document.getElementById('test2-result');
+            
+            const allDragonBall = filtered.every(p => p.categoryId === dragonBallCategoryId);
+            const noDragonBallAccessories = filtered.every(p => {
+                const category = sampleCategories.find(c => c.id === p.categoryId);
+                return !category.isAccessory;
+            });
+            
+            result.innerHTML = `
+                <div class="test-result ${allDragonBall && noDragonBallAccessories ? 'pass' : 'fail'}">
+                    ${allDragonBall && noDragonBallAccessories ? '✅ PASS' : '❌ FAIL'}: 
+                    ${allDragonBall ? 'Chỉ hiển thị sản phẩm Dragon Ball' : 'Hiển thị sai category'}
+                </div>
+                <div>Lọc Dragon Ball, hiển thị: ${filtered.length} sản phẩm</div>
+                <div>Sản phẩm hiển thị:</div>
+                ${filtered.map(p => {
+                    const category = sampleCategories.find(c => c.id === p.categoryId);
+                    return `<div class="product model">${p.name} (${category.name})</div>`;
+                }).join('')}
+            `;
+        }
+
+        // Test 3: Lọc category phụ kiện
+        function test3() {
+            const accessoryCategoryId = 4; // Đế trưng bày category
+            const filtered = filterProducts(sampleProducts, sampleCategories, accessoryCategoryId);
+            const result = document.getElementById('test3-result');
+            
+            const allAccessories = filtered.every(p => p.categoryId === accessoryCategoryId);
+            const hasAccessoryProducts = filtered.length > 0;
+            
+            result.innerHTML = `
+                <div class="test-result ${allAccessories && hasAccessoryProducts ? 'pass' : 'fail'}">
+                    ${allAccessories && hasAccessoryProducts ? '✅ PASS' : '❌ FAIL'}: 
+                    ${allAccessories ? 'Hiển thị đúng phụ kiện khi lọc' : 'Không hiển thị phụ kiện khi lọc'}
+                </div>
+                <div>Lọc Đế trưng bày, hiển thị: ${filtered.length} sản phẩm</div>
+                <div>Sản phẩm hiển thị:</div>
+                ${filtered.map(p => {
+                    const category = sampleCategories.find(c => c.id === p.categoryId);
+                    return `<div class="product accessory">${p.name} (${category.name})</div>`;
+                }).join('')}
+            `;
+        }
+
+        // Chạy tất cả test
+        function runAllTests() {
+            displaySampleData();
+            test1();
+            test2();
+            test3();
+        }
+
+        // Chạy test khi trang load
+        document.addEventListener('DOMContentLoaded', runAllTests);
+    </script>
+</body>
+</html>

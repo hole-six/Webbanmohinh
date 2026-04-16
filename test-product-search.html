@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Product Search</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .search-box { margin: 10px 0; }
+        .search-box input { padding: 10px; width: 300px; border: 1px solid #ddd; border-radius: 5px; }
+        .search-box button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .results { margin: 10px 0; }
+        .product-item { padding: 10px; margin: 5px 0; background: #f8f9fa; border-radius: 3px; }
+        .product-code { font-weight: bold; color: #e53935; }
+        .loading { color: #999; font-style: italic; }
+        .error { color: #e53935; }
+    </style>
+</head>
+<body>
+    <h1>Test Tìm Kiếm Sản Phẩm</h1>
+    
+    <div class="test-section">
+        <h2>Test API Search</h2>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Nhập tên sản phẩm hoặc mã SP (SP001)...">
+            <button onclick="testSearch()">Tìm kiếm</button>
+            <button onclick="clearResults()">Xóa</button>
+        </div>
+        <div id="searchResults" class="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Cases</h2>
+        <button onclick="testProductCode()">Test mã SP: SP001</button>
+        <button onclick="testProductName()">Test tên: Iron Man</button>
+        <button onclick="testPartialCode()">Test mã ngắn: 001</button>
+        <button onclick="testInvalidCode()">Test mã không tồn tại: SP999</button>
+    </div>
+
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:5000/api'
+            : '/api';
+
+        async function testSearch() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (!searchTerm) {
+                alert('Vui lòng nhập từ khóa tìm kiếm');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = '<div class="loading">🔍 Đang tìm kiếm...</div>';
+
+            try {
+                const url = `${API_BASE}/products?search=${encodeURIComponent(searchTerm)}`;
+                console.log('Calling API:', url);
+                
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data.data, searchTerm);
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">❌ Lỗi: ${data.message}</div>`;
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                resultsDiv.innerHTML = `<div class="error">❌ Lỗi kết nối: ${error.message}</div>`;
+            }
+        }
+
+        function displayResults(products, searchTerm) {
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!products || products.length === 0) {
+                resultsDiv.innerHTML = `<div>❌ Không tìm thấy sản phẩm nào với từ khóa: "${searchTerm}"</div>`;
+                return;
+            }
+
+            let html = `<div><strong>✅ Tìm thấy ${products.length} sản phẩm:</strong></div>`;
+            
+            products.forEach(product => {
+                const productCode = product.productCode || (product._id ? product._id.slice(-6).toUpperCase() : 'N/A');
+                html += `
+                    <div class="product-item">
+                        <div><strong>${product.name}</strong></div>
+                        <div>Mã SP: <span class="product-code">${productCode}</span></div>
+                        <div>Giá: ${product.price?.toLocaleString()}₩</div>
+                        <div>ID: ${product._id}</div>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        function clearResults() {
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('searchInput').value = '';
+        }
+
+        // Test cases
+        function testProductCode() {
+            document.getElementById('searchInput').value = 'SP001';
+            testSearch();
+        }
+
+        function testProductName() {
+            document.getElementById('searchInput').value = 'Iron Man';
+            testSearch();
+        }
+
+        function testPartialCode() {
+            document.getElementById('searchInput').value = '001';
+            testSearch();
+        }
+
+        function testInvalidCode() {
+            document.getElementById('searchInput').value = 'SP999';
+            testSearch();
+        }
+
+        // Handle Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                testSearch();
+            }
+        });
+    </script>
+</body>
+</html>

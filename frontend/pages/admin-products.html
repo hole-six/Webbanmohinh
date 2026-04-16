@@ -295,9 +295,10 @@
             <!-- Filters và Search -->
             <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
                 <div style="flex: 1; min-width: 200px;">
-                    <input type="text" id="searchProducts" placeholder="🔍 Tìm kiếm sản phẩm..." 
+                    <input type="text" id="searchProducts" placeholder="🔍 Tìm kiếm theo tên, ID (5E1E40)..." 
                            style="width: 100%; padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px; color: #fff;">
                 </div>
+                <button onclick="testSearch()" style="padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 12px;">Tìm</button>
                 <select id="filterCategory" style="padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); border-radius: 8px; color: #fff;">
                     <option value="">Tất cả danh mục</option>
                 </select>
@@ -325,6 +326,7 @@
                     <thead>
                         <tr>
                             <th>Ảnh</th>
+                            <th>Mã SP</th>
                             <th>Thông Tin Sản Phẩm</th>
                             <th class="hide-mobile">Giá & Giao Hàng</th>
                             <th class="hide-mobile">Danh Mục</th>
@@ -506,7 +508,8 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
             
             // Add event listeners for filters
             document.getElementById('searchProducts').addEventListener('input', applyFilters);
-            document.getElementById('filterCategory').addEventListener('change', applyFilters);
+            document.getElementById('filterCategory').addEventListener('change', applyLocalFilters);
+            document.getElementById('filterDelivery').addEventListener('change', applyLocalFilters);
             document.getElementById('itemsPerPage').addEventListener('change', displayProducts);
 
             // Upload setup
@@ -647,35 +650,128 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
             }
         }
 
-        // Load products
-        async function loadProducts() {
-            const res = await fetch(`${API}/products`);
-            const data = await res.json();
+        // Load products with optional search
+        async function loadProducts(searchTerm = '') {
+            // Show loading indicator
+            const productList = document.getElementById('productList');
+            if (productList) {
+                productList.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #999;">🔍 Đang tìm kiếm...</td></tr>';
+            }
             
-            if (data.success) {
-                allProducts = data.data;
-                applyFilters();
+            let url = `${API}/products`;
+            if (searchTerm) {
+                url += `?search=${encodeURIComponent(searchTerm)}`;
+            }
+            
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                if (data.success) {
+                    allProducts = data.data;
+                    filteredProducts = [...allProducts]; // Initialize filtered products
+                    console.log('🔍 Loaded products:', allProducts.length);
+                    applyLocalFilters(); // Apply category and delivery filters locally
+                } else {
+                    console.error('Failed to load products:', data.message);
+                    if (productList) {
+                        productList.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #e53935;">❌ Lỗi tải dữ liệu</td></tr>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+                if (productList) {
+                    productList.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #e53935;">❌ Lỗi kết nối</td></tr>';
+                }
             }
         }
         
-        // Apply filters and search
-        function applyFilters() {
-            const searchTerm = document.getElementById('searchProducts').value.toLowerCase();
+        // Apply local filters (category, delivery) - search is handled by API
+        function applyLocalFilters() {
             const categoryFilter = document.getElementById('filterCategory').value;
             const deliveryFilter = document.getElementById('filterDelivery')?.value || '';
             
             filteredProducts = allProducts.filter(product => {
-                const matchesSearch = !searchTerm || 
-                    product.name.toLowerCase().includes(searchTerm) ||
-                    (product.description && product.description.toLowerCase().includes(searchTerm));
-                
                 const matchesCategory = !categoryFilter || product.categoryId == categoryFilter;
                 const matchesDelivery = !deliveryFilter || product.deliveryTime === deliveryFilter;
+                
+                return matchesCategory && matchesDelivery;
+            });
+            
+            currentPage = 1; // Reset to first page
+            displayProducts();
+        }
+        
+        // Apply filters and search - now calls API for search
+        let searchTimeout;
+        async function applyFilters() {
+            const searchTerm = document.getElementById('searchProducts').value.trim();
+            
+            // Clear previous timeout
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            
+            // If no search term, just load all products
+            if (!searchTerm) {
+                await loadProducts('');
+                return;
+            }
+            
+            // Check if it's an ID search (hex pattern) - allow 3+ characters
+            const isIdSearch = /^[0-9a-fA-F]{3,24}$/i.test(searchTerm);
+            
+            if (isIdSearch) {
+                // For ID search, ensure we have all products loaded first
+                console.log('🔍 ID search detected for:', searchTerm);
+                
+                // If allProducts is empty or small, load all products first
+                if (allProducts.length < 100) {
+                    console.log('🔍 Loading all products for ID search...');
+                    await loadProducts(''); // Load all products without search filter
+                }
+                
+                console.log('🔍 Using local ID search, total products:', allProducts.length);
+                applyLocalSearch(searchTerm);
+            } else {
+                // For text search, use API
+                searchTimeout = setTimeout(async () => {
+                    try {
+                        await loadProducts(searchTerm);
+                    } catch (error) {
+                        console.error('API search failed, falling back to local search:', error);
+                        applyLocalSearch(searchTerm);
+                    }
+                }, 300);
+            }
+        }
+        
+        // Fallback local search function
+        function applyLocalSearch(searchTerm) {
+            const categoryFilter = document.getElementById('filterCategory').value;
+            const deliveryFilter = document.getElementById('filterDelivery')?.value || '';
+            
+            console.log('🔍 Local search - searchTerm:', searchTerm);
+            console.log('🔍 Local search - allProducts count:', allProducts.length);
+            
+            filteredProducts = allProducts.filter(product => {
+                const idMatch = product._id && product._id.toLowerCase().includes(searchTerm.toLowerCase());
+                const nameMatch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+                const descMatch = product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase());
+                
+                const matchesSearch = !searchTerm || idMatch || nameMatch || descMatch;
+                const matchesCategory = !categoryFilter || product.categoryId == categoryFilter;
+                const matchesDelivery = !deliveryFilter || product.deliveryTime === deliveryFilter;
+                
+                if (idMatch) {
+                    console.log('🔍 ID match found:', product.name, 'ID:', product._id);
+                }
                 
                 return matchesSearch && matchesCategory && matchesDelivery;
             });
             
-            currentPage = 1; // Reset to first page
+            console.log('🔍 Local search results:', filteredProducts.length);
+            currentPage = 1;
             displayProducts();
         }
         
@@ -699,9 +795,14 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                         <img src="${p.images[0]}" alt="${p.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
                     </td>
                     <td>
+                        <div style="text-align: center;">
+                            <div style="font-weight: 700; color: #f472b6; font-size: 14px; margin-bottom: 2px;">${p._id.slice(-6).toUpperCase()}</div>
+                            <div style="font-size: 10px; color: rgba(255,255,255,0.5);">ID: ${p._id.slice(-8)}</div>
+                        </div>
+                    </td>
+                    <td>
                         <div style="max-width: 200px;">
                             <div style="font-weight: 600; margin-bottom: 4px; color: #fff;">${p.name}</div>
-                            <div style="font-size: 11px; color: rgba(255,255,255,0.6);">ID: ${p._id}</div>
                             <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
                             ${p.deliveryTime ? `<span style="background: ${p.deliveryTime === '1-2 ngày' ? '#27ae60' : '#3498db'}; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px;">${p.deliveryTime === '1-2 ngày' ? '🚚' : '📦'} ${p.deliveryTime}</span>` : ''}
                             ${p.badge ? `<span style="background:${p.badge==='HOT'?'#e53935':p.badge==='NEW'?'#1565c0':p.badge==='SALE'?'#2e7d32':'#6a1b9a'}; color:#fff; padding:2px 6px; border-radius:4px; font-size:10px;">${p.badge}</span>` : ''}
@@ -822,7 +923,37 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                 
                 if (data.success) {
                     showToast(editingProductId ? 'Cập nhật sản phẩm thành công!' : 'Thêm sản phẩm thành công!');
-                    loadProducts(); // Reload products and refresh display
+                    
+                    // Update product list without reloading - smart update
+                    if (editingProductId) {
+                        // Update existing product in the arrays
+                        const updatedProduct = data.data;
+                        
+                        // Update in allProducts array
+                        const allIndex = allProducts.findIndex(p => p._id === editingProductId);
+                        if (allIndex !== -1) {
+                            allProducts[allIndex] = updatedProduct;
+                        }
+                        
+                        // Update in filteredProducts array
+                        const filteredIndex = filteredProducts.findIndex(p => p._id === editingProductId);
+                        if (filteredIndex !== -1) {
+                            filteredProducts[filteredIndex] = updatedProduct;
+                        }
+                        
+                        // Re-render the current page without changing pagination
+                        displayProducts();
+                    } else {
+                        // For new product, add to beginning of arrays
+                        const newProduct = data.data;
+                        allProducts.unshift(newProduct);
+                        filteredProducts.unshift(newProduct);
+                        
+                        // Go to first page to show the new product
+                        currentPage = 1;
+                        displayProducts();
+                    }
+                    
                     clearAllTempData();
                     cancelEdit();
                 } else {
@@ -899,7 +1030,19 @@ Cảm ơn khách hàng đã tin tưởng và ủng hộ`;
                 
                 if (data.success) {
                     showToast('Đã xóa sản phẩm!');
-                    loadProducts(); // Reload products and refresh display
+                    
+                    // Remove product from arrays without reloading
+                    allProducts = allProducts.filter(p => p._id !== id);
+                    filteredProducts = filteredProducts.filter(p => p._id !== id);
+                    
+                    // Check if current page is empty after deletion
+                    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+                    if (currentPage > totalPages && totalPages > 0) {
+                        currentPage = totalPages;
+                    }
+                    
+                    // Re-render the current page
+                    displayProducts();
                 } else {
                     showToast(data.message, 'error');
                 }
