@@ -452,9 +452,11 @@ function buildOrderTxt() {
     window.cart.forEach((item, i) => {
         const p = getP(item.productId);
         if (!p) return;
+        const pid = p._id || p.id;
+        const productCode = pid.slice(-6).toUpperCase();
         const line = p.price * item.quantity;
         total += line;
-        txt += `${i+1}. ${p.name}\n   SL: ${item.quantity}  —  ${fmt(line)}\n\n`;
+        txt += `${i+1}. ${p.name}\n   Mã SP: ${productCode}\n   SL: ${item.quantity}  —  ${fmt(line)}\n\n`;
     });
     txt += `━━━━━━━━━━━━━━━━━━\nTỔNG: ${fmt(total)}\n\nVui lòng xác nhận và cung cấp địa chỉ giao hàng!`;
     return txt;

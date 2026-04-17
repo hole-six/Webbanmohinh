@@ -2511,7 +2511,6 @@
                 </div>
                 <div class="pCard-info">
                     <div class="pCard-name">${p.name}</div>
-                    <div style="font-size: 10px; color: #999; margin-bottom: 4px;">Mã: ${pid.slice(-6).toUpperCase()}</div>
                     <div class="pCard-bottom">
                         <div class="pCard-price">
                             <span class="pCard-price-new">${formatPrice(p.price)}</span>
@@ -2799,7 +2798,8 @@
                 
                 if (!hasFilters && !userHasSorted) {
                     // Only prioritize badges when no filters and no manual sorting
-                    const pri = p => (p.badge === 'HOT' ? 3 : p.badge === 'BEST SELLER' ? 2 : p.badge === 'NEW' ? 1 : 0);
+                    // NEW gets highest priority, then HOT, then BEST SELLER
+                    const pri = p => (p.badge === 'NEW' ? 4 : p.badge === 'HOT' ? 3 : p.badge === 'BEST SELLER' ? 2 : 0);
                     const pd = pri(b) - pri(a);
                     if (pd !== 0) return pd;
                 }
@@ -2841,7 +2841,6 @@
                     </div>
                     <div class="pCard-info">
                         <div class="pCard-name">${p.name}</div>
-                        <div style="font-size: 10px; color: #999; margin-bottom: 4px;">Mã: ${pid.slice(-6).toUpperCase()}</div>
                         <div class="pCard-bottom">
                             <div class="pCard-price">
                                 ${p.oldPrice && p.oldPrice > p.price ? 
