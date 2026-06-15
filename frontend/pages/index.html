@@ -2950,6 +2950,37 @@
             buildFooterCats();
             updateCartUI();
             applyLang(); // Apply saved language
+
+            // Check for search parameter in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchQuery = urlParams.get('search');
+            if (searchQuery) {
+                // Set search input value
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) {
+                    searchInput.value = searchQuery;
+                }
+                // Perform search
+                currentSearchQuery = searchQuery.toLowerCase();
+                currentCategoryFilter = '';
+                currentSpecialFilter = '';
+                
+                // Clear active categories
+                document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+                
+                // Update sections
+                renderFlashSale();
+                renderBestSeller();
+                updateClearFilterButton();
+                updateSectionTitle();
+                shown = PER_PAGE;
+                renderAllProducts(true);
+                
+                // Scroll to results
+                setTimeout(() => {
+                    document.getElementById('all-products').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }
         });
     </script>
 </body>
